@@ -47,4 +47,15 @@ export class MapleCustomEncryption {
         }
         return data;
     }
+
+    static decrypt(data: Int8Array) {
+        for (let i = 1; i <= 6; i++) {
+            let remember = 0;
+            let length = (data.length & 0xFF);
+            let next_remember: number;
+            if (i % 2 == 0) {
+
+            }
+        }
+    }
 }

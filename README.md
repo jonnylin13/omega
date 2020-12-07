@@ -5,9 +5,13 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 * Provide an easy development environment for beginners
 * Provide a usable source for low population servers (hosting for friends)
 
-## Setup and Contribution
+# Setup and Contribution
 * Fork the repository
 * Run `npm install` in the project directory to install the dependencies
+
+## Convention
+* Function and variable names will use snake_case
+* Class names will use PascalCase
 
 ## Running the server
 * Run the server with `npm run start`
