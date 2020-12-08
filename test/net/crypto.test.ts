@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha'; 
 import { MapleCustomEncryption } from '../../src/net/crypto';
-import { Convert } from '../../src/util/convert';
+import { Compare } from '../../src/util/compare';
 
 
 // Should we be using Int8Array here?
@@ -46,11 +46,11 @@ describe('MapleCustomEncryption test', () => {
     });
 
     it('test encrypt()', () => {
-        expect(Convert.compare_int8_array(MapleCustomEncryption.encrypt(test_bytes), test_answer)).equal(true);
+        expect(Compare.compare_int8_array(MapleCustomEncryption.encrypt(test_bytes), test_answer)).equal(true);
     });
 
     it('test decrypt()', () => {
         // Should you expect the decrypted data to match the unencrypted data?
-        expect(Convert.compare_int8_array(decrypted_answer, MapleCustomEncryption.decrypt(test_answer))).equal(true);
+        expect(Compare.compare_int8_array(decrypted_answer, MapleCustomEncryption.decrypt(test_answer))).equal(true);
     });
 });
