@@ -19,10 +19,10 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 * Build the server with `npm run build` (not necessary if running the server)
 
 ## Checklist
-[x] Finish custom encryption/decryption algorithms
-[x] Write unit tests for custom encryption/decryption
-[x] Finish implementing AES encryption
-[ ] Fix AES encrypt method (see unit test)
-[ ] Write unit tests for AES encryption
-[ ] Add a logger
-[ ] Think of a solution for performance (use child processes?)
+* [x] Finish custom encryption/decryption algorithms
+* [x] Write unit tests for custom encryption/decryption
+* [x] Finish implementing AES encryption
+* [ ] Fix AES encrypt method (see unit test)
+* [ ] Write unit tests for AES encryption
+* [ ] Add a logger
+* [ ] Think of a solution for performance (use child processes?)
