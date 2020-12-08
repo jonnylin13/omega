@@ -17,6 +17,6 @@
     },
     "include": [
         "src/**/*",
-        "index.ts", "test/net/aes.ts"
+        "index.ts"
     ]
 }

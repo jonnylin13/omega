@@ -36,4 +36,12 @@ export class MapleAESOFB {
         this.cipher = new ModeOfOperation.ModeOfOperationOFB(MapleAESOFB.skey, iv);
     }
 
+    static multiply_bytes(bytes: Int8Array, count: number, multiply: number): Int8Array {
+        let ret = [];
+        for (let x = 0; x < count * multiply; x++) {
+            ret[x] = bytes[x % count];
+        }
+        return new Int8Array(ret);
+    }
+
 }
