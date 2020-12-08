@@ -54,8 +54,34 @@ export class MapleCustomEncryption {
             let length = (data.length & 0xFF);
             let next_remember: number;
             if (i % 2 == 0) {
-
+                for (let j = 0; j < data.length; j++) {
+                    let cur = data[j];
+                    cur -= 0x48;
+                    cur = ((~cur) & 0xFF);
+                    cur = MapleCustomEncryption.roll_left(cur, length & 0xFF);
+                    next_remember = cur;
+                    cur ^= remember;
+                    remember = next_remember;
+                    cur -= length;
+                    cur = MapleCustomEncryption.roll_right(cur, 3);
+                    data[j] = cur;
+                    length--;
+                }
+            } else {
+                for (let j = data.length - 1; j >= 0; j--) {
+                    let cur = data[j];
+                    cur = MapleCustomEncryption.roll_left(cur, 3);
+                    cur ^= 0x13;
+                    next_remember = cur;
+                    cur ^= remember;
+                    remember = next_remember;
+                    cur -= length;
+                    cur = MapleCustomEncryption.roll_right(cur, 4);
+                    data[j] = cur;
+                    length--;
+                }
             }
         }
+        return data;
     }
 }
