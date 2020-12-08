@@ -1,4 +1,4 @@
-import { CenterServer } from './src/server/server';
+import { MasterServer } from './src/server/server';
 
-let center_server = new CenterServer(3000);
-center_server.start();
+let master_server = new MasterServer(3000);
+master_server.start();

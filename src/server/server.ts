@@ -2,8 +2,8 @@ import * as http from 'http';
 import { Socket, Server } from 'socket.io';
 // const socketio = require('socket.io');
 
-// Center server
-export class CenterServer {
+// Master server
+export class MasterServer {
 
     // TODO: type declarations
     port: number;

@@ -67,6 +67,7 @@ export class MapleAESOFB {
 
                     // TODO: This is probably broken but I can't be fkd to fix this until later
                     // Not even sure if this is used...
+                    
                     // let cipher = crypto.createCipheriv('aes-256-ofb', skey, this.iv);
                     my_iv = new Int8Array(this.cipher.update(my_iv));
                     // console.log(my_iv);
