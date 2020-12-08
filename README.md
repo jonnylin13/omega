@@ -12,6 +12,8 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 ## Convention
 * Function and variable names will use snake_case
 * Class names will use PascalCase
+* File names will use kebab-case
+* Tests will be written as `*.test.ts` and placed in the `test/` directory
 
 ## Running the server
 * Run the server with `npm run start`
