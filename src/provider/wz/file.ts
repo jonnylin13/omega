@@ -2,5 +2,5 @@ export class File {
     data: string;
     name: string;
     path: string;
-    encoding: string = 'utf-8';
+    encoding: string = 'utf-8'; // Necessary?
 }
