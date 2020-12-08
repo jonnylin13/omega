@@ -1,10 +1,10 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha'; 
-import { CenterServer } from '../../src/server/server';
+import { MasterServer } from '../../src/server/server';
 
-describe('CenterServer test', () => {
+describe('MasterServer test', () => {
     it('should start and stop the server', () => {
-        let center_server = new CenterServer(3000);
+        let center_server = new MasterServer(3000);
         center_server.start();
         expect(center_server.started).equal(true);
         center_server.stop();
