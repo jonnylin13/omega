@@ -30,6 +30,11 @@ describe('MapleAESOFB test', () => {
                                 0x0f, 0x0a, 0x0b, 0x0c]);
         let data = new Int8Array([0x01, 0x02, 0x03, 0x04, 0x05, 0x06]);
         let aes = new MapleAESOFB(iv, 83);
-        console.log(aes.encrypt(data, iv));
-    })
+        // TODO: Implement a test for this
+    });
+    
+    // TODO: Write a test for:
+    // * get_packet_header
+    // * check_packet
+    // * check_packet_by_header
 });

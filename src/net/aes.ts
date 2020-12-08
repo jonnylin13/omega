@@ -29,10 +29,12 @@ export class MapleAESOFB {
 
     maple_version: number;
     iv: Int8Array;
+    cipher: any;
 
     constructor(iv: Int8Array, maple_version: number) {
         this.iv = iv;
         this.maple_version = ((maple_version >> 8) & 0xFF) | ((maple_version << 8) & 0xFF00);
+        this.cipher = crypto.createCipheriv('aes-256-ofb', skey, this.iv);
     }
 
     static multiply_bytes(bytes: Int8Array, count: number, multiply: number): Int8Array {
@@ -43,27 +45,30 @@ export class MapleAESOFB {
         return new Int8Array(ret);
     }
 
-    encrypt(data: Int8Array, iv: Int8Array) {
+    encrypt(data: Int8Array) {
         let remaining = data.length;
         let chunk_length = 0x5B0;
         let start = 0;
         while (remaining > 0) {
-            let my_iv = MapleAESOFB.multiply_bytes(iv, 4, 4);
+            let my_iv = MapleAESOFB.multiply_bytes(this.iv, 4, 4);
             if (remaining < chunk_length) {
                 chunk_length = remaining;
             }
             for (let x = start; x < (start + chunk_length); x++) {
                 if ((x - start) % my_iv.length === 0) {
+
                     // let new_iv = this.cipher.encrypt(my_iv);
                     // for (let j = 0; j < my_iv.length; j++) {
                     //     my_iv[j] = new_iv[j];
                     // }
                     // console.log(my_iv);
-                    // TODO: This is probably broken but I can't be sure
-                    let cipher = crypto.createCipheriv('aes-256-ofb', skey, my_iv);
-                    let encrypted = cipher.update(new Uint8Array(my_iv));
-                    encrypted = Buffer.concat([encrypted, cipher.final()]);
-                    my_iv = new Int8Array(encrypted);
+
+                    // let cipher = new aes.ModeOfOperation.ofb(skey, my_iv);
+
+                    // TODO: This is probably broken but I can't be fkd to fix this until later
+                    // Not even sure if this is used...
+                    // let cipher = crypto.createCipheriv('aes-256-ofb', skey, this.iv);
+                    my_iv = new Int8Array(this.cipher.update(my_iv));
                     // console.log(my_iv);
                 }
                 data[x] ^= my_iv[(x - start) % my_iv.length];
