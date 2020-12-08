@@ -3,7 +3,7 @@ import { GenericLittleEndianAccessor } from './generic-lea';
 import { Point } from '../../point';
 
 
-export class GenericSeekableByteStream extends GenericLittleEndianAccessor implements SeekableLittleEndianAccessor {
+export class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAccessor implements SeekableLittleEndianAccessor {
     pos: number = 0;
 
     constructor(buf: Buffer) {
