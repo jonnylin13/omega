@@ -1,4 +1,5 @@
-const aes = require('aes-js');
+// const aes = require('aes-js');
+const crypto = require('crypto');
 
 const skey: Uint8Array = new Uint8Array([0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 
     0x06, 0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x00, 
@@ -57,10 +58,13 @@ export class MapleAESOFB {
                     // for (let j = 0; j < my_iv.length; j++) {
                     //     my_iv[j] = new_iv[j];
                     // }
-                    console.log(my_iv);
-                    let cipher = new aes.ModeOfOperation.ofb(skey, my_iv);
-                    my_iv = new Int8Array(cipher.encrypt(my_iv));
-                    console.log(my_iv);
+                    // console.log(my_iv);
+                    // TODO: This is probably broken but I can't be sure
+                    let cipher = crypto.createCipheriv('aes-256-ofb', skey, my_iv);
+                    let encrypted = cipher.update(new Uint8Array(my_iv));
+                    encrypted = Buffer.concat([encrypted, cipher.final()]);
+                    my_iv = new Int8Array(encrypted);
+                    // console.log(my_iv);
                 }
                 data[x] ^= my_iv[(x - start) % my_iv.length];
             }
