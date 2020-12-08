@@ -1,48 +1,41 @@
 import { Point } from '../../point';
-import { LittleEndianAccessor } from './lea';
+import { LittleEndianAccessor } from './interface/lea';
+import { ByteInputStream } from './interface/bs';
 
 
 export class GenericLittleEndianAccessor implements LittleEndianAccessor {
-    buf: Buffer;
-    bytes_read: number = 0;
+    is: ByteInputStream;
 
-    constructor(buf: Buffer) {
-        this.buf = buf;
+    constructor(is: ByteInputStream) {
+        this.is = is;
     }
 
     read_byte(): number {
-        this.bytes_read += 1;
-        return this.buf.readIntLE(this.bytes_read-1, 1);
-    }
-
-    read_int(): number {
-        this.bytes_read += 4;
-        return this.buf.readInt32LE(this.bytes_read-4);
+        return this.is.read_byte();
     }
 
     read_short(): number {
-        this.bytes_read += 2;
-        return this.buf.readInt16LE(this.bytes_read-2);
+        return this.is.read_short();
     }
 
     read_char(): string {
-        this.bytes_read += 2;
         return String.fromCharCode(97 + this.read_short());
     }
 
-    read_long(): BigInt {
-        this.bytes_read += 8;
-        return this.buf.readBigInt64LE(this.bytes_read-8);
+    read_int(): number {
+        return this.is.read_int();
     }
 
     read_float(): number {
-        this.bytes_read += 4;
-        return this.buf.readFloatLE(this.bytes_read-4);
+        return this.is.read_float();
+    }
+
+    read_long(): BigInt {
+        return this.is.read_long();
     }
 
     read_double(): number {
-        this.bytes_read += 8;
-        return this.buf.readDoubleLE(this.bytes_read-8);
+        return this.is.read_double();
     }
 
     read_ascii_string(length: number): string {
@@ -54,7 +47,13 @@ export class GenericLittleEndianAccessor implements LittleEndianAccessor {
     }
 
     read_terminated_ascii_string(): string {
-        return ''; // TODO
+        let ret: Array<string> = [];
+        while (true) {
+            let byte = this.read_byte();
+            if (byte === 0) break;
+            ret.push(String.fromCharCode(97 + byte));
+        }
+        return ret.join('');
     }
 
     read_maple_ascii_string(): string {
@@ -62,11 +61,7 @@ export class GenericLittleEndianAccessor implements LittleEndianAccessor {
     }
 
     read(length: number): Int8Array {
-        let ret: Int8Array = new Int8Array(length);
-        for (let i = 0; i < length; i++) {
-            ret[i] = this.read_byte();
-        }
-        return ret;
+        return this.is.read(length);
     }
 
     read_pos(): Point {
@@ -76,12 +71,7 @@ export class GenericLittleEndianAccessor implements LittleEndianAccessor {
     }
 
     skip(length: number): void {
-        this.bytes_read += length;
-    }
-
-    // TODO: Verify this function
-    available(): number {
-        return this.buf.length - this.bytes_read;
+        this.is.skip(length);
     }
 
 }

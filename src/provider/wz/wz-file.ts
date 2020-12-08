@@ -20,11 +20,11 @@ export class WZFile implements MapleDataProvider {
     root: WZDirectoryEntry;
     provide_images: boolean;
     c_offset: number;
-    buffer: Buffer;
 
     constructor(wz_file: File, provide_images: boolean) {
         this.wz_file = wz_file;
         
-        this.buffer = Buffer.from(fs.readFileSync(wz_file.path, {encoding: 'hex'}), 'hex');
+        let buffer = Buffer.from(fs.readFileSync(wz_file.path, {encoding: 'hex'}), 'hex');
+
     }
 }
