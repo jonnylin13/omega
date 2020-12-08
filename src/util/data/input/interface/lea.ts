@@ -1,9 +1,9 @@
 import { Point } from '../../../point';
-import { ByteInputStream } from './bs';
 
 
 export interface LittleEndianAccessor {
-    is: ByteInputStream
+    buf: Buffer;
+    bytes_read: number;
     read_byte(): number;
     read_char(): string;
     read_short(): number;
@@ -17,4 +17,5 @@ export interface LittleEndianAccessor {
     read_ascii_string(length: number): string;
     read_terminated_ascii_string(): string;
     read_maple_ascii_string(): string;
+    available(): number;
 }

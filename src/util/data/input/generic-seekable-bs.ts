@@ -1,19 +1,13 @@
-import { SeekableInputByteStream } from './interface/seekable-bs';
-import { GenericByteInputStream } from './generic-bs';
+import { SeekableLittleEndianAccessor } from './interface/seekable-lea';
+import { GenericLittleEndianAccessor } from './generic-lea';
+import { Point } from '../../point';
 
 
-export class GenericSeekableByteStream extends GenericByteInputStream implements SeekableInputByteStream {
+export class GenericSeekableByteStream extends GenericLittleEndianAccessor implements SeekableLittleEndianAccessor {
     pos: number = 0;
-    arr: Int8Array;
-    buf: Buffer;
 
-    constructor(arr: Int8Array) {
-        super(Buffer.from(arr.buffer));
-        this.arr = arr;
-    }
-
-    seek(offset: number) {
-        this.pos = offset;
+    constructor(buf: Buffer) {
+        super(buf);
     }
 
     read_byte(): number {
@@ -26,6 +20,10 @@ export class GenericSeekableByteStream extends GenericByteInputStream implements
         this.bytes_read += 2;
         this.pos += 2;
         return this.buf.readInt16LE(this.pos-2);
+    }
+
+    read_char(): string {
+        return String.fromCharCode(97 + this.read_short());
     }
 
     read_int(): number {
@@ -52,6 +50,34 @@ export class GenericSeekableByteStream extends GenericByteInputStream implements
         return this.buf.readDoubleLE(this.pos-8);
     }
 
+    read_ascii_string(length: number): string {
+        let ret: Array<string> = [];
+        for (let i = 0; i < length; i++) {
+            ret.push(String.fromCharCode(97 + this.read_byte()));
+        }
+        return ret.join('');
+    }
+
+    read_terminated_ascii_string(): string {
+        let ret: Array<string> = [];
+        while (true) {
+            let byte = this.read_byte();
+            if (byte === 0) break;
+            ret.push(String.fromCharCode(97 + byte));
+        }
+        return ret.join('');
+    }
+
+    read_maple_ascii_string(): string {
+        return this.read_ascii_string(this.read_short());
+    }
+
+    read_pos(): Point {
+        let x = this.read_short();
+        let y = this.read_short();
+        return new Point(x, y);
+    }
+
     read(length: number): Int8Array {
         let ret: Int8Array = new Int8Array(length);
         for (let i = 0; i < length; i++) {
@@ -63,6 +89,10 @@ export class GenericSeekableByteStream extends GenericByteInputStream implements
     skip(length: number): void {
         this.bytes_read += length;
         this.pos += length;
+    }
+
+    seek(offset: number) {
+        this.pos = offset;
     }
 
 

@@ -1,21 +1,24 @@
 import { Point } from '../../point';
 import { LittleEndianAccessor } from './interface/lea';
-import { ByteInputStream } from './interface/bs';
 
 
 export class GenericLittleEndianAccessor implements LittleEndianAccessor {
-    is: ByteInputStream;
 
-    constructor(is: ByteInputStream) {
-        this.is = is;
+    buf: Buffer;
+    bytes_read: number = 0;
+
+    constructor(buf: Buffer) {
+        this.buf = buf;
     }
 
     read_byte(): number {
-        return this.is.read_byte();
+        this.bytes_read += 1;
+        return this.buf.readIntLE(this.bytes_read-1, 1);
     }
 
     read_short(): number {
-        return this.is.read_short();
+        this.bytes_read += 2;
+        return this.buf.readInt16LE(this.bytes_read-2);
     }
 
     read_char(): string {
@@ -23,19 +26,23 @@ export class GenericLittleEndianAccessor implements LittleEndianAccessor {
     }
 
     read_int(): number {
-        return this.is.read_int();
+        this.bytes_read += 4;
+        return this.buf.readInt32LE(this.bytes_read-4);
     }
 
     read_float(): number {
-        return this.is.read_float();
+        this.bytes_read += 4;
+        return this.buf.readFloatLE(this.bytes_read-4);
     }
 
     read_long(): BigInt {
-        return this.is.read_long();
+        this.bytes_read += 8;
+        return this.buf.readBigInt64LE(this.bytes_read-8);
     }
 
     read_double(): number {
-        return this.is.read_double();
+        this.bytes_read += 8;
+        return this.buf.readDoubleLE(this.bytes_read-8);
     }
 
     read_ascii_string(length: number): string {
@@ -60,18 +67,26 @@ export class GenericLittleEndianAccessor implements LittleEndianAccessor {
         return this.read_ascii_string(this.read_short());
     }
 
-    read(length: number): Int8Array {
-        return this.is.read(length);
-    }
-
     read_pos(): Point {
         let x = this.read_short();
         let y = this.read_short();
         return new Point(x, y);
     }
 
+    read(length: number): Int8Array {
+        let ret: Int8Array = new Int8Array(length);
+        for (let i = 0; i < length; i++) {
+            ret[i] = this.read_byte();
+        }
+        return ret;
+    }
+
     skip(length: number): void {
-        this.is.skip(length);
+        this.bytes_read += length;
+    }
+
+    available(): number {
+        return this.buf.length - this.bytes_read;
     }
 
 }
