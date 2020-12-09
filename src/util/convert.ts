@@ -19,7 +19,6 @@ export class Convert {
         });
     }
 
-    // TODO: Validate this function
     static buf_to_string(buf: ArrayBuffer) {
         return String.fromCharCode.apply(null, buf);
     }

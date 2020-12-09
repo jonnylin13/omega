@@ -45,6 +45,7 @@ export class WZTool {
         return str;
     }
 
+    // TODO: Needs validation
     static read_decoded_string(llea: LittleEndianAccessor): string {
 
         let str_length;

@@ -1,6 +1,7 @@
 import { SeekableLittleEndianAccessor } from './interface/seekable-lea';
 import { GenericLittleEndianAccessor } from './generic-lea';
 import { Point } from '../../point';
+import { Convert } from '../../convert';
 
 
 export class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAccessor implements SeekableLittleEndianAccessor {
@@ -51,25 +52,25 @@ export class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
     }
 
     read_ascii_string(length: number): string {
-        let ret: Array<string> = [];
-        for (let i = 0; i < length; i++) {
-            ret.push(String.fromCharCode(97 + this.read_byte()));
-        }
-        return ret.join('');
+        let ret: Int8Array = new Int8Array(length);
+        for (let i = 0; i < length; i++) 
+            ret[i] = this.read_byte();
+        return Convert.buf_to_string(ret);
     }
 
     read_terminated_ascii_string(): string {
-        let ret: Array<string> = [];
+        let arr = [];
         while (true) {
             let byte = this.read_byte();
             if (byte === 0) break;
-            ret.push(String.fromCharCode(97 + byte));
+            arr.push(byte);
         }
-        return ret.join('');
+        return Convert.buf_to_string(Int8Array.from(arr));
     }
 
     read_maple_ascii_string(): string {
-        return this.read_ascii_string(this.read_short());
+        let length = this.read_short();
+        return this.read_ascii_string(length);
     }
 
     read_pos(): Point {
