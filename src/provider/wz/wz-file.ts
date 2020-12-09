@@ -58,6 +58,6 @@ export class WZFile implements MapleDataProvider {
     }
 
     private parse_directory(dir: MapleDataDirectoryEntry): void {
-
+        
     }
 }

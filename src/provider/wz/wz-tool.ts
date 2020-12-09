@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { SeekableLittleEndianAccessor } from '../../util/data/input/interface/seekable-lea';
 import { Convert } from '../../util/convert';
 import { LittleEndianAccessor } from '../../util/data/input/interface/lea';
 
@@ -98,6 +99,31 @@ export class WZTool {
             xor_byte++;
         }
         return Convert.buf_to_string(char_ret);
+    }
+
+    static read_decoded_string_at_offset(slea: SeekableLittleEndianAccessor, offset: number): string {
+        slea.seek(offset);
+        return this.read_decoded_string(slea);
+    }
+
+    static read_decoded_string_at_offset_and_reset(slea: SeekableLittleEndianAccessor, offset: number): string {
+        let pos = slea.pos;
+        slea.seek(offset);
+        let ret = this.read_decoded_string(slea);
+        slea.seek(pos);
+        return ret;
+    }
+
+    static read_value(lea: LittleEndianAccessor): number {
+        let b = lea.read_byte();
+        if (b === -128) return lea.read_int();
+        else return b;
+    }
+
+    static read_float_value(lea: LittleEndianAccessor): number {
+        let b = lea.read_byte();
+        if (b === -128) lea.read_float();
+        else return 0;
     }
     
 }
