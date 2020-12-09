@@ -9,6 +9,7 @@ import { GenericSeekableLittleEndianAccessor } from '../../util/data/input/gener
 import { GenericLittleEndianAccessor } from '../../util/data/input/generic-lea';
 import { WZTool } from './wz-tool';
 import { WZFileEntry } from './wz-file-entry';
+import { WZIMGFile } from './wz-img-file';
 
 
 export class WZFile implements MapleDataProvider {
@@ -41,7 +42,7 @@ export class WZFile implements MapleDataProvider {
         this.lea.read_ascii_string(4);
         this.lea.read_int();
         this.lea.read_int();
-        let header_size = this.lea.read_int();
+        this.header_size = this.lea.read_int();
         this.lea.read_terminated_ascii_string();
         this.lea.read_short();
         this.parse_directory(this.root);
@@ -91,7 +92,7 @@ export class WZFile implements MapleDataProvider {
         }
     }
 
-    // TODO: Implement
+    // TODO: Needs implementation
     get_img_file(path: string): WZIMGFile {
         return null;
     }
