@@ -3,7 +3,7 @@ import { MapleDataEntity } from '../data-entity';
 import { MapleDataType } from './data-type';
 
 
-export class MapleIMGEntry implements MapleData {
+export class WZIMGEntry implements MapleData {
     name: string;
     type: MapleDataType;
     children: Array<MapleData> = new Array<MapleData>(10);
