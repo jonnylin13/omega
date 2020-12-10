@@ -1,5 +1,5 @@
 import { BufferedImage } from "../img";
-import { MapleCanvas } from "../maple-canvas";
+import { MapleCanvas } from "../canvas";
 
 
 export class PNGMapleCanvas implements MapleCanvas {

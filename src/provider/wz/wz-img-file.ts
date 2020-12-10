@@ -9,7 +9,6 @@ import { SeekableLittleEndianAccessor } from "../../util/data/input/interface/se
 import { Point } from "../../util/point";
 
 
-
 export class WZIMGFile {
     file: WZFileEntry;
     root: WZIMGEntry;
