@@ -147,7 +147,6 @@ export class XMLMapleData implements MapleData {
                     this.data = Number.parseFloat(number);
                 else if (this.type == MapleDataType.INT || this.type === MapleDataType.SHORT)
                     this.data = Number.parseInt(number);
-                else // console.log();
                 return;
             case MapleDataType.STRING:
             case MapleDataType.UOL:
