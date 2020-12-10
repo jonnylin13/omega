@@ -18,4 +18,13 @@ describe('XMLMapleData test', () => {
         expect(value).equal(0);
         expect(name).equal('reqJob');
     });
+
+    it('should load wz/Quest/PQuest.img.xml and get node by path', () => {
+        let dir = new File(root_dir + '/wz/Quest.wz/PQuest.img.xml');
+        let root = XMLMapleData.from_string(fs.readFileSync(root_dir + '/wz/Quest.wz/PQuest.img.xml').toString(), dir);
+
+        let path = (root.children[0].children[2].children[0].children[0].children[0] as XMLMapleData).path;
+        let data = root.get_child_by_path(path);
+        expect((data as XMLMapleData).data).equal(6);
+    });
 });

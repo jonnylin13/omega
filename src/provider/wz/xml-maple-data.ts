@@ -14,6 +14,7 @@ export class XMLMapleData implements MapleData {
     image_data_dir: File;
     is_root: boolean;
     tag_name: string;
+    path: string;
 
     name: string;
     parent: MapleDataEntity;
@@ -23,19 +24,23 @@ export class XMLMapleData implements MapleData {
 
 
     constructor(xml_data: any, image_data_dir: File, parent: XMLMapleData = null, tag_name: string = null) { 
+
         if (!parent) {
             // Root is guaranteed to be imgdir, only one node
             this.is_root = true;
             this.tag_name = 'imgdir';
             this.xml_data = xml_data[this.tag_name][0];
+            this.name = this.xml_data.attr.name;
+            this.path = this.name;
         } else {
             this.parent = parent;
             this.tag_name = tag_name;
             this.xml_data = xml_data;
+            this.name = this.xml_data.attr.name;
+            this.path = (this.parent as XMLMapleData).path + '/' + this.name;
+            
         }
-
         this.image_data_dir = image_data_dir;
-        this.name = this.xml_data.attr.name;
         this.init();
     }
 
@@ -50,7 +55,7 @@ export class XMLMapleData implements MapleData {
         if (segments[0] === '..') return (this.parent as XMLMapleData).get_child_by_path(path.substring(path.indexOf('/') + 1));
 
         let ret: XMLMapleData = this;
-        for (let s of segments) {
+        for (let s of segments.slice(1, segments.length)) {
             let children = ret.children;
             let found_child = false;
             for (let i = 0; i < children.length; i++) {
@@ -79,7 +84,7 @@ export class XMLMapleData implements MapleData {
             if (child_tag_name === 'attr') continue; // Skip attribute
             
             for (let child_xml_data of this.xml_data[child_tag_name]) {
-                let child = new XMLMapleData(child_xml_data, new File(this.image_data_dir.path + '/' + child_xml_data.attr.name), this, child_tag_name);
+                let child = new XMLMapleData(child_xml_data, this.image_data_dir, this, child_tag_name);
                 this.children.push(child);
             }
             
