@@ -22,9 +22,7 @@ export class XMLMapleData implements MapleData {
     data: any;
 
 
-    constructor(xml_data: any, image_data_dir: File, parent: XMLMapleData = null, tag_name: string = null) {
-        // console.log(xml_data);
-        
+    constructor(xml_data: any, image_data_dir: File, parent: XMLMapleData = null, tag_name: string = null) { 
         if (!parent) {
             // Root is guaranteed to be imgdir, only one node
             this.is_root = true;
@@ -38,8 +36,6 @@ export class XMLMapleData implements MapleData {
 
         this.image_data_dir = image_data_dir;
         this.name = this.xml_data.attr.name;
-
-        // Init type
         this.init();
     }
 
@@ -48,6 +44,7 @@ export class XMLMapleData implements MapleData {
         return new XMLMapleData(xml_data, image_data_dir, parent, tag_name);
     }
 
+    // TODO: Needs implementation
     get_child_by_path(path: string): MapleData {
         return this;
         // let segments = path.split('/');
