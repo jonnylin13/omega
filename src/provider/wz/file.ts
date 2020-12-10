@@ -7,8 +7,8 @@ export class File {
         this.path = path;
     }
 
-    // TODO: Needs implementation
+    // TODO: Needs validation
     get_parent_file(): File {
-        return null;
+        return new File(this.path.split('/').slice(0, -1).join('/'));
     }
 }
