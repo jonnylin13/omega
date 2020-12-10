@@ -44,29 +44,26 @@ export class XMLMapleData implements MapleData {
         return new XMLMapleData(xml_data, image_data_dir, parent, tag_name);
     }
 
-    // TODO: Needs implementation
+    // TODO: Needs validation
     get_child_by_path(path: string): MapleData {
-        return this;
-        // let segments = path.split('/');
-        // if (segments[0] === '..') return (this.parent as MapleData).get_child_by_path(path.substring(path.indexOf('/') + 1));
+        let segments = path.split('/');
+        if (segments[0] === '..') return (this.parent as XMLMapleData).get_child_by_path(path.substring(path.indexOf('/') + 1));
 
-        // let my_node = this.node;
-        // for (let s of segments) {
-        //     let child_nodes = my_node.childNodes;
-        //     let found_child = false;
-        //     for (let i = 0; i < child_nodes.length; i++) {
-        //         let child_node = child_nodes.item(i);
-        //         if (child_node.nodeType === NodeType.ELEMENT_NODE && child_node.attributes.getNamedItem('name').nodeValue === s) {
-        //             my_node = child_node;
-        //             found_child = true;
-        //             break;
-        //         }
-        //     }
-        //     if (!found_child) return null;
-        // }
-        // // TODO: Validate that this is a valid path
-        // let ret = XMLDOMMapleData.from_node(my_node, new File(this.image_data_dir.path + '/' + this.name + '/' + path).get_parent_file());
-        // return ret;
+        let ret: XMLMapleData = this;
+        for (let s of segments) {
+            let children = ret.children;
+            let found_child = false;
+            for (let i = 0; i < children.length; i++) {
+                let child = children[i] as XMLMapleData;
+                if (child.name === s) {
+                    ret = child;
+                    found_child = true;
+                    break;
+                }
+            }
+            if (!found_child) return null;
+        }
+        return ret;
 
     }
 
