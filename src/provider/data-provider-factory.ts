@@ -16,4 +16,17 @@ export class MapleDataProviderFactory {
     }
 
     // TODO: Finish implementing
+
+    static get_data_provider(input: File): MapleDataProvider {
+        return new WZFile(input, false);
+    }
+
+    static get_image_providing_data_provider(input: File): MapleDataProvider {
+        return new WZFile(input, true);
+    }
+
+    static file_in_wz_provider(filename: string) {
+        return new File(this.wz_path + '/' + filename);
+    }
+
 }
