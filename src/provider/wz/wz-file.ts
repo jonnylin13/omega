@@ -80,7 +80,7 @@ export class WZFile implements MapleDataProvider {
                     size = WZTool.read_value(this.lea);
                     checksum = WZTool.read_value(this.lea);
                     this.lea.read_int();
-                    if (marker === 3) dir.subdirs.push(new WZDirectoryEntry(name, size, checksum, dir));
+                    if (marker === 3) dir.add_directory(new WZDirectoryEntry(name, size, checksum, dir));
                     else dir.files.push(new WZFileEntry(name, size, checksum, dir));
                     break;
                 default:
