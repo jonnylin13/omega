@@ -11,7 +11,7 @@ export class MapleDataProviderFactory {
         if (file.name.endsWith('wz') && !fs.lstatSync(file.path).isDirectory()) {
             return new WZFile(file, provide_images);
         } else {
-            return new WZFile(file);
+            return new WZFile(file, null);
         }
     }
 

@@ -1,6 +1,5 @@
 import { MapleData } from '../data';
 import { MapleDataDirectoryEntry } from '../data-directory-entry';
-import { MapleDataFileEntry } from '../data-file-entry';
 import { MapleDataProvider } from '../data-provider';
 import { File } from './file';
 import { WZDirectoryEntry } from './wz-directory-entry';
@@ -10,6 +9,7 @@ import { GenericLittleEndianAccessor } from '../../util/data/input/generic-lea';
 import { WZTool } from './wz-tool';
 import { WZFileEntry } from './wz-file-entry';
 import { WZIMGFile } from './wz-img-file';
+import { ListWZFile } from './list-wz-file';
 
 
 export class WZFile implements MapleDataProvider {
@@ -104,7 +104,7 @@ export class WZFile implements MapleDataProvider {
         let entry = (dir.get_entry(segments[segments.length - 1]) as WZFileEntry);
         if (entry === null) return null;
         let full_path = this.wz_file.name.substring(0, this.wz_file.name.length - 3).toLowerCase() + '/' + path;
-        return new WZIMGFile(this.wz_file, entry, this.provide_images, ListWZFile.is_modern_img(full_path));
+        return new WZIMGFile(this.wz_file, entry, this.provide_images, ListWZFile.is_modern_img_file(full_path));
     }
 
     get_data(path: string): MapleData {
