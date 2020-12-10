@@ -28,3 +28,4 @@ export class File {
     exists(): boolean {
         return fs.existsSync(this.path);
     }
+}
