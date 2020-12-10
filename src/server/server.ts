@@ -1,11 +1,11 @@
 import * as http from 'http';
 import { Socket, Server } from 'socket.io';
-// const socketio = require('socket.io');
+import { Config } from '../util/config';
+
 
 // Master server
 export class MasterServer {
 
-    // TODO: type declarations
     port: number;
     sockets: Map<string, Socket>;
     started: boolean = false;
@@ -45,7 +45,6 @@ export class MasterServer {
     }
 
     on_disconnect(socket_id: string, reason: string) {
-        // TODO: Handle other stuff???
         this.sockets.delete(socket_id);
     }
 

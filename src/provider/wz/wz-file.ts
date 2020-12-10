@@ -14,12 +14,6 @@ import { ListWZFile } from './list-wz-file';
 
 export class WZFile implements MapleDataProvider {
 
-    // TODO: Make sure this is similar to Java static constructors
-    // https://stackoverflow.com/questions/49589518/static-constructor-typescript
-    // static init() {
-        // ListWZFile.init();
-    // }
-
     wz_file: File;
     header_size: number;
     root: WZDirectoryEntry;

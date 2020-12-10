@@ -51,6 +51,4 @@ describe('GenericSeekableLittleEndianAccessor test', () => {
         llea.seek(2);
         expect(llea.read_maple_ascii_string()).equal('omg this is working');
     });
-    
-    // TODO: Finish test cases
 });

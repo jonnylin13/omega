@@ -2,10 +2,11 @@ import { MapleDataProvider } from './data-provider';
 import { File } from './wz/file';
 import * as fs from 'fs';
 import { WZFile } from './wz/wz-file';
+import { Config } from '../util/config';
 
 
 export class MapleDataProviderFactory {
-    static wz_path: string = ''; // TODO: Set up config to set wz_path
+    static wz_path: string = Config.properties.system.wzpath;
 
     static get_wz(file: File, provide_images: boolean): MapleDataProvider {
         if (file.name.endsWith('wz') && !fs.lstatSync(file.path).isDirectory()) {
@@ -15,7 +16,6 @@ export class MapleDataProviderFactory {
         }
     }
 
-    // TODO: Finish implementing
 
     static get_data_provider(input: File): MapleDataProvider {
         return new WZFile(input, false);
@@ -25,7 +25,7 @@ export class MapleDataProviderFactory {
         return new WZFile(input, true);
     }
 
-    static file_in_wz_provider(filename: string) {
+    static file_in_wz_path(filename: string) {
         return new File(this.wz_path + '/' + filename);
     }
 

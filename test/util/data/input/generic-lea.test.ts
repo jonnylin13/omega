@@ -43,6 +43,4 @@ describe('GenericLittleEndianAccessor test', () => {
         let llea = new GenericLittleEndianAccessor(Buffer.from(data_str_maple));
         expect(llea.read_maple_ascii_string()).equal('omg this is working');
     });
-    
-    // TODO: Finish test cases
 });

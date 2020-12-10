@@ -5,6 +5,7 @@ import { File } from './file';
 import { WZTool } from './wz-tool';
 import { Convert } from '../../util/convert';
 import { MapleDataProviderFactory } from "../data-provider-factory";
+import { Config } from "../../util/config";
 
 
 export class ListWZFile {
@@ -31,7 +32,7 @@ export class ListWZFile {
     }
 
     static init(): void {
-        let list_wz_path = ''; // TODO: Set up a configuration to get this path
+        let list_wz_path = Config.properties.system.wzpath;
         if (list_wz_path !== null) {
             let list_wz: ListWZFile = new ListWZFile(MapleDataProviderFactory.file_in_wz_path('List.wz'));
             this.modern_imgs = new Set<string>(list_wz.entries);

@@ -12,7 +12,7 @@ export class XMLWZFile implements MapleDataProvider {
     root_file: File;
 
     constructor(input: File) {
-        this.root_file = input; // TODO: Evaluate how this works
+        this.root_file = input; // TODO: Needs validation
         this.root = new WZDirectoryEntry(input.name, 0, 0, null);
         this.fill_maple_data_entities(this.root_file, this.root);
     }
