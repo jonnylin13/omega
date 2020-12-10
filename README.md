@@ -39,6 +39,7 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
     * [x] Write unit tests for input
 * [ ] Implement WZ loading
     * [x] Parse a single WZ XML file
+    * [x] Parse a WZ directory
 * [ ] Implement packet delegation/handling
 * [ ] Implement login
 * [ ] Implement database layer
