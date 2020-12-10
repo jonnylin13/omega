@@ -1,6 +1,6 @@
 
 
-export class ImgMapleClass {
+export class ImgMapleSound {
     data_length: number;
     offset: number;
 

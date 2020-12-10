@@ -7,6 +7,8 @@ import * as fs from 'fs';
 import { GenericSeekableLittleEndianAccessor } from "../../util/data/input/generic-seekable-lea";
 import { SeekableLittleEndianAccessor } from "../../util/data/input/interface/seekable-lea";
 import { Point } from "../../util/point";
+import { PNGMapleCanvas } from './png-canvas';
+import { ImgMapleSound } from './maple-sound';
 
 
 export class WZIMGFile {

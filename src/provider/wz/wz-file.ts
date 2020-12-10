@@ -92,9 +92,19 @@ export class WZFile implements MapleDataProvider {
         }
     }
 
-    // TODO: Needs implementation
+    // TODO: Needs validation
     get_img_file(path: string): WZIMGFile {
-        return null;
+        let segments = path.split('/');
+        let dir = this.root;
+        for (let i = 0; i < segments.length - 1; i++) {
+            dir = (dir.get_entry(segments[i]) as WZDirectoryEntry);
+            if (dir === null) return null;
+        }
+
+        let entry = (dir.get_entry(segments[segments.length - 1]) as WZFileEntry);
+        if (entry === null) return null;
+        let full_path = this.wz_file.name.substring(0, this.wz_file.name.length - 3).toLowerCase() + '/' + path;
+        return new WZIMGFile(this.wz_file, entry, this.provide_images, ListWZFile.is_modern_img(full_path));
     }
 
     get_data(path: string): MapleData {

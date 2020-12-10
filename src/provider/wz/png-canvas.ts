@@ -17,8 +17,8 @@ export class PNGMapleCanvas implements MapleCanvas {
         this.data = data;
     }
 
-    // TODO: Needs implementation
+    // TODO: Needs implementation, this is a stub
     get_image(): BufferedImage {
-        return new BufferedImage();
+        return new BufferedImage(this.width, this.height, Buffer.from(this.data));
     }
 }
