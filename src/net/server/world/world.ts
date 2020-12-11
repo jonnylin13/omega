@@ -17,6 +17,7 @@ export class World {
     constructor(world: number, flag: number, event_msg: string, exp_rate: number, drop_rate: number, boss_drop_rate: number, meso_rate: number, quest_rate: number, travel_rate: number, fishing_rate: number) {
         this.id = world;
         this.flag = flag;
+        this.event_msg = event_msg;
         this.exp_rate = exp_rate;
         this.drop_rate = drop_rate;
         this.boss_drop_rate = boss_drop_rate;
