@@ -1,4 +1,5 @@
 import { MapleClient } from '../client/client';
+import { MasterServer } from './server/server';
 
 
 export abstract class AbstractMaplePacketHandler {
@@ -6,8 +7,7 @@ export abstract class AbstractMaplePacketHandler {
         return c.is_logged_in();
     }
 
-    // TODO: Needs implementation
     static current_server_time(): number {
-        return 1;
+        return MasterServer.get_instance().server_current_time;
     }
 }

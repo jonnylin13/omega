@@ -1,4 +1,5 @@
 import * as net from 'net';
+import { Config } from '../../util/config';
 const shortid = require('shortid');
 
 
@@ -13,6 +14,9 @@ export class MasterServer {
     port: number;
     sockets: Map<string, Socket>;
     started: boolean = false;
+    // current_time: number = 0; // BigInt here?
+    server_current_time: number = 0;
+    uptime: number = new Date().getTime();
 
     private server: net.Server;
     private static instance: MasterServer = null;
@@ -65,6 +69,20 @@ export class MasterServer {
 
     private on_disconnect(socket_id: string, had_error: boolean) {
         this.sockets.delete(socket_id);
+    }
+
+    get_current_timestamp() {
+        return this.server_current_time - this.uptime;
+    }
+
+    update_current_time() {
+        this.server_current_time += Config.properties.server.time_update_interval;
+    }
+
+    force_update_current_time() {
+        let time_now = new Date().getTime();
+        this.server_current_time = time_now;
+        return time_now;
     }
 
 }
