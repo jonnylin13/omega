@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha'; 
-import { MasterServer } from '../../src/server/server';
+import { MasterServer } from '../../../src/net/server/server';
 
 describe('MasterServer test', () => {
     it('should start and stop the server', () => {
