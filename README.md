@@ -46,4 +46,4 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 * [ ] Implement logging
 
 ### Long goals
-* [ ] Design master-child process communication to delegate compute-heavy tasks (login/cashshop/chat server?)
+* [ ] Design worker_threads system to delegate compute-heavy tasks

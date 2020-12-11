@@ -49,7 +49,6 @@ export class XMLMapleData implements MapleData {
         return new XMLMapleData(xml_data, image_data_dir, parent, tag_name);
     }
 
-    // TODO: Needs validation
     get_child_by_path(path: string): MapleData {
         let segments = path.split('/');
         if (segments[0] === '..') return (this.parent as XMLMapleData).get_child_by_path(path.substring(path.indexOf('/') + 1));
