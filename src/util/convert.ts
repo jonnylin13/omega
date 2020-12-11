@@ -14,9 +14,7 @@ export class Convert {
     }
 
     static sign_array(arr: Array<number>, bit_length: number) {
-        return arr.map((val) => {
-            return Convert.sign(val, bit_length);
-        });
+        return arr.map((val) => Convert.sign(val, bit_length));
     }
 
     static buf_to_string(buf: ArrayBuffer) {

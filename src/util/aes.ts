@@ -45,6 +45,7 @@ export class MapleAESOFB {
         return new Int8Array(ret);
     }
 
+    // TODO: Needs rework
     encrypt(data: Int8Array) {
         let remaining = data.length;
         let chunk_length = 0x5B0;
@@ -64,9 +65,6 @@ export class MapleAESOFB {
                     // console.log(my_iv);
 
                     // let cipher = new aes.ModeOfOperation.ofb(skey, my_iv);
-
-                    // TODO: This is probably broken but I can't be fkd to fix this until later
-                    // Not even sure if this is used...
                     
                     // let cipher = crypto.createCipheriv('aes-256-ofb', skey, this.iv);
                     my_iv = new Int8Array(this.cipher.update(my_iv));
