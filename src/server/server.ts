@@ -1,6 +1,5 @@
 import * as http from 'http';
 import { Socket, Server } from 'socket.io';
-import { Config } from '../util/config';
 
 
 // Master server
@@ -10,9 +9,14 @@ export class MasterServer {
     sockets: Map<string, Socket>;
     started: boolean = false;
 
-    private rawServer: http.Server;
+    private http_server: http.Server;
     private server: Server;
+    private static instance: MasterServer = null;
 
+    static get_instance(): MasterServer {
+        if (this.instance === null) this.instance = new MasterServer();
+        return this.instance;
+    }
 
     constructor(port=3000) {
         this.port = port;
@@ -20,10 +24,10 @@ export class MasterServer {
     }
 
     start() {
-        if (this.rawServer || this.server) return;
+        if (this.http_server || this.server) return;
 
-        this.rawServer = http.createServer();
-        this.server = new Server(this.rawServer);
+        this.http_server = http.createServer();
+        this.server = new Server(this.http_server);
 
         this.server.on('connect', socket => this.on_connect(socket))
         this.server.listen(this.port);
@@ -32,10 +36,10 @@ export class MasterServer {
     }
 
     stop() {
-        if (this.rawServer) this.rawServer.close();
+        if (this.http_server) this.http_server.close();
         if (this.server) this.server.close();
         this.started = false;
-        delete this.rawServer;
+        delete this.http_server;
         delete this.server;
     }
 
