@@ -5,6 +5,7 @@ export interface LittleEndianWriter {
     buf: Buffer;
     bytes_written: number;
     write(bytes: Int8Array): void;
+    write_buffer(buf: Buffer): void;
     write_byte(byte: number): void;
     skip(length: number): void;
     write_int(int: number): void;

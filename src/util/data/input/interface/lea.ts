@@ -9,7 +9,7 @@ export interface LittleEndianAccessor {
     read_short(): number;
     read_int(): number;
     read_pos(): Point;
-    read_long(): BigInt;
+    read_long(): bigint;
     skip(length: number): void;
     read(length: number): Int8Array;
     read_float(): number;

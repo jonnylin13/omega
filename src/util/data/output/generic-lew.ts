@@ -4,7 +4,7 @@ import { Point } from '../../point';
 
 export class GenericLittleEndianWriter implements LittleEndianWriter {
     buf: Buffer;
-    bytes_written: number;
+    bytes_written: number = 0;
 
     constructor(buf: Buffer) {
         this.buf = buf;
@@ -14,8 +14,13 @@ export class GenericLittleEndianWriter implements LittleEndianWriter {
         for (let byte of bytes) this.write_byte(byte);
     }
 
+    write_buffer(buf: Buffer): void {
+        for (let byte of buf) this.write_byte(byte);
+    }
+
     write_byte(byte: number): void {
-        this.buf.writeIntLE(byte, 0, 1);
+        this.bytes_written += 1;
+        this.buf.writeIntLE(byte, this.bytes_written - 1, 1);
     }
 
     skip(length: number): void {
@@ -23,20 +28,22 @@ export class GenericLittleEndianWriter implements LittleEndianWriter {
     }
 
     write_short(short: number): void {
-        this.buf.writeInt16LE(short);
+        this.bytes_written += 2;
+        this.buf.writeInt16LE(short, this.bytes_written - 2);
     }
 
     write_int(int: number): void {
-        this.buf.writeInt32LE(int);
+        this.bytes_written += 4;
+        this.buf.writeInt32LE(int, this.bytes_written - 4);
     }
 
     write_long(long: bigint): void {
-        this.buf.writeBigInt64LE(long);
+        this.bytes_written += 8;
+        this.buf.writeBigInt64LE(long, this.bytes_written - 8);
     }
 
     write_ascii_string(str: string): void {
-        // TODO: Validate function, then validate charset
-        this.write(new Int8Array(Buffer.from(str)));
+        this.write_buffer(Buffer.from(str, 'utf-8'));
     }
 
     write_maple_ascii_string(str: string): void {

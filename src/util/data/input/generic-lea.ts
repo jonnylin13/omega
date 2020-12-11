@@ -36,7 +36,7 @@ export class GenericLittleEndianAccessor implements LittleEndianAccessor {
         return this.buf.readFloatLE(this.bytes_read-4);
     }
 
-    read_long(): BigInt {
+    read_long(): bigint {
         this.bytes_read += 8;
         return this.buf.readBigInt64LE(this.bytes_read-8);
     }

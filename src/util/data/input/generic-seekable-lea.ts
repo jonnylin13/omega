@@ -39,7 +39,7 @@ export class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
         return this.buf.readFloatLE(this.pos-4);
     }
 
-    read_long(): BigInt {
+    read_long(): bigint {
         this.bytes_read += 8;
         this.pos += 8;
         return this.buf.readBigInt64LE(this.pos-8);
