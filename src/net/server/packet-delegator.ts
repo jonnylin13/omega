@@ -2,9 +2,9 @@ import { RecvOpcode } from '../opcodes/recv';
 import { MaplePacketHandler } from '../packet-handler';
 
 
-export class PacketProcessor {
+export class PacketDelegator {
 
-    static instances: Map<string, PacketProcessor> = new Map();
+    static instances: Map<string, PacketDelegator> = new Map();
     private handlers: Array<MaplePacketHandler>;
 
     constructor() {
@@ -29,13 +29,13 @@ export class PacketProcessor {
 
     static get_processor(world: number, channel: number) {
         let lolpair = world + ' ' + channel;
-        let processor = this.instances.get(lolpair);
-        if (processor = null) {
-            processor = new PacketProcessor();
-            processor.reset(channel);
-            this.instances.set(lolpair, processor);
+        let delegator = this.instances.get(lolpair);
+        if (delegator = null) {
+            delegator = new PacketDelegator();
+            delegator.reset(channel);
+            this.instances.set(lolpair, delegator);
         }
-        return processor;
+        return delegator;
     }
 
     reset(channel: number) {

@@ -1,18 +1,14 @@
 import * as net from 'net';
 import { Config } from '../../util/config';
 const shortid = require('shortid');
-
-
-class Socket extends net.Socket {
-    id: string;
-}
+import { Session } from './session';
 
 
 // Master server
 export class MasterServer {
 
     port: number;
-    sockets: Map<string, Socket>;
+    sockets: Map<string, Session>;
     started: boolean = false;
     // current_time: number = 0; // BigInt here?
     server_current_time: number = 0;
@@ -52,7 +48,7 @@ export class MasterServer {
 
     private on_connect(socket: net.Socket) {
         
-        let id_socket = (socket as Socket);
+        let id_socket = (socket as Session);
         id_socket.id = this.assign_id();
         socket.on('data', (data: Buffer) => this.on_data(id_socket.id, data));
         socket.on('close', had_error => this.on_disconnect(id_socket.id, had_error));
