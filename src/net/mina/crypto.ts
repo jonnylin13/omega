@@ -1,4 +1,4 @@
-import { Convert } from '../util/convert';
+import { Convert } from '../../util/convert';
 
 export class MapleCustomEncryption {
 

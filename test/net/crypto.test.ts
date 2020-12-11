@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha'; 
-import { MapleCustomEncryption } from '../../src/net/crypto';
+import { MapleCustomEncryption } from '../../src/net/mina/crypto';
 import { Compare } from '../../src/util/compare';
 
 
