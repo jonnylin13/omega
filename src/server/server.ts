@@ -1,5 +1,10 @@
-import * as http from 'http';
-import { Socket, Server } from 'socket.io';
+import * as net from 'net';
+const shortid = require('shortid');
+
+
+class Socket extends net.Socket {
+    id: string;
+}
 
 
 // Master server
@@ -9,8 +14,7 @@ export class MasterServer {
     sockets: Map<string, Socket>;
     started: boolean = false;
 
-    private http_server: http.Server;
-    private server: Server;
+    private server: net.Server;
     private static instance: MasterServer = null;
 
     static get_instance(): MasterServer {
@@ -24,31 +28,42 @@ export class MasterServer {
     }
 
     start() {
-        if (this.http_server || this.server) return;
+        if (this.server && this.started) return;
 
-        this.http_server = http.createServer();
-        this.server = new Server(this.http_server);
-
-        this.server.on('connect', socket => this.on_connect(socket))
+        this.server = net.createServer();
+        this.server.on('connection', socket => this.on_connect(socket))
         this.server.listen(this.port);
         this.started = true;
 
     }
 
     stop() {
-        if (this.http_server) this.http_server.close();
-        if (this.server) this.server.close();
+        if (this.server) {
+            this.server.close();
+            for (let socket of this.sockets.values()) socket.destroy(); // TODO: Should be using socket.end()?
+        }
         this.started = false;
-        delete this.http_server;
         delete this.server;
     }
 
-    on_connect(socket: Socket) {
-        socket.on('disconnect', reason => this.on_disconnect(socket.id, reason));
-        this.sockets.set(socket.id, socket);
+    private on_connect(socket: net.Socket) {
+        
+        let id_socket = (socket as Socket);
+        id_socket.id = this.assign_id();
+        socket.on('data', (data: Buffer) => this.on_data(id_socket.id, data));
+        socket.on('close', had_error => this.on_disconnect(id_socket.id, had_error));
+        this.sockets.set(id_socket.id, id_socket);
     }
 
-    on_disconnect(socket_id: string, reason: string) {
+    private assign_id(): string {
+        return shortid.generate();
+    }
+
+    private on_data(socket_id: string, data: Buffer) {
+        // TODO: Needs implementation
+    }
+
+    private on_disconnect(socket_id: string, had_error: boolean) {
         this.sockets.delete(socket_id);
     }
 
