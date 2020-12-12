@@ -1,6 +1,6 @@
 import { MapleClient } from "../../../client/client";
 import { SeekableLittleEndianAccessor } from "../../../util/data/input/interface/seekable-lea";
-import { LoginPackets } from "../../../util/packets/login/login-packets";
+import { LoginPackets } from "../../../util/packets/login-packets";
 import { MaplePacketHandler } from '../../packet-handler';
 
 
