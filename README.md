@@ -23,7 +23,7 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 ## Checklist
 
 ### Features
-* [ ] There are none yet!
+* [ ] Login
 
 ### Short goals
 * [x] Implement Maple custom encryption algorithms
@@ -32,17 +32,17 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 * [x] Finish implementing AES encryption (needs rework)
     * [ ] Rework
     * [ ] Write unit tests
-* [ ] Implement lea classes/interfaces with Buffer
-    * [ ] Output classes/interfaces
-    * [ ] Write unit tests for output
+* [x] Implement lea classes/interfaces with Buffer
+    * [x] Output classes/interfaces
+    * [x] Write unit tests for output
     * [x] Input classes/interfaces
     * [x] Write unit tests for input
-* [ ] Implement WZ loading
+* [x] Implement WZ loading (might need rework)
     * [x] Parse a single WZ XML file
     * [x] Parse a WZ directory
-* [ ] Implement packet delegation/handling
-* [ ] Implement login
-* [ ] Implement database layer
+* [ ] Implement packet delegation
+* [ ] Implement packet handling
+* [x] Implement database layer
 * [ ] Implement logging
 
 ### Long goals
