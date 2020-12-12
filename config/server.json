@@ -1,3 +1,6 @@
 {
-    "time_update_interval": 1
+    "time_update_interval": 1,
+    "use_enforce_admin_account": true,
+    "enable_pic": true,
+    "enable_pin": true
 }

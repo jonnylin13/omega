@@ -5,6 +5,10 @@ export class MapleClient {
 
     gm_level: number;
     session: Session;
+    pic: string;
+    account_id: number;
+    account_name: string;
+    gender: number;
 
     // TODO: Needs implementation
     is_logged_in(): boolean {
@@ -16,8 +20,38 @@ export class MapleClient {
         return 1;
     }
 
-    announce(packet: Int8Array) {
-        this.session.write(Buffer.from(packet));
+    // TODO: Needs implementation
+    pong_received(): void {
+        
+    }
+
+    announce(packet: Buffer) {
+        this.session.write(packet);
+    }
+
+    // TODO: Needs implementation
+    disconnect(a: boolean, b: boolean) {
+        
+    }
+
+    // TODO: Needs implementation
+    accept_tos(): boolean {
+        return true;
+    }
+
+    // TODO: Needs implementation
+    finish_login(): number {
+        return 1;
+    }
+
+    // TODO
+    can_bypass_pin(): boolean {
+        return false;
+    }
+
+    // TODO
+    can_bypass_pic(): boolean {
+        return false;
     }
 
 }

@@ -81,4 +81,9 @@ export class MasterServer {
         return time_now;
     }
 
+    // TODO: Needs implementation
+    can_fly(account_id: number): boolean {
+        return false;
+    }
+
 }
