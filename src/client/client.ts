@@ -3,9 +3,16 @@ import { Session } from "../net/server/session";
 
 export class MapleClient {
 
+    static LOGIN = {
+        LOGGED_OUT: 0,
+        SERVER_TRANSITION: 1,
+        LOGGED_IN: 2
+    };
+
     gm_level: number;
     session: Session;
     pic: string;
+    pin: string;
     account_id: number;
     account_name: string;
     gender: number;
@@ -52,6 +59,16 @@ export class MapleClient {
     // TODO
     can_bypass_pic(): boolean {
         return false;
+    }
+
+    // TODO
+    check_pin(pin: string): boolean {
+        return false;
+    }
+
+    // TODO
+    update_login_state(state: number) {
+
     }
 
 }

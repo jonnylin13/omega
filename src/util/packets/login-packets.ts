@@ -1,8 +1,8 @@
-import { MapleClient } from '../../../client/client';
-import { MaplePacketLittleEndianWriter } from '../../data/output/maple-lew';
-import { SendOpcode } from '../../../net/opcodes/send';
-import { MasterServer } from '../../../net/server/server';
-import { Config } from '../../config';
+import { MapleClient } from '../../client/client';
+import { MaplePacketLittleEndianWriter } from '../data/output/maple-lew';
+import { SendOpcode } from '../../net/opcodes/send';
+import { MasterServer } from '../../net/server/server';
+import { Config } from '../config';
 
 
 export class LoginPackets {
@@ -50,6 +50,29 @@ export class LoginPackets {
         mplew.write_byte(reason);
         mplew.write_byte(0);
         mplew.write_int(0);
+        return mplew.get_packet();
+    }
+
+    static register_pin(): Buffer {
+        return this.pin_operation(1);
+    }
+
+    static request_pin(): Buffer {
+        return this.pin_operation(4);
+    }
+
+    static request_pin_after_failure(): Buffer {
+        return this.pin_operation(2);
+    }
+
+    static pin_accepted(): Buffer {
+        return this.pin_operation(0);
+    }
+
+    private static pin_operation(mode: number): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(3);
+        mplew.write_short(SendOpcode.CHECK_PINCODE.get_value());
+        mplew.write_byte(mode);
         return mplew.get_packet();
     }
 
