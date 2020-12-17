@@ -20,4 +20,8 @@ export class Convert {
     static buf_to_string(buf: ArrayBuffer) {
         return String.fromCharCode.apply(null, buf);
     }
+
+    static int8_to_hexstr(arr: Int8Array) {
+        return arr.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
+    }
 }

@@ -23,11 +23,6 @@ export class MapleClient {
     }
 
     // TODO: Needs implementation
-    get_gm_level(): number {
-        return 1;
-    }
-
-    // TODO: Needs implementation
     pong_received(): void {
         
     }

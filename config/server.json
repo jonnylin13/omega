@@ -2,5 +2,7 @@
     "time_update_interval": 1,
     "use_enforce_admin_account": true,
     "enable_pic": true,
-    "enable_pin": true
+    "enable_pin": true,
+    "use_ip_validation": true,
+    "local_server": true
 }
