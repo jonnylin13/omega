@@ -3,6 +3,7 @@ import { MaplePacketLittleEndianWriter } from '../data/output/maple-lew';
 import { SendOpcode } from '../../net/opcodes/send';
 import { MasterServer } from '../../net/server/server';
 import { Config } from '../config';
+import { Time } from './time';
 
 
 export class LoginPackets {
@@ -73,6 +74,20 @@ export class LoginPackets {
         const mplew = new MaplePacketLittleEndianWriter(3);
         mplew.write_short(SendOpcode.CHECK_PINCODE.get_value());
         mplew.write_byte(mode);
+        return mplew.get_packet();
+    }
+
+    static send_guest_tos(): Buffer {
+        const url = 'http://google.com'
+        const mplew = new MaplePacketLittleEndianWriter(52 + url.length);
+        mplew.write_short(SendOpcode.GUEST_ID_LOGIN.get_value());
+        mplew.write_short(0x100);
+        mplew.write_int(Math.floor(Math.random() * Math.floor(999999)));
+        mplew.write_long(BigInt(0));
+        mplew.write_long(BigInt(Time.get_time(BigInt(-2))));
+        mplew.write_long(BigInt(Time.get_time(BigInt(new Date().getTime()))));
+        mplew.write_int(0);
+        mplew.write_maple_ascii_string(url);
         return mplew.get_packet();
     }
 
