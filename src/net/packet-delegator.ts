@@ -27,7 +27,7 @@ export class PacketDelegator {
         this.handlers[code.get_value()] = handler;
     }
 
-    static get_processor(world: number, channel: number) {
+    static get_delegator(world: number, channel: number) {
         let lolpair = world + ' ' + channel;
         let delegator = this.instances.get(lolpair);
         if (delegator === undefined) {

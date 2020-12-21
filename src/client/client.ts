@@ -7,6 +7,7 @@ import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/co
 import { MapleCharacter } from "./character/character";
 import { LoginPackets } from "../util/packets/login-packets";
 import { AccountDB } from "../util/db/account";
+import { MapleAESOFB } from "../util/aes";
 
 
 export class MapleClient {
@@ -43,6 +44,15 @@ export class MapleClient {
     channel_id: number;
     num_worlds_visible: number;
     last_npc_click: bigint;
+    send: MapleAESOFB;
+    receive: MapleAESOFB;
+    session_id: string;
+
+    constructor(send: MapleAESOFB, receive: MapleAESOFB, session: Session) {
+        this.send = send;
+        this.receive = receive;
+        this.session_id = session.id;
+    }
 
     pong_received(): void {
         this.last_pong = MasterServer.get_instance().get_current_time();
