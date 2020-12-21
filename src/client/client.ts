@@ -7,6 +7,7 @@ import { Config } from "../util/config";
 import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/coordinator/session/session-coordinator";
 import { MapleCharacter } from "./character";
 import { World } from "../net/server/world/world";
+import { LoginPackets } from "../util/packets/login-packets";
 
 
 export class MapleClient {
@@ -368,6 +369,10 @@ export class MapleClient {
 
     set_clicked_npc() {
         this.last_npc_click = MasterServer.get_instance().get_current_time();
+    }
+
+    send_char_list(server: number) {
+        this.announce(LoginPackets.get_char_list(this, server, 0));
     }
 
 }

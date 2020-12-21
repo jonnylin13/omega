@@ -29,4 +29,8 @@ export class Convert {
         let ip_arr = ip.split(separator);
         return Int8Array.from(ip_arr.map((decimal) => parseInt(decimal)));
     }
+
+    static right_padded_str(str: string, padding: string, length: number): string {
+        return str; // TODO: Needs implementation
+    }
 }

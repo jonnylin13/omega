@@ -7,6 +7,7 @@ import { Time } from '../time';
 import { Convert } from '../convert';
 import { Channel } from '../../net/server/channel/channel';
 import { Pair } from '../pair';
+import { MapleCharacter } from '../../client/character';
 
 
 export class LoginPackets {
@@ -207,6 +208,67 @@ export class LoginPackets {
             mplew.write_maple_ascii_string(pair.right);
         }
         return mplew.get_packet();
+    }
+
+    static get_char_list(c: MapleClient, server_id: number, status: number): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter();
+        mplew.write_short(SendOpcode.CHARLIST.get_value());
+        mplew.write_byte(status);
+        let chars = c.load_characters(server_id);
+        mplew.write_byte(chars.length);
+        for (let chr of chars)
+            this.add_char_entry(mplew, chr, false);
+        
+        mplew.write_byte(Config.properties.server.enable_pic && !c.can_bypass_pic ? (c.pic == null || c.pic == '' ? 0 : 1) : 2);
+        mplew.write_int(Config.properties.server.collective_charslot ? chars.length + c.get_available_character_slots() : c.get_character_slots());
+        return mplew.get_packet();
+    }
+
+    private static add_char_entry(mplew: MaplePacketLittleEndianWriter, chr: MapleCharacter, view_all: boolean) {
+        this.add_char_stats(mplew, chr);
+        this.add_char_look(mplew, chr, false);
+        if (!view_all)
+            mplew.write_byte(0);
+        if (chr.gm || chr.is_gm_job()) {
+            mplew.write_byte(0);
+            return;
+        }
+        mplew.write_byte(1);
+        mplew.write_int(chr.rank);
+        mplew.write_int(chr.rank_move);
+        mplew.write_int(chr.job_rank);
+        mplew.write_int(chr.job_rank_move);
+    }
+
+    private static add_char_stats(mplew: MaplePacketLittleEndianWriter, chr: MapleCharacter) {
+        mplew.write_int(chr.id);
+        mplew.write_ascii_string(Convert.right_padded_str(chr.name, '\0', 13));
+        mplew.write_byte(chr.gender);
+        mplew.write_byte(chr.skin_color.id);
+        mplew.write_int(chr.face);
+        mplew.write_int(chr.hair);
+
+        for (let i = 0; i < 3; i++) {
+            let pet = chr.pets[i];
+            if (pet != undefined) {
+                mplew.write_long(pet.id);
+            } else mplew.write_long(BigInt(0));
+        }
+
+        mplew.write_byte(chr.level);
+        mplew.write_short(chr.job.id);
+        mplew.write_short(chr.str);
+        mplew.write_short(chr.dex);
+        mplew.write_short(chr.int);
+        mplew.write_short(chr.luk);
+        mplew.write_short(chr.hp);
+        mplew.write_short(chr.client_max_hp);
+        mplew.write_short(chr.mp);
+        mplew.write_short(chr.client_max_mp);
+        mplew.write_short(chr.remaining_ap);
+
+        // TODO: Need to finish implementing this
+
     }
  
 }
