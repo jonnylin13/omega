@@ -252,7 +252,7 @@ export class LoginPackets {
         for (let i = 0; i < 3; i++) {
             let pet = chr.pets[i];
             if (pet != undefined) {
-                mplew.write_long(pet.id);
+                mplew.write_long(pet.unique_id);
             } else mplew.write_long(BigInt(0));
         }
 

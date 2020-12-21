@@ -1,4 +1,5 @@
 import { MapleClient } from "../client";
+import { MaplePet } from "./inventory/pet";
 import { MapleJob } from "./job";
 import { MapleSkinColor } from "./skin-color";
 
@@ -35,6 +36,7 @@ export class MapleCharacter {
     map_id: number;
     spawn_point: number;
     skin_color: MapleSkinColor;
+    pets: Array<MaplePet> = new Array(3);
 
     is_gm(): boolean {
         return this.gm_level > 0;
