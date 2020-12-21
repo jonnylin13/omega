@@ -1,4 +1,6 @@
 import * as net from 'net';
+import { Config } from '../../../util/config';
+import { PlayerStorage } from '../player-storage';
 
 
 export class Channel {
@@ -7,6 +9,7 @@ export class Channel {
     world: number;
     id: number;
     socket: net.Socket;
+    private players: PlayerStorage = new PlayerStorage();
 
     constructor(world: number, channel: number, start_time: number) {
         this.world = world;
@@ -22,6 +25,10 @@ export class Channel {
     // TODO: Needs implementation
     can_uninstall(): boolean {
         return false;
+    }
+
+    get_capacity(): number {
+        return Math.ceil((this.players.size() / Config.properties.server.channel_load) * 800);
     }
 
 }

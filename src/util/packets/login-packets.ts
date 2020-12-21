@@ -5,6 +5,8 @@ import { MasterServer } from '../../net/server/server';
 import { Config } from '../config';
 import { Time } from '../time';
 import { Convert } from '../convert';
+import { Channel } from '../../net/server/channel/channel';
+import { Pair } from '../pair';
 
 
 export class LoginPackets {
@@ -154,4 +156,57 @@ export class LoginPackets {
         return mplew.get_packet();
     }
 
+    static get_server_list(server_id: number, server_name: string, flag: number, event_msg: string, channels: Array<Channel>): Buffer {
+        let server_payload_size = 11 + server_name.length + event_msg.length;
+        let channels_payload_size = (13 + server_name.length) * channels.length;
+        const mplew = new MaplePacketLittleEndianWriter(server_payload_size + channels_payload_size);
+        mplew.write_short(SendOpcode.SERVERLIST.get_value());
+        mplew.write_byte(server_id);
+        mplew.write_maple_ascii_string(server_name);
+        mplew.write_byte(flag);
+        mplew.write_maple_ascii_string(event_msg);
+        mplew.write_byte(100);
+        mplew.write_byte(0);
+        mplew.write_byte(100);
+        mplew.write_byte(0);
+        mplew.write_byte(0);
+        mplew.write_byte(channels.length);
+        for (let channel of channels) {
+            mplew.write_maple_ascii_string(server_name + '-' + channel.id);
+            mplew.write_int(channel.get_capacity());
+            mplew.write_int(1);
+            mplew.write_byte(channel.id - 1);
+            mplew.write_bool(false);
+        }
+        mplew.write_short(0);
+        return mplew.get_packet();
+    }
+
+    static get_end_of_server_list(): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(3);
+        mplew.write_short(SendOpcode.SERVERLIST.get_value());
+        mplew.write_byte(0xFF);
+        return mplew.get_packet();
+    }
+
+    static select_world(world_id: number): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(6);
+        mplew.write_short(SendOpcode.LAST_CONNECTED_WORLD.get_value());
+        mplew.write_int(world_id);
+        return mplew.get_packet();
+    }
+
+    static send_recommended(world_recommended_list: Array<Pair<number, string>>): Buffer {
+        let size = 3;
+        for (let pair of world_recommended_list) size += 4 + pair.right.length;
+        const mplew = new MaplePacketLittleEndianWriter(size);
+        mplew.write_short(SendOpcode.RECOMMENDED_WORLD_MESSAGE.get_value());
+        mplew.write_byte(world_recommended_list.length);
+        for (let pair of world_recommended_list) {
+            mplew.write_int(pair.left);
+            mplew.write_maple_ascii_string(pair.right);
+        }
+        return mplew.get_packet();
+    }
+ 
 }

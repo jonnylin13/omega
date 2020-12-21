@@ -1,6 +1,7 @@
 import * as net from 'net';
 import { MapleClient } from '../../client/client';
 import { Config } from '../../util/config';
+import { Pair } from '../../util/pair';
 import { MapleSessionCoordinator } from './coordinator/session/session-coordinator';
 const shortid = require('shortid');
 import { Session } from './session';
@@ -25,6 +26,7 @@ export class MasterServer {
     private transitioning_characters: Map<string, number> = new Map();
     private account_characters: Map<number, Set<number>> = new Map();
     private world_characters: Map<number, number> = new Map();
+    world_recommended_list: Array<Pair<number, string>> = [];
 
     static get_instance(): MasterServer {
         return this.instance;

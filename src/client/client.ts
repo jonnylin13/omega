@@ -41,6 +41,8 @@ export class MapleClient {
     last_pong: bigint;
     world_id: number;
     channel_id: number;
+    num_worlds_visible: number;
+    last_npc_click: bigint;
 
     pong_received(): void {
         this.last_pong = MasterServer.get_instance().get_current_time();
@@ -357,6 +359,15 @@ export class MapleClient {
         this.update_login_state(MapleClient.LOGIN.SERVER_TRANSITION);
         this.session.in_transition = true;
         MasterServer.get_instance().set_character_id_in_transition(this, character_id);
+    }
+
+    requested_server_list(worlds: number) {
+        this.num_worlds_visible = worlds;
+        this.set_clicked_npc();
+    }
+
+    set_clicked_npc() {
+        this.last_npc_click = MasterServer.get_instance().get_current_time();
     }
 
 }
