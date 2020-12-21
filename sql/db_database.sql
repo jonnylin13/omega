@@ -13036,7 +13036,7 @@ CREATE TABLE IF NOT EXISTS `maker_reward_data` (
   `item_id` int(11) NOT NULL,
   `reward_id` int(11) NOT NULL,
   `quantity` smallint(6) NOT NULL,
-  `probability` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `chance` tinyint(3) unsigned NOT NULL DEFAULT '100',
   PRIMARY KEY (`item_id`,`reward_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -15805,7 +15805,7 @@ INSERT IGNORE INTO `maker_recipe_data` (`item_id`, `req_item`, `count`) VALUES
   (1492023, 4260008, 20),
   (1492023, 4021010, 3);
 
-INSERT IGNORE INTO `maker_reward_data` (`item_id`, `reward_id`, `quantity`, `prob`) VALUES
+INSERT IGNORE INTO `maker_reward_data` (`item_id`, `reward_id`, `quantity`, `chance`) VALUES
   (4250000, 4250000, 1, 14),
   (4250000, 4250001, 1, 5),
   (4250000, 4250002, 1, 1),
