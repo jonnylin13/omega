@@ -1,4 +1,3 @@
-import { hash } from "bcrypt";
 import { DatabaseConnection, SQLError } from "./db";
 
 

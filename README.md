@@ -1,11 +1,11 @@
 # omega
 v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https://github.com/ronancpl/HeavenMS)
 
-## Project Goals
+## Project goals
 * Provide an easy development environment for beginners
 * Provide a usable source for low population servers (hosting for friends)
 
-## Setup and Contribution
+## Setup and contribution
 * Fork the repository
 * Run `npm install` in the project directory to install the dependencies
 
@@ -19,6 +19,10 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 * Run the server with `npm run start`
 * Run the unit tests with `npm run test`
 * Build the server with `npm run build` (not necessary if running the server)
+
+## Client files
+
+* Download the client files [here](https://drive.google.com/drive/folders/0BzDsHSr-0V4MYVJ0TWIxd05hYUk)
 
 ## Checklist
 
