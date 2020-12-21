@@ -45,6 +45,10 @@ export class MapleCharacter {
         return this.gm_level > 0;
     }
 
+    is_gm_job(): boolean {
+        return true; // TODO: Needs implementation
+    }
+
     static load_from_db(character_id: number, c: MapleClient, channel_server: boolean): MapleCharacter {
         return null; // TODO: Needs implementation
     }

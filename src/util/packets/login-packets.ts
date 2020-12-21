@@ -288,5 +288,13 @@ export class LoginPackets {
         mplew.write_int(chr.hair);
         this.add_char_equips(mplew, chr);
     }
+
+    private static add_remaining_skill_info(mplew: MaplePacketLittleEndianWriter, chr: MapleCharacter) {
+        // TODO: Needs implementation
+    }
+
+    private static add_char_equips(mplew: MaplePacketLittleEndianWriter, chr: MapleCharacter) {
+        // TODO: Needs implementation
+    }
  
 }
