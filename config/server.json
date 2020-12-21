@@ -13,5 +13,6 @@
     "max_allowed_account_hwid": 1,
     "use_character_account_check": true,
     "channel_load": 200,
-    "collective_charslot": true
+    "collective_charslot": true,
+    "max_ap": 32767
 }

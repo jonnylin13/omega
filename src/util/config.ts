@@ -21,6 +21,7 @@ interface ServerConfig extends ConfigType {
     use_character_account_check: boolean;
     channel_load: number;
     collective_charslot: boolean;
+    max_ap: number;
 }
 
 interface ConfigType {}

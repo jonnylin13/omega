@@ -1,6 +1,7 @@
 import { AbstractAnimatedMapleMapObject } from "../../server/maps/abstract-anim-map-object";
-import { MapleMapObjectType } from "../../server/maps/map-object.type";
 import { EventEmitter } from 'events';
+import { MapleStat } from "./stat";
+import { Config } from "../../util/config";
 
 
 export class Short {
@@ -15,8 +16,6 @@ export class Short {
 
 
 export abstract class AbstractMapleCharacter extends AbstractAnimatedMapleMapObject {
-    // TODO: Needs implementation
-    // TODO: Implement AbstractAnimatedMapleMapObject
 
     map: MapleMap;
     str: number; dex: number; luk: number; int: number; 
@@ -29,6 +28,10 @@ export abstract class AbstractMapleCharacter extends AbstractAnimatedMapleMapObj
 
     lister: AbstractCharacterListener = null;
     stat_updates: Map<MapleStat, number> = new Map();
+
+    private static ap_assigned(x: number) {
+        return x != null ? x : 0;
+    }
 
     is_alive(): boolean {
         return this.hp > 0;
@@ -181,12 +184,189 @@ export abstract class AbstractMapleCharacter extends AbstractAnimatedMapleMapObj
             this.stat_updates.set(MapleStat.AVAILABLE_SP, this.remaining_sp[skillbook]);
         }
 
-        if (this.stat_updates.length > 0) {
+        if (this.stat_updates.size > 0) {
             if (pool_update) this.events.emit('hp_mp_pool_updated');
             if (stat_update) this.events.emit('stat_updated');
             if (!silent) this.events.emit('stat_pool_update_announced');
         }
     }
 
-    // TODO: Finish implementation
+    heal_hp_mp() {
+        this.update_hp_mp(30000, 30000);
+    }
+
+    update_hp_mp(hp: number, mp: number) {
+        this.change_hp_mp(hp, mp, false);
+    }
+
+    protected change_hp_mp(hp: number, mp: number, silent: boolean) {
+        this.change_hp_mp_pool(hp, mp, null, null, silent);
+    }
+
+    private change_hp_mp_pool(hp: number, mp: number, max_hp: number, max_mp: number, silent: boolean) {
+        let hp_mp_pool = AbstractMapleCharacter.calc_stat_pool_long(hp, mp, max_hp, max_mp);
+        this.change_stat_pool(hp_mp_pool, null, null, -1, silent);
+    }
+
+    update_hp(hp: number) {
+        this.update_hp_max_hp(hp, null);
+    }
+
+    update_max_hp(max_hp: number) {
+        this.update_hp_max_hp(null, max_hp);
+    }
+
+    update_hp_max_hp(hp: number, max_hp: number) {
+        this.change_hp_mp_pool(hp, null, max_hp, null, false);
+    }
+
+    update_mp(mp: number) {
+        this.update_mp_max_mp(mp, null);
+    }
+
+    update_max_mp(max_mp: number) {
+        this.update_mp_max_mp(null, max_mp);
+    }
+
+    update_mp_max_mp(mp: number, max_mp: number) {
+        this.change_hp_mp_pool(null, mp, null, max_mp, false);
+    }
+
+    update_max_hp_max_mp(max_hp: number, max_mp: number) {
+        this.change_hp_mp_pool(null, null, max_hp, max_mp, false);
+    }
+
+    protected enforce_max_hp_mp() {
+        if (this.mp > this.local_max_mp || this.hp > this.local_max_mp)
+            this.change_hp_mp(this.hp, this.mp, false);
+    }
+
+    safe_add_hp(delta: number) {
+        if (this.hp + delta < 0) delta = -this.hp + 1;
+        this.add_hp(delta);
+        return delta;
+    }
+
+    add_hp(delta: number) {
+        this.update_hp(this.hp + delta);
+    }
+
+    add_mp(delta: number) {
+        this.update_mp(this.mp + delta);
+    }
+
+    add_hp_mp(delta_hp: number, delta_mp: number) {
+        this.update_hp_mp(this.hp + delta_hp, this.mp + delta_mp);
+    }
+
+    add_max_hp_max_mp(delta_hp: number, delta_mp: number, silent: boolean) {
+        this.change_hp_mp_pool(null, null, this.max_hp + delta_hp, this.max_mp + delta_mp, silent);
+    }
+
+    add_max_hp(delta: number) {
+        this.update_max_hp(this.max_hp + delta);
+    }
+
+    add_max_mp(delta: number) {
+        this.update_max_mp(this.mp + delta);
+    }
+
+    assign_str(x: number): boolean {
+        return this.assign_str_dex_int_luk(x, null, null, null);
+    }
+
+    assign_dex(x: number): boolean {
+        return this.assign_str_dex_int_luk(null, x, null, null);
+    }
+
+    assign_int(x: number): boolean {
+        return this.assign_str_dex_int_luk(null, null, x, null);
+    }
+
+    assign_luk(x: number): boolean {
+        return this.assign_str_dex_int_luk(null, null, null, x);
+    }
+
+    assign_hp(delta_hp: number, delta_ap: number): boolean {
+        if (this.remaining_ap - delta_ap < 0 || this.hp_mp_ap_used + delta_ap < 0 || this.max_hp >= 30000) return false;
+        let hp_mp_pool = AbstractMapleCharacter.calc_stat_pool_long(null, null, this.max_hp + delta_hp, this.max_mp);
+        let str_dex_int_luk = AbstractMapleCharacter.calc_stat_pool_long(this.str, this.dex, this.int, this.luk);
+        this.change_stat_pool(hp_mp_pool, str_dex_int_luk, null, this.remaining_ap - delta_ap, false);
+        this.hp_mp_ap_used += delta_ap;
+        return true;
+    }
+
+    assign_mp(delta_mp: number, delta_ap: number): boolean {
+        if (this.remaining_ap - delta_ap < 0 || this.hp_mp_ap_used + delta_ap < 0 || this.max_mp >= 30000) return false;
+        let hp_mp_pool = AbstractMapleCharacter.calc_stat_pool_long(null, null, this.max_hp, this.max_mp + delta_mp);
+        let str_dex_int_luk = AbstractMapleCharacter.calc_stat_pool_long(this.str, this.dex, this.int, this.luk);
+        this.change_stat_pool(hp_mp_pool, str_dex_int_luk, null, this.remaining_ap - delta_ap, false);
+        this.hp_mp_ap_used += delta_ap;
+        return true;
+    }
+
+    assign_str_dex_int_luk(delta_str: number, delta_dex: number, delta_int: number, delta_luk: number): boolean {
+        let ap_used = AbstractMapleCharacter.ap_assigned(delta_str) + AbstractMapleCharacter.ap_assigned(delta_dex) + AbstractMapleCharacter.ap_assigned(delta_int) + AbstractMapleCharacter.ap_assigned(delta_luk);
+        if (ap_used > this.remaining_ap) return false;
+        let new_str = this.str;
+        let new_dex = this.dex;
+        let new_int = this.int;
+        let new_luk = this.luk;
+        if (delta_str != null && delta_str != undefined) new_str += delta_str;
+        if (delta_dex != null && delta_dex != undefined) new_dex += delta_dex;
+        if (delta_int != null && delta_int != undefined) new_int += delta_int;
+        if (delta_luk != null && delta_luk != undefined) new_luk += delta_luk;
+
+        if (new_str < 4 || new_str > Config.properties.server.max_ap) return false;
+        if (new_dex < 4 || new_dex > Config.properties.server.max_ap) return false;
+        if (new_int < 4 || new_int > Config.properties.server.max_ap) return false;
+        if (new_luk < 4 || new_luk > Config.properties.server.max_ap) return false;
+        let new_ap = this.remaining_ap - ap_used;
+        this.update_str_dex_int_luk(new_str, new_dex, new_int, new_luk, new_ap);
+        return true;
+    }
+
+    change_remaining_ap(x: number, silent: boolean) {
+        this.change_str_dex_int_luk(this.str, this.dex, this.int, this.luk, x, silent);
+    }
+
+    gain_ap(delta_ap: number, silent: boolean) {
+        this.change_remaining_ap(Math.max(0, this.remaining_ap + delta_ap), silent);
+    }
+
+    protected update_str_dex_int_luk(str: number, dex: number, int: number, luk: number, remaining_ap: number) {
+        this.change_str_dex_int_luk(str, dex, int, luk, remaining_ap, false);
+    }
+
+    private change_str_dex_int_luk(str: number, dex: number, int: number, luk: number, remaining_ap: number, silent: boolean) {
+        let str_dex_int_luk = AbstractMapleCharacter.calc_stat_pool_long(str, dex, int, luk);
+        this.change_stat_pool(null, str_dex_int_luk, null, remaining_ap, silent);
+    }
+
+    private change_str_dex_int_luk_sp(str: number, dex: number, int: number, luk: number, remaining_ap: number, remaining_sp: number, skillbook: number, silent: boolean) {
+        let str_dex_int_luk = AbstractMapleCharacter.calc_stat_pool_long(str, dex, int, luk);
+        let sp = AbstractMapleCharacter.calc_stat_pool_long(0, 0, remaining_sp, skillbook);
+        this.change_stat_pool(null, str_dex_int_luk, sp, remaining_ap, silent);
+    }
+
+    protected update_str_dex_int_luk_sp(str: number, dex: number, int: number, luk: number, remaining_ap: number, remaining_sp: number, skillbook: number) {
+        this.change_str_dex_int_luk_sp(str, dex, int, luk, remaining_ap, remaining_sp, skillbook, false);
+    }
+
+    protected set_remaining_sp_array(sp: Array<number>) {
+        this.remaining_sp = Array.from(sp);
+    }
+
+    protected update_remaining_sp(remaining_sp: number, skillbook: number) {
+        this.change_remaining_sp(remaining_sp, skillbook, false);
+    }
+
+    protected change_remaining_sp(remaining_sp: number, skillbook: number, silent: boolean) {
+        let sp = AbstractMapleCharacter.calc_stat_pool_long(0, 0, remaining_sp, skillbook);
+        this.change_stat_pool(null, null, sp, Short.MIN_VALUE(), silent);
+    }
+
+    gain_sp(delta_sp: number, skillbook: number, silent: boolean) {
+        this.change_remaining_sp(Math.max(0, this.remaining_sp[skillbook] + delta_sp), skillbook, silent);
+    }
 }
