@@ -31,6 +31,7 @@ export class MasterServer {
     world_recommended_list: Array<Pair<number, string>> = [];
 
     static get_instance(): MasterServer {
+        if (this.instance === null) this.instance = new MasterServer();
         return this.instance;
     }
 

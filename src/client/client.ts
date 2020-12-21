@@ -51,6 +51,7 @@ export class MapleClient {
     constructor(send: MapleAESOFB, receive: MapleAESOFB, session: Session) {
         this.send = send;
         this.receive = receive;
+        this.session = session;
         this.session_id = session.id;
     }
 
