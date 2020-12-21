@@ -8,9 +8,9 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
-DROP DATABASE IF EXISTS `heavenms`;
-CREATE DATABASE `heavenms` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-USE `heavenms`;
+DROP DATABASE IF EXISTS `omega`;
+CREATE DATABASE `omega` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+USE `omega`;
 
 CREATE TABLE IF NOT EXISTS `accounts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -18,36 +18,36 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `password` varchar(128) NOT NULL DEFAULT '',
   `pin` varchar(10) NOT NULL DEFAULT '',
   `pic` varchar(26) NOT NULL DEFAULT '',
-  `loggedin` tinyint(4) NOT NULL DEFAULT '0',
-  `lastlogin` timestamp NULL DEFAULT NULL,
-  `createdat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `logged_in` tinyint(4) NOT NULL DEFAULT '0',
+  `last_login` timestamp NULL DEFAULT NULL,
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `birthday` date NOT NULL DEFAULT '0000-00-00',
   `banned` tinyint(1) NOT NULL DEFAULT '0',
-  `banreason` text,
+  `ban_reason` text,
   `macs` tinytext,
-  `nxCredit` int(11) DEFAULT NULL,
-  `maplePoint` int(11) DEFAULT NULL,
-  `nxPrepaid` int(11) DEFAULT NULL,
-  `characterslots` tinyint(2) NOT NULL DEFAULT '3',
+  `nx_credit` int(11) DEFAULT NULL,
+  `maple_points` int(11) DEFAULT NULL,
+  `nx_prepaid` int(11) DEFAULT NULL,
+  `character_slots` tinyint(2) NOT NULL DEFAULT '3',
   `gender` tinyint(2) NOT NULL DEFAULT '10',
-  `tempban` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `temp_ban` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `greason` tinyint(4) NOT NULL DEFAULT '0',
   `tos` tinyint(1) NOT NULL DEFAULT '0',
-  `sitelogged` text,
-  `webadmin` int(1) DEFAULT '0',
+  `site_logged` text,
+  `web_admin` int(1) DEFAULT '0',
   `nick` varchar(20) DEFAULT NULL,
   `mute` int(1) DEFAULT '0',
   `email` varchar(45) DEFAULT NULL,
   `ip` text,
-  `rewardpoints` int(11) NOT NULL DEFAULT '0',
-  `votepoints` int(11) NOT NULL DEFAULT '0',
+  `reward_points` int(11) NOT NULL DEFAULT '0',
+  `vote_points` int(11) NOT NULL DEFAULT '0',
   `hwid` varchar(12) NOT NULL DEFAULT '',
   `language` int(1) NOT NULL DEFAULT '2',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`),
   KEY `ranking1` (`id`,`banned`),
   INDEX (id, name),
-  INDEX (id, nxCredit, maplePoint, nxPrepaid)
+  INDEX (id, nx_credit, maple_points, nx_prepaid)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `alliance` (
@@ -65,16 +65,16 @@ CREATE TABLE IF NOT EXISTS `alliance` (
   INDEX (name)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `allianceguilds` (
+CREATE TABLE IF NOT EXISTS `alliance_guilds` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `allianceid` int(10) NOT NULL DEFAULT '-1',
-  `guildid` int(10) NOT NULL DEFAULT '-1',
+  `alliance_id` int(10) NOT NULL DEFAULT '-1',
+  `guild_id` int(10) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `area_info` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `charid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
   `area` int(11) NOT NULL,
   `info` varchar(200) NOT NULL,
   PRIMARY KEY (`id`)
@@ -82,46 +82,46 @@ CREATE TABLE IF NOT EXISTS `area_info` (
 
 CREATE TABLE IF NOT EXISTS `bosslog_daily` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
-  `bosstype` enum('ZAKUM','HORNTAIL','PINKBEAN','SCARGA','PAPULATUS') NOT NULL,
-  `attempttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `character_id` int(11) NOT NULL,
+  `boss_type` enum('ZAKUM','HORNTAIL','PINKBEAN','SCARGA','PAPULATUS') NOT NULL,
+  `attempt_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `bosslog_weekly` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
-  `bosstype` enum('ZAKUM','HORNTAIL','PINKBEAN','SCARGA','PAPULATUS') NOT NULL,
-  `attempttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `character_id` int(11) NOT NULL,
+  `boss_type` enum('ZAKUM','HORNTAIL','PINKBEAN','SCARGA','PAPULATUS') NOT NULL,
+  `attempt_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `bbs_replies` (
-  `replyid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `threadid` int(10) unsigned NOT NULL,
-  `postercid` int(10) unsigned NOT NULL,
+  `reply_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `thread_id` int(10) unsigned NOT NULL,
+  `poster_character_id` int(10) unsigned NOT NULL,
   `timestamp` bigint(20) unsigned NOT NULL,
   `content` varchar(26) NOT NULL DEFAULT '',
-  PRIMARY KEY (`replyid`)
+  PRIMARY KEY (`reply_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `bbs_threads` (
-  `threadid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `postercid` int(10) unsigned NOT NULL,
+  `thread_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `poster_character_id` int(10) unsigned NOT NULL,
   `name` varchar(26) NOT NULL DEFAULT '',
   `timestamp` bigint(20) unsigned NOT NULL,
   `icon` smallint(5) unsigned NOT NULL,
-  `replycount` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `startpost` text NOT NULL,
-  `guildid` int(10) unsigned NOT NULL,
-  `localthreadid` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`threadid`)
+  `reply_count` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `start_post` text NOT NULL,
+  `guild_id` int(10) unsigned NOT NULL,
+  `local_thread_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`thread_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `buddies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
-  `buddyid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `buddy_id` int(11) NOT NULL,
   `pending` tinyint(4) NOT NULL DEFAULT '0',
   `group` varchar(17) DEFAULT '0',
   PRIMARY KEY (`id`)
@@ -129,24 +129,24 @@ CREATE TABLE IF NOT EXISTS `buddies` (
 
 CREATE TABLE IF NOT EXISTS `characters` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `accountid` int(11) NOT NULL DEFAULT '0',
+  `account_id` int(11) NOT NULL DEFAULT '0',
   `world` int(11) NOT NULL DEFAULT '0',
   `name` varchar(13) NOT NULL DEFAULT '',
   `level` int(11) NOT NULL DEFAULT '1',
   `exp` int(11) NOT NULL DEFAULT '0',
-  `gachaexp` int(11) NOT NULL DEFAULT '0',
+  `gacha_exp` int(11) NOT NULL DEFAULT '0',
   `str` int(11) NOT NULL DEFAULT '12',
   `dex` int(11) NOT NULL DEFAULT '5',
   `luk` int(11) NOT NULL DEFAULT '4',
   `int` int(11) NOT NULL DEFAULT '4',
   `hp` int(11) NOT NULL DEFAULT '50',
   `mp` int(11) NOT NULL DEFAULT '5',
-  `maxhp` int(11) NOT NULL DEFAULT '50',
-  `maxmp` int(11) NOT NULL DEFAULT '5',
+  `max_hp` int(11) NOT NULL DEFAULT '50',
+  `max_mp` int(11) NOT NULL DEFAULT '5',
   `meso` int(11) NOT NULL DEFAULT '0',
-  `hpMpUsed` int(11) unsigned NOT NULL DEFAULT '0',
+  `hp_mp_used` int(11) unsigned NOT NULL DEFAULT '0',
   `job` int(11) NOT NULL DEFAULT '0',
-  `skincolor` int(11) NOT NULL DEFAULT '0',
+  `skin_color` int(11) NOT NULL DEFAULT '0',
   `gender` int(11) NOT NULL DEFAULT '0',
   `fame` int(11) NOT NULL DEFAULT '0',
   `fquest` int(11) NOT NULL DEFAULT '0',
@@ -155,83 +155,83 @@ CREATE TABLE IF NOT EXISTS `characters` (
   `ap` int(11) NOT NULL DEFAULT '0',
   `sp` varchar(128) NOT NULL DEFAULT '0,0,0,0,0,0,0,0,0,0',
   `map` int(11) NOT NULL DEFAULT '0',
-  `spawnpoint` int(11) NOT NULL DEFAULT '0',
+  `spawn_point` int(11) NOT NULL DEFAULT '0',
   `gm` tinyint(1) NOT NULL DEFAULT '0',
   `party` int(11) NOT NULL DEFAULT '0',
-  `buddyCapacity` int(11) NOT NULL DEFAULT '25',
-  `createdate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `buddy_capacity` int(11) NOT NULL DEFAULT '25',
+  `create_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `rank` int(10) unsigned NOT NULL DEFAULT '1',
-  `rankMove` int(11) NOT NULL DEFAULT '0',
-  `jobRank` int(10) unsigned NOT NULL DEFAULT '1',
-  `jobRankMove` int(11) NOT NULL DEFAULT '0',
-  `guildid` int(10) unsigned NOT NULL DEFAULT '0',
-  `guildrank` int(10) unsigned NOT NULL DEFAULT '5',
-  `messengerid` int(10) unsigned NOT NULL DEFAULT '0',
-  `messengerposition` int(10) unsigned NOT NULL DEFAULT '4',
-  `mountlevel` int(9) NOT NULL DEFAULT '1',
-  `mountexp` int(9) NOT NULL DEFAULT '0',
-  `mounttiredness` int(9) NOT NULL DEFAULT '0',
-  `omokwins` int(11) NOT NULL DEFAULT '0',
-  `omoklosses` int(11) NOT NULL DEFAULT '0',
-  `omokties` int(11) NOT NULL DEFAULT '0',
-  `matchcardwins` int(11) NOT NULL DEFAULT '0',
-  `matchcardlosses` int(11) NOT NULL DEFAULT '0',
-  `matchcardties` int(11) NOT NULL DEFAULT '0',
-  `MerchantMesos` int(11) DEFAULT '0',
-  `HasMerchant` tinyint(1) DEFAULT '0',
-  `equipslots` int(11) NOT NULL DEFAULT '24',
-  `useslots` int(11) NOT NULL DEFAULT '24',
-  `setupslots` int(11) NOT NULL DEFAULT '24',
-  `etcslots` int(11) NOT NULL DEFAULT '24',
-  `familyId` int(11) NOT NULL DEFAULT '-1',
-  `monsterbookcover` int(11) NOT NULL DEFAULT '0',
-  `allianceRank` int(10) NOT NULL DEFAULT '5',
-  `vanquisherStage` int(11) unsigned NOT NULL DEFAULT '0',
-  `ariantPoints` int(11) unsigned NOT NULL DEFAULT '0',
-  `dojoPoints` int(11) unsigned NOT NULL DEFAULT '0',
-  `lastDojoStage` int(10) unsigned NOT NULL DEFAULT '0',
-  `finishedDojoTutorial` tinyint(1) unsigned NOT NULL DEFAULT '0',
-  `vanquisherKills` int(11) unsigned NOT NULL DEFAULT '0',
-  `summonValue` int(11) unsigned NOT NULL DEFAULT '0',
-  `partnerId` int(11) NOT NULL DEFAULT '0',
-  `marriageItemId` int(11) NOT NULL DEFAULT '0',
+  `rank_move` int(11) NOT NULL DEFAULT '0',
+  `job_rank` int(10) unsigned NOT NULL DEFAULT '1',
+  `job_rank_move` int(11) NOT NULL DEFAULT '0',
+  `guild_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `guild_rank` int(10) unsigned NOT NULL DEFAULT '5',
+  `messenger_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `messenger_position` int(10) unsigned NOT NULL DEFAULT '4',
+  `mount_level` int(9) NOT NULL DEFAULT '1',
+  `mount_exp` int(9) NOT NULL DEFAULT '0',
+  `mount_tiredness` int(9) NOT NULL DEFAULT '0',
+  `omok_wins` int(11) NOT NULL DEFAULT '0',
+  `omok_losses` int(11) NOT NULL DEFAULT '0',
+  `omok_ties` int(11) NOT NULL DEFAULT '0',
+  `match_card_wins` int(11) NOT NULL DEFAULT '0',
+  `match_card_losses` int(11) NOT NULL DEFAULT '0',
+  `match_card_ties` int(11) NOT NULL DEFAULT '0',
+  `merchant_mesos` int(11) DEFAULT '0',
+  `has_merchant` tinyint(1) DEFAULT '0',
+  `equip_slots` int(11) NOT NULL DEFAULT '24',
+  `use_slots` int(11) NOT NULL DEFAULT '24',
+  `setup_slots` int(11) NOT NULL DEFAULT '24',
+  `etc_slots` int(11) NOT NULL DEFAULT '24',
+  `family_id` int(11) NOT NULL DEFAULT '-1',
+  `monster_book_cover` int(11) NOT NULL DEFAULT '0',
+  `alliance_rank` int(10) NOT NULL DEFAULT '5',
+  `vanquisher_stage` int(11) unsigned NOT NULL DEFAULT '0',
+  `ariant_points` int(11) unsigned NOT NULL DEFAULT '0',
+  `dojo_points` int(11) unsigned NOT NULL DEFAULT '0',
+  `last_dojo_stage` int(10) unsigned NOT NULL DEFAULT '0',
+  `finished_dojo_tutorial` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `vanquisher_kills` int(11) unsigned NOT NULL DEFAULT '0',
+  `summon_value` int(11) unsigned NOT NULL DEFAULT '0',
+  `partner_id` int(11) NOT NULL DEFAULT '0',
+  `marriage_item_id` int(11) NOT NULL DEFAULT '0',
   `reborns` int(5) NOT NULL DEFAULT '0',
-  `PQPoints` int(11) NOT NULL DEFAULT '0',
-  `dataString` varchar(64) NOT NULL DEFAULT '',
-  `lastLogoutTime` timestamp NOT NULL DEFAULT '2015-01-01 05:00:00',
-  `lastExpGainTime` timestamp NOT NULL DEFAULT '2015-01-01 05:00:00',
-  `partySearch` tinyint(1) NOT NULL DEFAULT '1',
-  `jailexpire` bigint(20) NOT NULL DEFAULT '0',
+  `pq_points` int(11) NOT NULL DEFAULT '0',
+  `data_string` varchar(64) NOT NULL DEFAULT '',
+  `last_logout_time` timestamp NOT NULL DEFAULT '2015-01-01 05:00:00',
+  `last_exp_gain_time` timestamp NOT NULL DEFAULT '2015-01-01 05:00:00',
+  `party_search` tinyint(1) NOT NULL DEFAULT '1',
+  `jail_expire` bigint(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `accountid` (`accountid`),
+  KEY `account_id` (`account_id`),
   KEY `party` (`party`),
   KEY `ranking1` (`level`,`exp`),
   KEY `ranking2` (`gm`,`job`),
-  INDEX (id, accountid, world),
-  INDEX (id, accountid, name)
+  INDEX (id, account_id, world),
+  INDEX (id, account_id, name)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 PACK_KEYS=0 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `cooldowns` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `charid` int(11) NOT NULL,
-  `SkillID` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `skill_id` int(11) NOT NULL,
   `length` bigint(20) unsigned NOT NULL,
-  `StartTime` bigint(20) unsigned NOT NULL,
+  `start_time` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `temp_data` (
-  `dropperid` int(11) NOT NULL,
-  `itemid` int(11) NOT NULL DEFAULT '0',
+  `dropper_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL DEFAULT '0',
   `minimum_quantity` int(11) NOT NULL DEFAULT '1',
   `maximum_quantity` int(11) NOT NULL DEFAULT '1',
-  `questid` int(11) NOT NULL DEFAULT '0',
+  `quest_id` int(11) NOT NULL DEFAULT '0',
   `chance` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`dropperid`, `itemid`),
-  KEY `mobid` (`dropperid`)
+  PRIMARY KEY (`dropper_id`, `item_id`),
+  KEY `mob_id` (`dropper_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=0 ;
 
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (9400121, 4000138, 1, 1, 0, 600000),
 (9400121, 4010006, 1, 1, 0, 45000),
 (9400121, 2000006, 1, 1, 0, 999999),
@@ -1543,7 +1543,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (3110102, 1072294, 1, 1, 0, 800),
 (3110102, 2044210, 1, 1, 0, 300),
 (3110102, 4130003, 1, 1, 0, 6000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (3110102, 4130004, 1, 1, 0, 6000),
 (3110102, 4130011, 1, 1, 0, 6000),
 (3110300, 2000003, 1, 1, 0, 20000),
@@ -2824,7 +2824,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (4230102, 1002215, 1, 1, 0, 1500),
 (4230102, 1002212, 1, 1, 0, 1500),
 (4230102, 1082066, 1, 1, 0, 1000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (4230102, 1072141, 1, 1, 0, 800),
 (4230102, 1072303, 1, 1, 0, 800),
 (4230102, 2330002, 1, 1, 0, 500),
@@ -4109,7 +4109,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (5120003, 2041023, 1, 1, 0, 300),
 (5120003, 1032019, 1, 1, 0, 1000),
 (5120003, 2070004, 1, 1, 0, 500);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (5120003, 2070010, 1, 1, 0, 500),
 (5120003, 1002153, 1, 1, 0, 1500),
 (5120003, 1002181, 1, 1, 0, 1500),
@@ -5391,7 +5391,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (6130208, 4130012, 1, 1, 0, 6000),
 (6130209, 4000289, 1, 1, 0, 600000),
 (6130209, 4000021, 1, 1, 0, 50000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (6130209, 4003005, 1, 1, 0, 200000),
 (6130209, 4020004, 1, 1, 0, 9000),
 (6130209, 4020002, 1, 1, 0, 9000),
@@ -6676,7 +6676,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (7160000, 2040619, 1, 1, 0, 300),
 (7160000, 4130003, 1, 1, 0, 6000),
 (7160000, 4130007, 1, 1, 0, 6000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (7160000, 4130011, 1, 1, 0, 6000),
 (7220000, 4000284, 1, 1, 0, 600000),
 (7220000, 4000284, 1, 1, 0, 600000),
@@ -7960,7 +7960,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (8170000, 1061106, 1, 1, 0, 800),
 (8170000, 1050083, 1, 1, 0, 700),
 (8170000, 1051069, 1, 1, 0, 700);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (8170000, 1072211, 1, 1, 0, 800),
 (8170000, 1072178, 1, 1, 0, 800),
 (8170000, 1462013, 1, 1, 0, 500),
@@ -9226,7 +9226,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (8830000, 2020015, 1, 1, 0, 999999),
 (8830000, 2049100, 1, 1, 0, 3000),
 (8830000, 2049000, 1, 1, 0, 1500);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (8830000, 2040739, 1, 1, 0, 3000),
 (8830000, 1072376, 1, 1, 0, 8000),
 (8830000, 4001261, 1, 1, 0, 600000),
@@ -10435,7 +10435,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (3230104, 4031209, 1, 1, 3072, 500000),
 (3230306, 4031159, 1, 1, 2074, 500000),
 (9500400, 4031224, 1, 1, 3607, 1000000),
-(9500400, 4031223, 1, 1, 3608, 1000000),    # thanks Lame for noticing Hongbu's gourd unavailable
+(9500400, 4031223, 1, 1, 3608, 1000000),
 (9420003, 4031400, 1, 1, 8761, 1000000),
 (9420001, 4031401, 1, 1, 8761, 1000000),
 (9300097, 4031472, 1, 1, 6301, 100000),
@@ -10485,7 +10485,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (130101, 4031846, 1, 1, 2173, 50000),
 (1210100, 4031846, 1, 1, 2173, 50000),
 (8180001, 4031464, 1, 1, 6303, 1000000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropped_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (7130104, 4031436, 1, 1, 3828, 1000000),
 (3110302, 4031694, 1, 1, 3312, 50000),
 (3110303, 4031694, 1, 1, 3312, 100000),
@@ -11675,7 +11675,7 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 (9420530, 1382019, 1, 1, 0, 1800),
 (9420530, 2041002, 1, 1, 0, 1000),
 (9420530, 2040901, 1, 1, 0, 1000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (9420530, 2020014, 1, 1, 0, 10000),
 (9420530, 400006, 1, 1, 0, 333333),
 (9420530, 400002, 1, 1, 0, 10000),
@@ -12791,17 +12791,17 @@ INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maxi
 CREATE TABLE IF NOT EXISTS `drop_data_global` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `continent` tinyint(1) NOT NULL DEFAULT '-1',
-  `itemid` int(11) NOT NULL DEFAULT '0',
+  `item_id` int(11) NOT NULL DEFAULT '0',
   `minimum_quantity` int(11) NOT NULL DEFAULT '1',
   `maximum_quantity` int(11) NOT NULL DEFAULT '1',
-  `questid` int(11) NOT NULL DEFAULT '0',
+  `quest_id` int(11) NOT NULL DEFAULT '0',
   `chance` int(11) NOT NULL DEFAULT '0',
   `comments` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `mobid` (`continent`) USING BTREE
+  KEY `mob_id` (`continent`) USING BTREE
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC AUTO_INCREMENT=5 ;
 
-INSERT INTO `drop_data_global` (`id`, `continent`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`, `comments`) VALUES
+INSERT INTO `drop_data_global` (`id`, `continent`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`, `comments`) VALUES
 (1, -1, 4031865, 1, 1, 0, 35000, 'NX Card 100 PTS'),
 (2, -1, 4031866, 1, 1, 0, 20000, 'NX Card 250 PTS'),
 (3, -1, 4001126, 1, 2, 0, 8000, 'Maple Leaves'),
@@ -12809,72 +12809,72 @@ INSERT INTO `drop_data_global` (`id`, `continent`, `itemid`, `minimum_quantity`,
 (5, -1, 2340000, 1, 1, 0, 1200, 'White Scroll'),
 (6, -1, 4001006, 1, 1, 0, 10000, 'Flaming Feather');
 
-CREATE TABLE IF NOT EXISTS `dueyitems` (
+CREATE TABLE IF NOT EXISTS `duey_items` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `PackageId` int(10) unsigned NOT NULL DEFAULT '0',
-  `inventoryitemid` int(10) unsigned NOT NULL DEFAULT '0',
+  `package_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `inventory_item_id` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `INVENTORYITEMID` (`inventoryitemid`),
-  KEY `PackageId` (`PackageId`)
+  KEY `InventoryItemId` (`inventory_item_id`),
+  KEY `PackageId` (`package_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `dueypackages` (
-  `PackageId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `ReceiverId` int(10) unsigned NOT NULL,
-  `SenderName` varchar(13) NOT NULL,
-  `Mesos` int(10) unsigned DEFAULT '0',
-  `TimeStamp` timestamp NOT NULL DEFAULT '2015-01-01 05:00:00',
-  `Message` varchar(200) NULL,
-  `Checked` tinyint(1) unsigned DEFAULT '1',
-  `Type` tinyint(1) unsigned DEFAULT '0',
-  PRIMARY KEY (`PackageId`)
+CREATE TABLE IF NOT EXISTS `duey_packages` (
+  `package_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `receiver_id` int(10) unsigned NOT NULL,
+  `sender_name` varchar(13) NOT NULL,
+  `mesos` int(10) unsigned DEFAULT '0',
+  `timestamp` timestamp NOT NULL DEFAULT '2015-01-01 05:00:00',
+  `message` varchar(200) NULL,
+  `checked` tinyint(1) unsigned DEFAULT '1',
+  `type` tinyint(1) unsigned DEFAULT '0',
+  PRIMARY KEY (`package_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `eventstats` (
-  `characterid` int(11) unsigned NOT NULL,
+CREATE TABLE IF NOT EXISTS `event_stats` (
+  `character_id` int(11) unsigned NOT NULL,
   `name` varchar(11) NOT NULL DEFAULT '0' COMMENT '0',
   `info` int(11) NOT NULL,
-  PRIMARY KEY (`characterid`)
+  PRIMARY KEY (`character_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `famelog` (
-  `famelogid` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL DEFAULT '0',
-  `characterid_to` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `fame_log` (
+  `fame_log_id` int(11) NOT NULL AUTO_INCREMENT,
+  `sender_character_id` int(11) NOT NULL DEFAULT '0',
+  `receiver_character_id` int(11) NOT NULL DEFAULT '0',
   `when` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`famelogid`),
-  KEY `characterid` (`characterid`)
+  PRIMARY KEY (`fame_log_id`),
+  KEY `characterid` (`sender_character_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `family_character` (
-  `cid` int(11) NOT NULL,
-  `familyid` int(11) NOT NULL,
-  `seniorid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `family_id` int(11) NOT NULL,
+  `senior_id` int(11) NOT NULL,
   `reputation` int(11) NOT NULL DEFAULT '0',
-  `todaysrep` int(11) NOT NULL DEFAULT '0',
-  `totalreputation` int(11) NOT NULL DEFAULT '0',
-  `reptosenior` int(11) NOT NULL DEFAULT '0',
+  `todays_rep` int(11) NOT NULL DEFAULT '0',
+  `total_rep` int(11) NOT NULL DEFAULT '0',
+  `rep_to_senior` int(11) NOT NULL DEFAULT '0',
   `precepts` varchar(200) DEFAULT NULL,
-  `lastresettime` BIGINT(20) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`cid`),
-  INDEX (cid, familyid)
+  `last_reset_time` BIGINT(20) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`character_id`),
+  INDEX (character_id, family_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 CREATE TABLE IF NOT EXISTS `family_entitlement` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `charid` int(11) NOT NULL,
-  `entitlementid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `entitlement_id` int(11) NOT NULL,
   `timestamp` BIGINT(20) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  INDEX (charid)
+  INDEX (character_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `fredstorage` (
+CREATE TABLE IF NOT EXISTS `frederick_storage` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `cid` int(10) unsigned NOT NULL,
-  `daynotes` int(4) unsigned NOT NULL,
+  `character_id` int(10) unsigned NOT NULL,
+  `day_notes` int(4) unsigned NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY `cid_2` (`cid`),
+  UNIQUE KEY `cid_2` (`character_id`),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -12884,51 +12884,51 @@ CREATE TABLE IF NOT EXISTS `gifts` (
   `from` varchar(13) NOT NULL,
   `message` tinytext NOT NULL,
   `sn` int(10) unsigned NOT NULL,
-  `ringid` int(10) NOT NULL,
+  `ring_id` int(10) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `guilds` (
-  `guildid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `guild_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `leader` int(10) unsigned NOT NULL DEFAULT '0',
-  `GP` int(10) unsigned NOT NULL DEFAULT '0',
+  `guild_points` int(10) unsigned NOT NULL DEFAULT '0',
   `logo` int(10) unsigned DEFAULT NULL,
-  `logoColor` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `logo_color` smallint(5) unsigned NOT NULL DEFAULT '0',
   `name` varchar(45) NOT NULL,
-  `rank1title` varchar(45) NOT NULL DEFAULT 'Master',
-  `rank2title` varchar(45) NOT NULL DEFAULT 'Jr. Master',
-  `rank3title` varchar(45) NOT NULL DEFAULT 'Member',
-  `rank4title` varchar(45) NOT NULL DEFAULT 'Member',
-  `rank5title` varchar(45) NOT NULL DEFAULT 'Member',
+  `rank1_title` varchar(45) NOT NULL DEFAULT 'Master',
+  `rank2_title` varchar(45) NOT NULL DEFAULT 'Jr. Master',
+  `rank3_title` varchar(45) NOT NULL DEFAULT 'Member',
+  `rank4_title` varchar(45) NOT NULL DEFAULT 'Member',
+  `rank5_title` varchar(45) NOT NULL DEFAULT 'Member',
   `capacity` int(10) unsigned NOT NULL DEFAULT '10',
-  `logoBG` int(10) unsigned DEFAULT NULL,
-  `logoBGColor` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `logo_bg` int(10) unsigned DEFAULT NULL,
+  `logo_bg_color` smallint(5) unsigned NOT NULL DEFAULT '0',
   `notice` varchar(101) DEFAULT NULL,
   `signature` int(11) NOT NULL DEFAULT '0',
-  `allianceId` int(11) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guildid`),
-  INDEX (guildid, name)
+  `alliance_id` int(11) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guild_id`),
+  INDEX (guild_id, name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `hwidaccounts` (
-  `accountid` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `hwid_accounts` (
+  `account_id` int(11) NOT NULL DEFAULT '0',
   `hwid` varchar(40) NOT NULL DEFAULT '',
   `relevance` tinyint(2) NOT NULL DEFAULT '0',
-  `expiresat` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`accountid`,`hwid`)
+  `expires_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`account_id`,`hwid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `hwidbans` (
-  `hwidbanid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `hwid_bans` (
+  `hwid_ban_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `hwid` varchar(30) NOT NULL,
-  PRIMARY KEY (`hwidbanid`),
+  PRIMARY KEY (`hwid_ban_id`),
   UNIQUE KEY `hwid_2` (`hwid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `inventoryequipment` (
-  `inventoryequipmentid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `inventoryitemid` int(10) unsigned NOT NULL DEFAULT '0',
-  `upgradeslots` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `inventory_equipment` (
+  `inventory_equipment_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `inventory_item_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `upgrade_slots` int(11) NOT NULL DEFAULT '0',
   `level` int(11) NOT NULL DEFAULT '0',
   `str` int(11) NOT NULL DEFAULT '0',
   `dex` int(11) NOT NULL DEFAULT '0',
@@ -12947,73 +12947,73 @@ CREATE TABLE IF NOT EXISTS `inventoryequipment` (
   `jump` int(11) NOT NULL DEFAULT '0',
   `locked` int(11) NOT NULL DEFAULT '0',
   `vicious` int(11) unsigned NOT NULL DEFAULT '0',
-  `itemlevel` int(11) NOT NULL DEFAULT '1',
-  `itemexp` int(11) unsigned NOT NULL DEFAULT '0',
-  `ringid` int(11) NOT NULL DEFAULT '-1',
-  PRIMARY KEY (`inventoryequipmentid`),
-  KEY `INVENTORYITEMID` (`inventoryitemid`)
+  `item_level` int(11) NOT NULL DEFAULT '1',
+  `item_exp` int(11) unsigned NOT NULL DEFAULT '0',
+  `ring_id` int(11) NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`inventory_equipment_id`),
+  KEY `InventoryItemId` (`inventory_item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `inventoryitems` (
-  `inventoryitemid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `inventory_items` (
+  `inventory_item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `type` tinyint(3) unsigned NOT NULL,
-  `characterid` int(11) DEFAULT NULL,
-  `accountid` int(11) DEFAULT NULL,
-  `itemid` int(11) NOT NULL DEFAULT '0',
-  `inventorytype` int(11) NOT NULL DEFAULT '0',
+  `character_id` int(11) DEFAULT NULL,
+  `account_id` int(11) DEFAULT NULL,
+  `item_id` int(11) NOT NULL DEFAULT '0',
+  `inventory_type` int(11) NOT NULL DEFAULT '0',
   `position` int(11) NOT NULL DEFAULT '0',
   `quantity` int(11) NOT NULL DEFAULT '0',
   `owner` tinytext NOT NULL,
-  `petid` int(11) NOT NULL DEFAULT '-1',
+  `pet_id` int(11) NOT NULL DEFAULT '-1',
   `flag` int(11) NOT NULL,
   `expiration` bigint(20) NOT NULL DEFAULT '-1',
-  `giftFrom` varchar(26) NOT NULL,
-  PRIMARY KEY (`inventoryitemid`),
-  KEY `CHARID` (`characterid`)
+  `gift_from` varchar(26) NOT NULL,
+  PRIMARY KEY (`inventory_item_id`),
+  KEY `CHARID` (`character_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `inventorymerchant` (
-  `inventorymerchantid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `inventoryitemid` int(10) unsigned NOT NULL DEFAULT '0',
-  `characterid` int(11) DEFAULT NULL,
+CREATE TABLE IF NOT EXISTS `inventory_merchant` (
+  `inventory_merchant_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `inventory_item_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `character_id` int(11) DEFAULT NULL,
   `bundles` int(10) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`inventorymerchantid`),
-  KEY `INVENTORYITEMID` (`inventoryitemid`)
+  PRIMARY KEY (`inventory_merchant_id`),
+  KEY `InventoryItemId` (`inventory_item_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `ipbans` (
-  `ipbanid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `ip_bans` (
+  `ip_ban_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `ip` varchar(40) NOT NULL DEFAULT '',
-  `aid` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`ipbanid`)
+  `account_id` varchar(40) DEFAULT NULL,
+  PRIMARY KEY (`ip_ban_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `keymap` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL DEFAULT '0',
+  `character_id` int(11) NOT NULL DEFAULT '0',
   `key` int(11) NOT NULL DEFAULT '0',
   `type` int(11) NOT NULL DEFAULT '0',
   `action` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `macbans` (
-  `macbanid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `mac_bans` (
+  `mac_ban_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `mac` varchar(30) NOT NULL,
-  `aid` varchar(40) DEFAULT NULL,
-  PRIMARY KEY (`macbanid`),
+  `account_id` varchar(40) DEFAULT NULL,
+  PRIMARY KEY (`mac_ban_id`),
   UNIQUE KEY `mac_2` (`mac`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `macfilters` (
-  `macfilterid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS `mac_filters` (
+  `mac_filter_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `filter` varchar(30) NOT NULL,
-  PRIMARY KEY (`macfilterid`)
+  PRIMARY KEY (`mac_filter_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `makercreatedata` (
+CREATE TABLE IF NOT EXISTS `maker_create_data` (
   `id` tinyint(3) unsigned NOT NULL,
-  `itemid` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
   `req_level` tinyint(3) unsigned NOT NULL,
   `req_maker_level` tinyint(3) unsigned NOT NULL,
   `req_meso` int(11) NOT NULL,
@@ -13022,26 +13022,26 @@ CREATE TABLE IF NOT EXISTS `makercreatedata` (
   `catalyst` int(11) NOT NULL,
   `quantity` smallint(6) NOT NULL,
   `tuc` tinyint(3) NOT NULL,
-  PRIMARY KEY (`id`,`itemid`)
+  PRIMARY KEY (`id`,`item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `makerrecipedata` (
-  `itemid` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `maker_recipe_data` (
+  `item_id` int(11) NOT NULL,
   `req_item` int(11) NOT NULL,
   `count` smallint(6) NOT NULL,
-  PRIMARY KEY (`itemid`,`req_item`)
+  PRIMARY KEY (`item_id`,`req_item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `makerrewarddata` (
-  `itemid` int(11) NOT NULL,
-  `rewardid` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `maker_reward_data` (
+  `item_id` int(11) NOT NULL,
+  `reward_id` int(11) NOT NULL,
   `quantity` smallint(6) NOT NULL,
-  `prob` tinyint(3) unsigned NOT NULL DEFAULT '100',
-  PRIMARY KEY (`itemid`,`rewardid`)
+  `probability` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  PRIMARY KEY (`item_id`,`reward_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 # updated with the MapleSkillMakerFetcher feature
-INSERT IGNORE INTO `makercreatedata` (`id`, `itemid`, `req_level`, `req_maker_level`, `req_meso`, `req_item`, `req_equip`, `catalyst`, `quantity`, `tuc`) VALUES
+INSERT IGNORE INTO `maker_create_data` (`id`, `item_id`, `req_level`, `req_maker_level`, `req_meso`, `req_item`, `req_equip`, `catalyst`, `quantity`, `tuc`) VALUES
   (0, 4250000, 45, 1, 110000, 0, 0, 0, 1, 0),
   (0, 4250100, 45, 1, 110000, 0, 0, 0, 1, 0),
   (0, 4250200, 45, 1, 110000, 0, 0, 0, 1, 0),
@@ -13877,7 +13877,7 @@ INSERT IGNORE INTO `makercreatedata` (`id`, `itemid`, `req_level`, `req_maker_le
   (16, 1482023, 115, 3, 616000, 0, 0, 4130016, 1, 3),
   (16, 1492023, 115, 3, 627000, 0, 0, 4130017, 1, 3);
 
-INSERT IGNORE INTO `makerrecipedata` (`itemid`, `req_item`, `count`) VALUES
+INSERT IGNORE INTO `maker_recipe_data` (`item_id`, `req_item`, `count`) VALUES
   (4250000, 4021007, 1),
   (4250100, 4021005, 1),
   (4250200, 4021000, 1),
@@ -15805,7 +15805,7 @@ INSERT IGNORE INTO `makerrecipedata` (`itemid`, `req_item`, `count`) VALUES
   (1492023, 4260008, 20),
   (1492023, 4021010, 3);
 
-INSERT IGNORE INTO `makerrewarddata` (`itemid`, `rewardid`, `quantity`, `prob`) VALUES
+INSERT IGNORE INTO `maker_reward_data` (`item_id`, `reward_id`, `quantity`, `prob`) VALUES
   (4250000, 4250000, 1, 14),
   (4250000, 4250001, 1, 5),
   (4250000, 4250002, 1, 1),
@@ -15907,14 +15907,14 @@ INSERT IGNORE INTO `makerrewarddata` (`itemid`, `rewardid`, `quantity`, `prob`) 
 
 # generated with the MapleSkillMakerReagentIndexer feature
 
-CREATE TABLE IF NOT EXISTS `makerreagentdata` (
-  `itemid` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `maker_reagent_data` (
+  `item_id` int(11) NOT NULL,
   `stat` varchar(20) NOT NULL,
   `value` smallint(6) NOT NULL,
-  PRIMARY KEY (`itemid`)
+  PRIMARY KEY (`item_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-INSERT IGNORE INTO `makerreagentdata` (`itemid`, `stat`, `value`) VALUES
+INSERT IGNORE INTO `maker_reagent_data` (`item_id`, `stat`, `value`) VALUES
   (4250000, "incPAD", 1),
   (4250001, "incPAD", 2),
   (4250002, "incPAD", 3),
@@ -15962,36 +15962,36 @@ INSERT IGNORE INTO `makerreagentdata` (`itemid`, `stat`, `value`) VALUES
   (4251402, "randStat", 5);
 
 CREATE TABLE IF NOT EXISTS `marriages` (
-  `marriageid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `husbandid` int(10) unsigned NOT NULL DEFAULT '0',
-  `wifeid` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`marriageid`)
+  `marriage_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `husband_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `wife_id` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`marriage_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `medalmaps` (
+CREATE TABLE IF NOT EXISTS `medal_maps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
-  `queststatusid` int(11) unsigned NOT NULL,
-  `mapid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `quest_status_id` int(11) unsigned NOT NULL,
+  `map_id` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `queststatusid` (`queststatusid`)
+  KEY `quest_status_id` (`quest_status_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `monsterbook` (
-  `charid` int(11) unsigned NOT NULL,
-  `cardid` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `monster_book` (
+  `character_id` int(11) unsigned NOT NULL,
+  `card_id` int(11) NOT NULL,
   `level` int(1) DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-CREATE TABLE IF NOT EXISTS `monstercarddata` (
+CREATE TABLE IF NOT EXISTS `monster_card_data` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `cardid` int(11) NOT NULL DEFAULT '0',
-  `mobid` int(11) NOT NULL DEFAULT '0',
+  `card_id` int(11) NOT NULL DEFAULT '0',
+  `mob_id` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `id` (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=309 ;
 
-INSERT INTO `monstercarddata` (`id`, `cardid`, `mobid`) VALUES
+INSERT INTO `monster_card_data` (`id`, `card_id`, `mob_id`) VALUES
 (1, 2380000, 100100),
 (2, 2380001, 100101),
 (3, 2380003, 130100),
@@ -16303,8 +16303,8 @@ INSERT INTO `monstercarddata` (`id`, `cardid`, `mobid`) VALUES
 
 CREATE TABLE IF NOT EXISTS `mts_cart` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `cid` int(11) NOT NULL,
-  `itemid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -16312,18 +16312,18 @@ CREATE TABLE IF NOT EXISTS `mts_items` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `tab` int(11) NOT NULL DEFAULT '0',
   `type` int(11) NOT NULL DEFAULT '0',
-  `itemid` int(10) unsigned NOT NULL DEFAULT '0',
+  `item_id` int(10) unsigned NOT NULL DEFAULT '0',
   `quantity` int(11) NOT NULL DEFAULT '1',
   `seller` int(11) NOT NULL DEFAULT '0',
   `price` int(11) NOT NULL DEFAULT '0',
-  `bid_incre` int(11) DEFAULT '0',
+  `bid_increment` int(11) DEFAULT '0',
   `buy_now` int(11) DEFAULT '0',
   `position` int(11) DEFAULT '0',
-  `upgradeslots` int(11) DEFAULT '0',
+  `upgrade_slots` int(11) DEFAULT '0',
   `level` int(11) DEFAULT '0',
-  `itemlevel` int(11) NOT NULL DEFAULT '1',
-  `itemexp` int(11) unsigned NOT NULL DEFAULT '0',
-  `ringid` int(11) NOT NULL DEFAULT '-1',
+  `item_level` int(11) NOT NULL DEFAULT '1',
+  `item_exp` int(11) unsigned NOT NULL DEFAULT '0',
+  `ring_id` int(11) NOT NULL DEFAULT '-1',
   `str` int(11) DEFAULT '0',
   `dex` int(11) DEFAULT '0',
   `int` int(11) DEFAULT '0',
@@ -16340,41 +16340,41 @@ CREATE TABLE IF NOT EXISTS `mts_items` (
   `speed` int(11) DEFAULT '0',
   `jump` int(11) DEFAULT '0',
   `locked` int(11) DEFAULT '0',
-  `isequip` int(1) DEFAULT '0',
+  `is_equip` int(1) DEFAULT '0',
   `owner` varchar(16) DEFAULT '',
-  `sellername` varchar(16) NOT NULL,
+  `seller_name` varchar(16) NOT NULL,
   `sell_ends` varchar(16) NOT NULL,
   `transfer` int(2) DEFAULT '0',
   `vicious` int(2) unsigned NOT NULL DEFAULT '0',
   `flag` int(2) unsigned NOT NULL DEFAULT '0',
   `expiration` bigint(20) NOT NULL DEFAULT '-1',
-  `giftFrom` varchar(26) NOT NULL,
+  `gift_from` varchar(26) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `namechanges` (
+CREATE TABLE IF NOT EXISTS `name_changes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
   `old` varchar(13) NOT NULL,
   `new` varchar(13) NOT NULL,
-  `requestTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `completionTime` timestamp NULL,
+  `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `completion_time` timestamp NULL,
   PRIMARY KEY (`id`),
-  INDEX (characterid)
+  INDEX (character_id)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `newyear` (
+CREATE TABLE IF NOT EXISTS `new_year` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `senderid` int(10) NOT NULL DEFAULT '-1',
-  `sendername` varchar(13) DEFAULT '',
-  `receiverid` int(10) NOT NULL DEFAULT '-1',
-  `receivername` varchar(13) DEFAULT '',
+  `sender_id` int(10) NOT NULL DEFAULT '-1',
+  `sender_name` varchar(13) DEFAULT '',
+  `receiver_id` int(10) NOT NULL DEFAULT '-1',
+  `receiver_name` varchar(13) DEFAULT '',
   `message` varchar(120) DEFAULT '',
-  `senderdiscard` tinyint(1) NOT NULL DEFAULT '0',
-  `receiverdiscard` tinyint(1) NOT NULL DEFAULT '0',
+  `sender_discard` tinyint(1) NOT NULL DEFAULT '0',
+  `receiver_discard` tinyint(1) NOT NULL DEFAULT '0',
   `received` tinyint(1) NOT NULL DEFAULT '0',
-  `timesent` bigint(20) unsigned NOT NULL,
-  `timereceived` bigint(20) unsigned NOT NULL,
+  `time_sent` bigint(20) unsigned NOT NULL,
+  `time_received` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -16389,7 +16389,7 @@ CREATE TABLE IF NOT EXISTS `notes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `nxcode` (
+CREATE TABLE IF NOT EXISTS `nx_code` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `code` varchar(17) NOT NULL UNIQUE,
   `retriever` varchar(13) DEFAULT NULL,
@@ -16397,26 +16397,26 @@ CREATE TABLE IF NOT EXISTS `nxcode` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `nxcode_items` (
+CREATE TABLE IF NOT EXISTS `nx_code_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `codeid` int(11) NOT NULL,
+  `code_id` int(11) NOT NULL,
   `type` int(11) NOT NULL DEFAULT '5',
   `item` int(11) NOT NULL DEFAULT '4000000',
   `quantity` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `nxcoupons` (
+CREATE TABLE IF NOT EXISTS `nx_coupons` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `couponid` int(11) NOT NULL DEFAULT '0',
+  `coupon_id` int(11) NOT NULL DEFAULT '0',
   `rate` int(11) NOT NULL DEFAULT '0',
-  `activeday` int(11) NOT NULL DEFAULT '0',
-  `starthour` int(11) NOT NULL DEFAULT '0',
-  `endhour` int(11) NOT NULL DEFAULT '0',
+  `active_day` int(11) NOT NULL DEFAULT '0',
+  `start_hour` int(11) NOT NULL DEFAULT '0',
+  `end_hour` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=41 ;
 
-INSERT INTO `nxcoupons` (`id`, `couponid`, `rate`, `activeday`, `starthour`, `endhour`) VALUES
+INSERT INTO `nx_coupons` (`id`, `coupon_id`, `rate`, `active_day`, `start_hour`, `end_hour`) VALUES
 (1,5211000,2,254,18,20),
 (2,5211004,2,124,7,11),
 (3,5211005,2,124,10,14),
@@ -16459,36 +16459,36 @@ INSERT INTO `nxcoupons` (`id`, `couponid`, `rate`, `activeday`, `starthour`, `en
 (40,5360042,2,254,0,24);
 
 CREATE TABLE IF NOT EXISTS `pets` (
-  `petid` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `pet_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(13) DEFAULT NULL,
   `level` int(10) unsigned NOT NULL,
   `closeness` int(10) unsigned NOT NULL,
   `fullness` int(10) unsigned NOT NULL,
   `summoned` tinyint(1) NOT NULL DEFAULT '0',
   `flag` int(10) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`petid`)
+  PRIMARY KEY (`pet_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 
-CREATE TABLE IF NOT EXISTS `petignores` (
+CREATE TABLE IF NOT EXISTS `pet_ignores` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `petid` int(11) unsigned NOT NULL ,
-  `itemid` int(10) unsigned NOT NULL ,
+  `pet_id` int(11) unsigned NOT NULL ,
+  `item_id` int(10) unsigned NOT NULL ,
   PRIMARY KEY (`id`),
-  CONSTRAINT `fk_petignorepetid` FOREIGN KEY (`petid`) REFERENCES `pets` (`petid`) ON DELETE CASCADE    # thanks Optimist for noticing queries over petid taking too long, shavit for pointing out an improvement using foreign key
+  CONSTRAINT `fk_petignorepetid` FOREIGN KEY (`pet_id`) REFERENCES `pets` (`pet_id`) ON DELETE CASCADE    # thanks Optimist for noticing queries over petid taking too long, shavit for pointing out an improvement using foreign key
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `playerdiseases` (
+CREATE TABLE IF NOT EXISTS `player_diseases` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `charid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
   `disease` int(11) NOT NULL,
-  `mobskillid` int(11) NOT NULL,
-  `mobskilllv` int(11) NOT NULL,
+  `mob_skill_id` int(11) NOT NULL,
+  `mob_skill_level` int(11) NOT NULL,
   `length` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `playernpcs` (
+CREATE TABLE IF NOT EXISTS `player_npcs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(13) NOT NULL,
   `hair` int(11) NOT NULL,
@@ -16500,27 +16500,27 @@ CREATE TABLE IF NOT EXISTS `playernpcs` (
   `world` int(11) NOT NULL DEFAULT '0',
   `map` int(11) NOT NULL DEFAULT '0',
   `dir` int(11) NOT NULL DEFAULT '0',
-  `scriptid` int(10) unsigned NOT NULL DEFAULT '0',
+  `script_id` int(10) unsigned NOT NULL DEFAULT '0',
   `fh` int(11) NOT NULL DEFAULT '0',
   `rx0` int(11) NOT NULL DEFAULT '0',
   `rx1` int(11) NOT NULL DEFAULT '0',
-  `worldrank` int(11) NOT NULL DEFAULT '0',
-  `overallrank` int(11) NOT NULL DEFAULT '0',
-  `worldjobrank` int(11) NOT NULL DEFAULT '0',
+  `world_rank` int(11) NOT NULL DEFAULT '0',
+  `overall_rank` int(11) NOT NULL DEFAULT '0',
+  `world_job_rank` int(11) NOT NULL DEFAULT '0',
   `job` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2147000000 ;
 
-CREATE TABLE IF NOT EXISTS `playernpcs_equip` (
+CREATE TABLE IF NOT EXISTS `player_npc_equips` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `npcid` int(11) NOT NULL DEFAULT '0',
-  `equipid` int(11) NOT NULL,
+  `npc_id` int(11) NOT NULL DEFAULT '0',
+  `equip_id` int(11) NOT NULL,
   `type` int(11) NOT NULL DEFAULT '0',
-  `equippos` int(11) NOT NULL,
+  `equip_pos` int(11) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `playernpcs_field` (
+CREATE TABLE IF NOT EXISTS `player_npc_fields` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `world` int(11) NOT NULL,
   `map` int(11) NOT NULL,
@@ -16529,7 +16529,7 @@ CREATE TABLE IF NOT EXISTS `playernpcs_field` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `plife` (
+CREATE TABLE IF NOT EXISTS `player_life` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `world` int(11) NOT NULL DEFAULT '-1',
   `map` int(11) NOT NULL DEFAULT '0',
@@ -16543,39 +16543,39 @@ CREATE TABLE IF NOT EXISTS `plife` (
   `x` int(11) NOT NULL DEFAULT '0',
   `y` int(11) NOT NULL DEFAULT '0',
   `hide` int(11) NOT NULL DEFAULT '0',
-  `mobtime` int(11) NOT NULL DEFAULT '0',
+  `mob_time` int(11) NOT NULL DEFAULT '0',
   `team` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `questactions` (
-  `questactionid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `questid` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `quest_actions` (
+  `quest_action_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `quest_id` int(11) NOT NULL DEFAULT '0',
   `status` int(11) NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
-  PRIMARY KEY (`questactionid`)
+  PRIMARY KEY (`quest_action_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `questprogress` (
+CREATE TABLE IF NOT EXISTS `quest_progress` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
-  `queststatusid` int(10) unsigned NOT NULL DEFAULT '0',
-  `progressid` int(11) NOT NULL DEFAULT '0',
+  `character_id` int(11) NOT NULL,
+  `quest_status_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `progress_id` int(11) NOT NULL DEFAULT '0',
   `progress` varchar(15) CHARACTER SET latin1 COLLATE latin1_german1_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `questrequirements` (
-  `questrequirementid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `questid` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `quest_requirements` (
+  `quest_requirement_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `quest_id` int(11) NOT NULL DEFAULT '0',
   `status` int(11) NOT NULL DEFAULT '0',
   `data` blob NOT NULL,
-  PRIMARY KEY (`questrequirementid`)
+  PRIMARY KEY (`quest_requirement_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `queststatus` (
-  `queststatusid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL DEFAULT '0',
+CREATE TABLE IF NOT EXISTS `quest_status` (
+  `quest_status_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `character_id` int(11) NOT NULL DEFAULT '0',
   `quest` int(11) NOT NULL DEFAULT '0',
   `status` int(11) NOT NULL DEFAULT '0',
   `time` int(11) NOT NULL DEFAULT '0',
@@ -16583,30 +16583,30 @@ CREATE TABLE IF NOT EXISTS `queststatus` (
   `forfeited` int(11) NOT NULL DEFAULT '0',
   `completed` int(11) NOT NULL DEFAULT '0',
   `info` tinyint(3) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`queststatusid`)
+  PRIMARY KEY (`quest_status_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 # quickslot table, by Shavit
-CREATE TABLE `quickslotkeymapped` (
-  `accountid` INT NOT NULL,
-  `keymap` BIGINT NOT NULL DEFAULT 0,
+CREATE TABLE `quickslot_keymap` (
+  `account_id` INT NOT NULL,
+  `key_map` BIGINT NOT NULL DEFAULT 0,
   PRIMARY KEY (`accountid`)
 );
 
-ALTER TABLE `quickslotkeymapped`
-  ADD CONSTRAINT `quickslotkeymapped_accountid_fk` FOREIGN KEY (`accountid`) REFERENCES `accounts` (`id`) ON DELETE CASCADE;
+ALTER TABLE `quickslot_keymap`
+  ADD CONSTRAINT `quickslotkeymapped_accountid_fk` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE;
 
-CREATE TABLE IF NOT EXISTS `reactordrops` (
-  `reactordropid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `reactorid` int(11) NOT NULL,
-  `itemid` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `reactor_drops` (
+  `reactor_drop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `reactor_id` int(11) NOT NULL,
+  `item_id` int(11) NOT NULL,
   `chance` int(11) NOT NULL,
-  `questid` int(5) NOT NULL DEFAULT '-1',
-  PRIMARY KEY (`reactordropid`),
-  KEY `reactorid` (`reactorid`)
+  `quest_id` int(5) NOT NULL DEFAULT '-1',
+  PRIMARY KEY (`reactor_drop_id`),
+  KEY `reactor_id` (`reactor_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 PACK_KEYS=1 AUTO_INCREMENT=841 ;
 
-INSERT INTO `reactordrops` (`reactordropid`, `reactorid`, `itemid`, `chance`, `questid`) VALUES
+INSERT INTO `reactor_drops` (`reactor_drop_id`, `reactor_id`, `item_id`, `chance`, `quest_id`) VALUES
 (1, 2001, 4031161, 1, 1008),
 (2, 2001, 4031162, 1, 1008),
 (3, 2001, 2010009, 2, -1),
@@ -17434,9 +17434,9 @@ INSERT INTO `reactordrops` (`reactordropid`, `reactorid`, `itemid`, `chance`, `q
 
 CREATE TABLE IF NOT EXISTS `reports` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `reporttime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `reporterid` int(11) NOT NULL,
-  `victimid` int(11) NOT NULL,
+  `report_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `reporter_id` int(11) NOT NULL,
+  `victim_id` int(11) NOT NULL,
   `reason` tinyint(4) NOT NULL,
   `chatlog` text NOT NULL,
   `description` text NOT NULL,  # correct field name, thanks resinate
@@ -17452,17 +17452,17 @@ CREATE TABLE IF NOT EXISTS `responses` (
 
 CREATE TABLE IF NOT EXISTS `rings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `partnerRingId` int(11) NOT NULL DEFAULT '0',
-  `partnerChrId` int(11) NOT NULL DEFAULT '0',
-  `itemid` int(11) NOT NULL DEFAULT '0',
-  `partnername` varchar(255) NOT NULL,
+  `partner_ring_id` int(11) NOT NULL DEFAULT '0',
+  `partner_character_id` int(11) NOT NULL DEFAULT '0',
+  `item_id` int(11) NOT NULL DEFAULT '0',
+  `partner_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `savedlocations` (
+CREATE TABLE IF NOT EXISTS `saved_locations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
-  `locationtype` enum('FREE_MARKET','WORLDTOUR','FLORINA','INTRO','SUNDAY_MARKET','MIRROR','EVENT','BOSSPQ','HAPPYVILLE','DEVELOPER','MONSTER_CARNIVAL') NOT NULL,
+  `character_id` int(11) NOT NULL,
+  `location_type` enum('FREE_MARKET','WORLDTOUR','FLORINA','INTRO','SUNDAY_MARKET','MIRROR','EVENT','BOSSPQ','HAPPYVILLE','DEVELOPER','MONSTER_CARNIVAL') NOT NULL,
   `map` int(11) NOT NULL,
   `portal` int(11) NOT NULL,
   PRIMARY KEY (`id`)
@@ -17470,26 +17470,26 @@ CREATE TABLE IF NOT EXISTS `savedlocations` (
 
 CREATE TABLE IF NOT EXISTS `server_queue` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `accountid` int(11) NOT NULL DEFAULT '0',
-  `characterid` int(11) NOT NULL DEFAULT '0',
+  `account_id` int(11) NOT NULL DEFAULT '0',
+  `character_id` int(11) NOT NULL DEFAULT '0',
   `type` tinyint(2) NOT NULL DEFAULT '0',
   `value` int(10) NOT NULL DEFAULT '0',
   `message` varchar(128) NOT NULL,
-  `createTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `create_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `shopitems` (
-  `shopitemid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `shopid` int(10) unsigned NOT NULL,
-  `itemid` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `shop_items` (
+  `shop_item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `shop_id` int(10) unsigned NOT NULL,
+  `item_id` int(11) NOT NULL,
   `price` int(11) NOT NULL,
   `pitch` int(11) NOT NULL DEFAULT '0',
   `position` int(11) NOT NULL COMMENT 'sort is an arbitrary field designed to give leeway when modifying shops. The lowest number is 104 and it increments by 4 for each item to allow decent space for swapping/inserting/removing items.',
-  PRIMARY KEY (`shopitemid`)
+  PRIMARY KEY (`shop_item_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20047 ;
 
-INSERT INTO `shopitems` (`shopitemid`, `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+INSERT INTO `shop_items` (`shop_item_id`, `shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
 (1, 11000, 1332005, 500, 0, 104),
 (2, 11000, 1322005, 50, 0, 108),
 (3, 11000, 1312004, 50, 0, 112),
@@ -18825,7 +18825,7 @@ INSERT INTO `shopitems` (`shopitemid`, `shopid`, `itemid`, `price`, `pitch`, `po
 (1359, 2041003, 1040085, 200000, 0, 436),
 (1360, 2041003, 1040000, 200000, 0, 440),
 (1361, 2041003, 1002004, 160000, 0, 444);
-INSERT INTO `shopitems` (`shopitemid`, `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+INSERT INTO `shop_items` (`shop_item_id`, `shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
 (1362, 2041006, 2330000, 600, 0, 104),
 (1363, 2041006, 2070000, 500, 0, 108),
 (1364, 2041006, 2061001, 10, 0, 112),
@@ -20111,7 +20111,7 @@ INSERT INTO `shopitems` (`shopitemid`, `shopid`, `itemid`, `price`, `pitch`, `po
 (2664, 9120004, 2030008, 400, 0, 116),
 (2665, 9120004, 1050100, 30000, 0, 120),
 (2666, 9120019, 2070000, 500, 0, 104);
-INSERT INTO `shopitems` (`shopitemid`, `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+INSERT INTO `shop_items` (`shop_item_id`, `shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
 (2667, 9120019, 2030010, 500, 0, 108),
 (2668, 9120019, 2030009, 500, 0, 112),
 (2669, 9120019, 2030008, 400, 0, 116),
@@ -21131,12 +21131,12 @@ INSERT INTO `shopitems` (`shopitemid`, `shopid`, `itemid`, `price`, `pitch`, `po
 (20254, 9270065, 2022476, 4200, 0, 26);
 
 CREATE TABLE IF NOT EXISTS `shops` (
-  `shopid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `npcid` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`shopid`)
+  `shop_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `npc_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`shop_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10000000 ;
 
-INSERT INTO `shops` (`shopid`, `npcid`) VALUES
+INSERT INTO `shops` (`shop_id`, `npc_id`) VALUES
 (11000, 11000),
 (11100, 11100),
 (21000, 21000),
@@ -21244,14 +21244,14 @@ INSERT INTO `shops` (`shopid`, `npcid`) VALUES
 (9270065, 9270065);
 
  -- missing shops
-INSERT INTO `shops` (`shopid`, `npcid`) VALUES
+INSERT INTO `shops` (`shop_id`, `npc_id`) VALUES
 ( 57, 2002001 ),
 (1052116, 1052116),
 (1301000, 1301000),
 (1200001, 1200001),
 (1200002, 1200002);
 
-INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `position`) VALUES
+INSERT INTO `shop_items` ( `shop_id`, `item_id`, `price`, `position`) VALUES
 ( 57, 3990000, 500, 1 ), 
 ( 57, 3990001, 500, 2 ), 
 ( 57, 3990002, 500, 3 ), 
@@ -21413,9 +21413,9 @@ INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `position`) VALUES
 (1337, 1902017, 1, 42),
 (1337, 1902018, 1, 43);
 
-CREATE TABLE IF NOT EXISTS `skillmacros` (
+CREATE TABLE IF NOT EXISTS `skill_macros` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL DEFAULT '0',
+  `character_id` int(11) NOT NULL DEFAULT '0',
   `position` tinyint(1) NOT NULL DEFAULT '0',
   `skill1` int(11) NOT NULL DEFAULT '0',
   `skill2` int(11) NOT NULL DEFAULT '0',
@@ -21427,16 +21427,16 @@ CREATE TABLE IF NOT EXISTS `skillmacros` (
 
 CREATE TABLE IF NOT EXISTS `skills` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `skillid` int(11) NOT NULL DEFAULT '0',
-  `characterid` int(11) NOT NULL DEFAULT '0',
-  `skilllevel` int(11) NOT NULL DEFAULT '0',
-  `masterlevel` int(11) NOT NULL DEFAULT '0',
+  `skill_id` int(11) NOT NULL DEFAULT '0',
+  `character_id` int(11) NOT NULL DEFAULT '0',
+  `skill_level` int(11) NOT NULL DEFAULT '0',
+  `master_level` int(11) NOT NULL DEFAULT '0',
   `expiration` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`),
-  UNIQUE INDEX `skillpair` (`skillid`, `characterid`)
+  UNIQUE INDEX `skillpair` (`skill_id`, `character_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `specialcashitems` (
+CREATE TABLE IF NOT EXISTS `special_cash_items` (
   `id` int(11) NOT NULL,
   `sn` int(11) NOT NULL,
   `modifier` int(11) NOT NULL COMMENT '1024 is add/remove',
@@ -21444,24 +21444,24 @@ CREATE TABLE IF NOT EXISTS `specialcashitems` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `specialcashitems` (`id`, `sn`, `modifier`, `info`) VALUES
+INSERT INTO `special_cash_items` (`id`, `sn`, `modifier`, `info`) VALUES
 (1, 10000617, 1024, 1);
 
 CREATE TABLE IF NOT EXISTS `storages` (
-  `storageid` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `accountid` int(11) NOT NULL DEFAULT '0',
+  `storage_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `account_id` int(11) NOT NULL DEFAULT '0',
   `world` int(2) NOT NULL,
   `slots` int(11) NOT NULL DEFAULT '0',
   `meso` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`storageid`)
+  PRIMARY KEY (`storage_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `trocklocations` (
-  `trockid` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
-  `mapid` int(11) NOT NULL,
+CREATE TABLE IF NOT EXISTS `trock_locations` (
+  `trock_id` int(11) NOT NULL AUTO_INCREMENT,
+  `character_id` int(11) NOT NULL,
+  `map_id` int(11) NOT NULL,
   `vip` int(2) NOT NULL,
-  PRIMARY KEY (`trockid`)
+  PRIMARY KEY (`trock_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `wishlists` (
@@ -21471,29 +21471,29 @@ CREATE TABLE IF NOT EXISTS `wishlists` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
-CREATE TABLE IF NOT EXISTS `worldtransfers` (
+CREATE TABLE IF NOT EXISTS `world_transfers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `characterid` int(11) NOT NULL,
+  `character_id` int(11) NOT NULL,
   `from` tinyint(3) NOT NULL,
   `to` tinyint(3) NOT NULL,
-  `requestTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `completionTime` timestamp NULL,
+  `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `completion_time` timestamp NULL,
   PRIMARY KEY (`id`),
   INDEX (characterid)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 
-ALTER TABLE `dueyitems`
-  ADD CONSTRAINT `dueyitems_ibfk_1` FOREIGN KEY (`PackageId`) REFERENCES `dueypackages` (`PackageId`) ON DELETE CASCADE;
+ALTER TABLE `duey_items`
+  ADD CONSTRAINT `dueyitems_ibfk_1` FOREIGN KEY (`packet_id`) REFERENCES `duey_packages` (`package_id`) ON DELETE CASCADE;
 
 ALTER TABLE `famelog`
-  ADD CONSTRAINT `famelog_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `famelog_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
   
 ALTER TABLE `family_character`
-  ADD CONSTRAINT `family_character_ibfk_1` FOREIGN KEY (`cid`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `family_character_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
 
 ALTER TABLE `skills`
-  ADD CONSTRAINT `skills_chrid_fk` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE;	# thanks Shavit
+  ADD CONSTRAINT `skills_chrid_fk` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE;	# thanks Shavit
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

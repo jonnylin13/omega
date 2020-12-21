@@ -79,7 +79,7 @@ export class MapleClient {
 
         let res = await DatabaseConnection.knex
             .where({name: user})
-            .select('id', 'password', 'gender', 'banned', 'pin', 'pic', 'characterslots', 'tos', 'language')
+            .select('id', 'password', 'gender', 'banned', 'pin', 'pic', 'character_slots', 'tos', 'language')
             .from('accounts');
         
     }

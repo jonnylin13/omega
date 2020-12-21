@@ -1,15 +1,15 @@
 #THIS SQL IS OPTIONAL, TO BE USED AFTER 'db_drops.sql'
 #THIS REQUIRES PROVIDED WZ FILES
 
-USE `heavenms`;
+USE `omega`;
 
 # Scroll shop at Asia, chair shop at Kino Konoko, potion shop at T-1337
-INSERT INTO `shops` (`shopid`,`npcid`) VALUES
+INSERT INTO `shops` (`shop_id`,`npc_id`) VALUES
 (2082014,2082014),
 (9110002,9110002),
 (9201101,9201101);
 
-INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+INSERT IGNORE INTO `shop_items` (`shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
 (2082014, 2040004, 480000, 0, 1),
 (2082014, 2040025, 500000, 0, 2),
 (2082014, 2040029, 500000, 0, 3),
@@ -102,9 +102,9 @@ INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`
 (2082014, 2030007, 1800000, 0, 90),
 (2082014, 4001017, 60000000, 0, 91);
 
-UPDATE shopitems SET price = 11*price WHERE (`position` >= 33 and `position` <= 79 and `shopid` = 2082014);
+UPDATE shop_items SET price = 11*price WHERE (`position` >= 33 and `position` <= 79 and `shop_id` = 2082014);
 
-INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+INSERT IGNORE INTO `shop_items` (`shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
 (1031100, 3010015, 20000, 0, 100),
 (9110002, 3010019, 7700000, 0, 92),
 (9110002, 3010008, 10000000, 0, 96),
@@ -132,7 +132,7 @@ INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`
 (9201101, 2022251, 3800000, 0, 168);
 
 # adding antibanish scrolls
-INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+INSERT IGNORE INTO `shop_items` (`shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
 (1001100, 2030100, 450, 0, 130),
 (1011100, 2030100, 450, 0, 142),
 (1021100, 2030100, 450, 0, 142),
@@ -169,8 +169,8 @@ INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`
 --        Arrows, Bullets, Throwings and Capsules,
 --        Others, Equips, Mounts, Scrolls.
 
-DELETE FROM `shopitems` WHERE `shopid`=1337;
-INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `position`) VALUES
+DELETE FROM `shop_items` WHERE `shop_id`=1337;
+INSERT INTO `shop_items` ( `shop_id`, `item_id`, `price`, `position`) VALUES
 (1337, 2100036, 1, 1),
 (1337, 2100035, 1, 2),
 (1337, 2100034, 1, 3),
@@ -259,7 +259,7 @@ INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `position`) VALUES
 (1337, 2050004, 1, 86);
 
 -- Thanks to DietStory v1.02 dev team
-INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+INSERT INTO `shop_items` ( `shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
  (1200001, 3010001, 1000, 0, 1),
  (1200001, 1092003, 2000, 0, 2),
  (1200001, 1072063, 10000, 0, 3),
@@ -338,8 +338,8 @@ INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `pitch`, `position`) VALU
  (1301000, 2000015, 160, 0, 168),
  (1301000, 2000000, 50, 0, 172);
 
-# adding missing pirate items at Singapore npc's
-INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
+
+INSERT INTO `shop_items` ( `shop_id`, `item_id`, `price`, `pitch`, `position`) VALUES
  (9270019, 1492006, 160000, 0, 80),
  (9270019, 1492005, 100000, 0, 84),
  (9270019, 1492004, 75000, 0, 88),
