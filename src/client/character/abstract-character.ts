@@ -3,6 +3,7 @@ import { EventEmitter } from 'events';
 import { MapleStat } from "./stat";
 import { Config } from "../../util/config";
 import { GameConstants } from "../../constants/game/game-constants";
+import { MapleMap } from "../../server/maps/map";
 
 
 export class Short {
@@ -26,8 +27,6 @@ export abstract class AbstractMapleCharacter extends AbstractAnimatedMapleMapObj
     client_max_hp: number; client_max_mp: number; local_max_hp: number; local_max_mp: number;
     transient_hp: number; transient_mp: number;
     events: EventEmitter = new EventEmitter();
-
-    listener: AbstractCharacterListener = null;
     stat_updates: Map<MapleStat, number> = new Map();
 
     private static ap_assigned(x: number) {

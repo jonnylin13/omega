@@ -8,4 +8,9 @@ export class GameConstants {
     static has_sp_table(job: MapleJob): boolean {
         return true; // TODO: Needs implementation
     }
+
+    static get_skill_book(job: number) {
+        if (job >= 2210 && job <= 2218) return job - 2209;
+        return 0;
+    }
 }

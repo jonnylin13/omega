@@ -110,7 +110,7 @@ export class MapleClient {
     // TODO: Needs implementation
     finish_login(): number {
         return 1;
-    }
+    } 
 
     // TODO: Needs implementation
     can_bypass_pin(): boolean {
@@ -130,6 +130,21 @@ export class MapleClient {
     // TODO: Needs implementation
     check_pic(pic: string): boolean {
         return false;
+    }
+
+    // TODO: Needs implementation
+    load_characters(server_id: number): Array<MapleCharacter> {
+        return [];
+    }
+
+    // TODO: Needs implementation
+    get_available_character_slots(): number {
+        return 1;
+    }
+
+    // TODO: Needs implementation
+    get_character_slots(): number {
+        return 1;
     }
 
     async update_macs(macs: string) {
