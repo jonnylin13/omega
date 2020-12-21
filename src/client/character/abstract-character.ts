@@ -45,6 +45,18 @@ export abstract class AbstractMapleCharacter extends AbstractAnimatedMapleMapObj
         return this.mp;
     }
 
+    get_max_hp() {
+        return this.max_hp;
+    }
+
+    get_max_mp() {
+        return this.max_mp;
+    }
+
+    get_remaining_sp() {
+        return this.remaining_sp;
+    }
+
     set_hp(new_hp: number) {
         let old_hp = this.hp;
         let thp = new_hp;

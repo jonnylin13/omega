@@ -1,12 +1,12 @@
 import { MapleClient } from "../client";
+import { AbstractMapleCharacter } from "./abstract-character";
 import { MaplePet } from "./inventory/pet";
 import { MapleJob } from "./job";
 import { MapleSkinColor } from "./skin-color";
 
 
-export class MapleCharacter {
+export class MapleCharacter extends AbstractMapleCharacter {
 
-    // TODO: Create AbstractMapleCharacter
     name: string;
     id: number;
     account_id: number;
@@ -22,16 +22,6 @@ export class MapleCharacter {
     face: number;
     hair: number;
     level: number;
-    str: number;
-    dex: number;
-    int: number;
-    luk: number;
-    hp: number;
-    client_max_hp: number;
-    mp: number;
-    client_max_mp: number;
-    remaining_ap: number;
-    remaining_sp: number;
     exp: number;
     fame: number;
     gacha_exp: number;
