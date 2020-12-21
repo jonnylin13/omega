@@ -18,29 +18,30 @@ export class CharNameAndId {
 
 export class MapleCharacter extends AbstractMapleCharacter {
 
-    name: string;
-    id: number;
+    world_id: number;
     account_id: number;
-    client: MapleClient;
-    logged_in: boolean;
-    gm_level: number;
+    id: number;
+    level: number;
     rank: number;
     rank_move: number;
     job_rank: number;
     job_rank_move: number;
-    job: MapleJob;
     gender: number;
     face: number;
     hair: number;
-    level: number;
-    exp: number;
     fame: number;
-    gacha_exp: number;
+    quest_fame: number;
+    initial_spawnpoint: number;
     map_id: number;
-    spawn_point: number;
+    name: string;
+    client: MapleClient;
+    logged_in: boolean;
+    gm_level: number;
+    job: MapleJob;
+    exp: number;
+    gacha_exp: number;
     skin_color: MapleSkinColor;
     pets: Array<MaplePet> = new Array(3);
-    world_id: number;
 
     is_gm(): boolean {
         return this.gm_level > 0;
