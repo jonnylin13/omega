@@ -140,4 +140,11 @@ export class LoginPackets {
         return mplew.get_packet();
     }
 
+    static get_relog_response(): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(3);
+        mplew.write_short(SendOpcode.RELOG_RESPONSE.get_value());
+        mplew.write_byte(1);
+        return mplew.get_packet();
+    }
+
 }
