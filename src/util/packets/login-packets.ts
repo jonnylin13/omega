@@ -229,7 +229,7 @@ export class LoginPackets {
         this.add_char_look(mplew, chr, false);
         if (!view_all)
             mplew.write_byte(0);
-        if (chr.gm || chr.is_gm_job()) {
+        if (chr.is_gm() || chr.is_gm_job()) {
             mplew.write_byte(0);
             return;
         }

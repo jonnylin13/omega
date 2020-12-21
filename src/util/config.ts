@@ -20,6 +20,7 @@ interface ServerConfig extends ConfigType {
     max_allowed_account_hwid: number;
     use_character_account_check: boolean;
     channel_load: number;
+    collective_charslot: boolean;
 }
 
 interface ConfigType {}
