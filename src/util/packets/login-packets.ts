@@ -133,4 +133,11 @@ export class LoginPackets {
         return mplew.get_packet();
     }
 
+    static pin_registered(): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(3);
+        mplew.write_short(SendOpcode.UPDATE_PINCODE.get_value());
+        mplew.write_byte(0);
+        return mplew.get_packet();
+    }
+
 }
