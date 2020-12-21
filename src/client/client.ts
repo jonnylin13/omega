@@ -4,10 +4,11 @@ import * as bcrypt from 'bcrypt';
 import * as sha from 'sha.js'
 import { Config } from "../util/config";
 import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/coordinator/session/session-coordinator";
-import { MapleCharacter } from "./character/character";
+import { CharNameAndId, MapleCharacter } from "./character/character";
 import { LoginPackets } from "../util/packets/login-packets";
 import { AccountDB } from "../util/db/account";
 import { MapleAESOFB } from "../util/aes";
+import { CharacterDB } from "../util/db/character";
 
 
 export class MapleClient {
@@ -19,34 +20,40 @@ export class MapleClient {
     };
 
     private login_attempts = 0;
-    private server_transition: boolean;
+    private server_transition: boolean = false;
     logged_in = false;
     gm_level: number;
     session: Session;
-    hwid: string;
-    birthday: Date;
-    pic: string;
-    pin: string;
-    account_id: number;
+    hwid: string = null;
+    birthday: Date = null;
+    pic: string = '';
+    pin: string = '';
+    pic_attempts: number = 0;
+    pin_attempts: number = 0;
+    cs_attempts: number = 0;
+    account_id: number = -4;
     private banned: boolean;
     account_name: string;
     password_hash: string;
-    gender: number;
-    character_slots: number;
-    language: number;
+    gender: number = -1;
+    character_slots: number = 3;
+    language: number = 0;
     macs: Array<string> = [];
     temp_ban: Date;
     greason: number;
-    disconnecting: boolean;
+    disconnecting: boolean = false;
     player: MapleCharacter;
     last_pong: bigint;
     world_id: number;
-    channel_id: number;
+    channel_id: number = 1;
     num_worlds_visible: number;
     last_npc_click: bigint;
+    last_packet: bigint = BigInt(new Date().getUTCMilliseconds());
     send: MapleAESOFB;
     receive: MapleAESOFB;
     session_id: string;
+
+    // vote_points, vote_time, engines
 
     constructor(send: MapleAESOFB, receive: MapleAESOFB, session: Session) {
         this.send = send;
@@ -133,9 +140,21 @@ export class MapleClient {
         return false;
     }
 
-    // TODO: Needs implementation
     load_characters(server_id: number): Array<MapleCharacter> {
-        return [];
+        let chars: Array<MapleCharacter> = [];
+        this._load_characters(server_id).then(res => {
+            for (let cni of res) {
+                chars.push(MapleCharacter.load_from_db(cni.id, this, false));
+            }
+            return chars;
+        }).catch(err => {
+            // TODO: Handle error
+        });
+        return []; 
+    }
+
+    private async _load_characters(server_id: number): Promise<Array<CharNameAndId>> {
+        return await CharacterDB.get_character_name_and_id(this.account_id, server_id);
     }
 
     // TODO: Needs implementation

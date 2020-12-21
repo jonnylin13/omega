@@ -5,6 +5,17 @@ import { MapleJob } from "./job";
 import { MapleSkinColor } from "./skin-color";
 
 
+export class CharNameAndId {
+    id: number;
+    name: string;
+
+    constructor(name: string, id: number) {
+        this.id = id;
+        this.name = name;
+    }
+}
+
+
 export class MapleCharacter extends AbstractMapleCharacter {
 
     name: string;

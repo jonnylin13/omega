@@ -24,7 +24,7 @@ export class AccountDB {
             .where({id: account_id})
             .select('temp_ban');
         if (results.length > 0) return results[0];
-        else throw new SQLError(`No results found for temp_ban: account_id ${account_id}`);
+        else return [];
     }
 
     static async get_ip_ban(remote_address: string) {
@@ -56,7 +56,7 @@ export class AccountDB {
             .where({id: account_id})
             .select('logged_in', 'last_login', 'birthday');
         if (results.length > 0) return results[0];
-        else throw new SQLError(`Could not retrieve login state from table accounts: account_id ${account_id}`);
+        else return [];
     }
 
     static async update_logged_in(account_id: number, logged_in: number) {
@@ -72,7 +72,7 @@ export class AccountDB {
             .where({id: account_id})
             .select('id', 'password', 'gender', 'banned', 'pin', 'pic', 'character_slots', 'tos', 'language');
         if (results.length > 0) return results[0];
-        else throw new SQLError(`Could not retrieve account login info: account_id ${account_id}`);
+        else return [];
     }
 
     static async create_auto_account(name: string, hashed_password: string) {
@@ -107,7 +107,7 @@ export class AccountDB {
             .where({account_id: account_id})
             .select('SQL_CACHE *');
         if (results.length > 0) return results;
-        else throw new SQLError(`Could not retrieve hwid_accounts: account_id ${account_id}`);
+        else return [];
     }
     
     static async create_hwid_account(account_id: number, remote_hwid: string, expires_at: bigint) {
