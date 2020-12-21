@@ -21,6 +21,8 @@ export class MapleClient {
     logged_in = false;
     gm_level: number;
     session: Session;
+    hwid: string;
+    birthday: Date;
     pic: string;
     pin: string;
     account_id: number;
@@ -48,8 +50,41 @@ export class MapleClient {
     disconnect(shutdown: boolean, cash_shop: boolean) {
         if (this.player !== null && this.player !== undefined && this.player.logged_in && this.player.client !== null && this.player.client !== undefined) {
             // TODO: Needs implementation
-        } 
-        // TODO: Needs implementation
+        }
+
+        if (!this.server_transition && this.logged_in) {
+            MapleSessionCoordinator.get_instance().close_session(this.session, false);
+            this.update_login_state(MapleClient.LOGIN.LOGGED_OUT);
+            this.session.client = null;
+            this.clear();
+        } else {
+            if (this.session.client) {
+                MapleSessionCoordinator.get_instance().close_session(this.session, false);
+                this.session.client = null;
+            }
+
+            if (!MasterServer.get_instance().has_character_in_transition(this)) {
+                this.update_login_state(MapleClient.LOGIN.LOGGED_OUT);
+            }
+        }
+    }
+
+    clear() {
+        if (this.player) {
+            // this.player.empty(true);
+        }
+
+        MasterServer.get_instance().unregister_login_state(this);
+
+        delete this.account_name;
+        delete this.macs;
+        delete this.hwid;
+        delete this.birthday;
+        // delete this.engines;
+        delete this.player;
+        // delete this.receive;
+        // delete this.send;
+
     }
 
     // TODO: Needs implementation

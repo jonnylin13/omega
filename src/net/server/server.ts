@@ -22,6 +22,7 @@ export class MasterServer {
     private static instance: MasterServer = null;
 
     private in_login_state: Map<MapleClient, bigint> = new Map();
+    private transitioning_characters: Map<string, number> = new Map();
 
     static get_instance(): MasterServer {
         return this.instance;
@@ -92,6 +93,16 @@ export class MasterServer {
     
     register_login_state(c: MapleClient) {
         this.in_login_state.set(c, BigInt(new Date().getUTCMilliseconds() + 600000));
+    }
+
+    unregister_login_state(c: MapleClient) {
+        this.in_login_state.delete(c);
+    }
+
+    has_character_in_transition(c: MapleClient): boolean {
+        if (Config.properties.server.use_ip_validation) return true;
+        let remote_ip = c.session.remoteAddress;
+        return this.transitioning_characters.has(remote_ip);
     }
 
 }
