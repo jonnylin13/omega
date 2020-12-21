@@ -37,10 +37,10 @@ export class MapleClient {
     greason: number;
     disconnecting: boolean;
     player: MapleCharacter;
+    last_pong: bigint;
 
-    // TODO: Needs implementation
     pong_received(): void {
-        
+        this.last_pong = MasterServer.get_instance().get_current_time();
     }
 
     announce(packet: Buffer) {
