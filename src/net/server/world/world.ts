@@ -1,4 +1,5 @@
 import { createBuilderStatusReporter } from "typescript";
+import { MapleCharacter } from "../../../client/character/character";
 import { Config } from "../../../util/config";
 import { Channel } from "../channel/channel";
 import { PlayerStorage } from "../player-storage";
@@ -15,6 +16,7 @@ export class World {
     fishing_rate: number;
     event_msg: string;
     private channels: Array<Channel> = [];
+    private account_characters: Map<number, Map<number, MapleCharacter>> = new Map();
     player_storage: PlayerStorage = new PlayerStorage();
 
 
@@ -70,5 +72,20 @@ export class World {
         else if (num_players >= world_cap * 0.8) status = 1;
         else status = 0;
         return status;
+    }
+
+    register_account_character_view(account_id: number, chr: MapleCharacter) {
+        this.account_characters.get(account_id).set(chr.id, chr);
+    }
+
+    unregister_account_character_view(account_id: number, character_id: number) {
+        this.account_characters.get(account_id).delete(character_id);
+    }
+
+    clear_account_character_view(account_id: number) {
+        if (this.account_characters.has(account_id)) {
+            let acc_chars = this.account_characters.get(account_id);
+            acc_chars.clear();
+        }
     }
 }

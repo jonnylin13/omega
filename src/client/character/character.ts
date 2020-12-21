@@ -5,6 +5,8 @@ import { MapleSkinColor } from "./skin-color";
 
 
 export class MapleCharacter {
+
+    // TODO: Create AbstractMapleCharacter
     name: string;
     id: number;
     account_id: number;
@@ -37,6 +39,7 @@ export class MapleCharacter {
     spawn_point: number;
     skin_color: MapleSkinColor;
     pets: Array<MaplePet> = new Array(3);
+    world_id: number;
 
     is_gm(): boolean {
         return this.gm_level > 0;
@@ -44,5 +47,10 @@ export class MapleCharacter {
 
     static load_from_db(character_id: number, c: MapleClient, channel_server: boolean): MapleCharacter {
         return null; // TODO: Needs implementation
+    }
+
+    generate_character_entry() {
+        let ret = new MapleCharacter();
+        return ret; // TODO: Needs implementation
     }
 }

@@ -1,10 +1,10 @@
 import * as net from 'net';
+import { MapleCharacter } from '../../client/character/character';
 import { MapleClient } from '../../client/client';
 import { Config } from '../../util/config';
 import { Pair } from '../../util/pair';
 import { MapleServerHandler } from '../maple-server-handler';
 import { MapleSessionCoordinator } from './coordinator/session/session-coordinator';
-import { Session } from './session';
 import { World } from './world/world';
 
 
@@ -27,6 +27,7 @@ export class MasterServer {
     private transitioning_characters: Map<string, number> = new Map();
     private account_characters: Map<number, Set<number>> = new Map();
     private world_characters: Map<number, number> = new Map();
+    private account_character_count: Map<number, number> = new Map();
     world_recommended_list: Array<Pair<number, string>> = [];
 
     static get_instance(): MasterServer {
@@ -120,6 +121,41 @@ export class MasterServer {
             this.transitioning_characters.delete(remote_host);
             return character_id;
         } else return null;
+    }
+
+    update_character_entry(chr: MapleCharacter) {
+        let chr_view = chr.generate_character_entry();
+
+        let world = this.get_world(chr.world_id);
+        if (world != null && world != undefined) world.register_account_character_view(chr_view.account_id, chr_view);
+    }
+
+    create_character_entry(chr: MapleCharacter) {
+        let account_id = chr.account_id;
+        let chr_id = chr.id;
+        let world_id = chr.world_id;
+
+        this.account_character_count.set(account_id, this.account_character_count.get(account_id) + 1);
+        let acc_chars = this.account_characters.get(account_id);
+        acc_chars.add(chr_id);
+        this.world_characters.set(chr_id, world_id);
+        let chr_view = chr.generate_character_entry();
+        let world = this.get_world(world_id);
+        if (world != null && world != undefined) world.register_account_character_view(chr_view.account_id, chr_view);
+
+    }
+
+    delete_character_entry(account_id: number, character_id: number) {
+        this.account_character_count.set(account_id, this.account_character_count.get(account_id) - 1);
+        let acc_chars = this.account_characters.get(account_id);
+        acc_chars.delete(character_id);
+        let world_id = this.world_characters.get(character_id);
+        if (world_id != null && world_id != undefined) {
+            this.world_characters.delete(character_id);
+            let world = this.get_world(world_id);
+            if (world != null && world != undefined) world.unregister_account_character_view(account_id, character_id);
+        }
+        
     }
 
 }
