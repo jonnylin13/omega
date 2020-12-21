@@ -25,6 +25,12 @@ export class MapleCharacter {
     mp: number;
     client_max_mp: number;
     remaining_ap: number;
+    remaining_sp: number;
+    exp: number;
+    fame: number;
+    gacha_exp: number;
+    map_id: number;
+    spawn_point: number;
 
     is_gm(): boolean {
         return this.gm_level > 0;

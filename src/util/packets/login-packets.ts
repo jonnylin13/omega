@@ -8,6 +8,7 @@ import { Convert } from '../convert';
 import { Channel } from '../../net/server/channel/channel';
 import { Pair } from '../pair';
 import { MapleCharacter } from '../../client/character';
+import { GameConstants } from '../../constants/game/game-constants';
 
 
 export class LoginPackets {
@@ -267,8 +268,25 @@ export class LoginPackets {
         mplew.write_short(chr.client_max_mp);
         mplew.write_short(chr.remaining_ap);
 
-        // TODO: Need to finish implementing this
+        if (GameConstants.has_sp_table(chr.job))
+            this.add_remaining_skill_info(mplew, chr);
 
+        else mplew.write_short(chr.remaining_sp);
+        mplew.write_int(chr.exp);
+        mplew.write_short(chr.fame);
+        mplew.write_int(chr.gacha_exp);
+        mplew.write_int(chr.map_id);
+        mplew.write_byte(chr.spawn_point);
+        mplew.write_int(0);
+    }
+
+    private static add_char_look(mplew: MaplePacketLittleEndianWriter, chr: MapleCharacter, mega: boolean) {
+        mplew.write_byte(chr.gender);
+        mplew.write_byte(chr.skin_color.id);
+        mplew.write_int(chr.face);
+        mplew.write_byte(mega ? 0 : 1);
+        mplew.write_int(chr.hair);
+        this.add_char_equips(mplew, chr);
     }
  
 }
