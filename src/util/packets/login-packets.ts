@@ -147,4 +147,11 @@ export class LoginPackets {
         return mplew.get_packet();
     }
 
+    static get_server_status(status: number): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(4);
+        mplew.write_short(SendOpcode.SERVERSTATUS.get_value());
+        mplew.write_short(status);
+        return mplew.get_packet();
+    }
+
 }
