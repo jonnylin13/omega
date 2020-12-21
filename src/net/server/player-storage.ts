@@ -1,4 +1,4 @@
-import { MapleCharacter } from '../../client/character';
+import { MapleCharacter } from '../../client/character/character';
 
 
 export class PlayerStorage {
