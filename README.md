@@ -54,3 +54,4 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 ### Long goals
 * [ ] Design worker_threads system to fork the cash shop server, world servers, channel servers
 * [ ] Docker support
+* [ ] Performance benchmarking
