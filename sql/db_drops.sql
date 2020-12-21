@@ -21868,7 +21868,7 @@ DELETE FROM temp_data WHERE dropper_id >= 9300315 AND dropper_id <= 9300324;
  SELECT 6130102, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance` FROM drop_data WHERE dropper_id = 6130103;
 
  INSERT IGNORE INTO drop_data (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`)
- SELECT 6230201, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance` FROM drop_data WHERE dropped_id = 6230200;
+ SELECT 6230201, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance` FROM drop_data WHERE dropper_id = 6230200;
 
  INSERT IGNORE INTO drop_data (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`)
  SELECT 3000002, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance` FROM drop_data WHERE dropper_id = 3000001;

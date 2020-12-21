@@ -10485,7 +10485,7 @@ INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `ma
 (130101, 4031846, 1, 1, 2173, 50000),
 (1210100, 4031846, 1, 1, 2173, 50000),
 (8180001, 4031464, 1, 1, 6303, 1000000);
-INSERT IGNORE INTO `temp_data` (`dropped_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
+INSERT IGNORE INTO `temp_data` (`dropper_id`, `item_id`, `minimum_quantity`, `maximum_quantity`, `quest_id`, `chance`) VALUES
 (7130104, 4031436, 1, 1, 3828, 1000000),
 (3110302, 4031694, 1, 1, 3312, 50000),
 (3110303, 4031694, 1, 1, 3312, 100000),
@@ -12843,7 +12843,7 @@ CREATE TABLE IF NOT EXISTS `fame_log` (
   `receiver_character_id` int(11) NOT NULL DEFAULT '0',
   `when` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`fame_log_id`),
-  KEY `characterid` (`sender_character_id`)
+  KEY `character_id` (`sender_character_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `family_character` (
@@ -16590,7 +16590,7 @@ CREATE TABLE IF NOT EXISTS `quest_status` (
 CREATE TABLE `quickslot_keymap` (
   `account_id` INT NOT NULL,
   `key_map` BIGINT NOT NULL DEFAULT 0,
-  PRIMARY KEY (`accountid`)
+  PRIMARY KEY (`account_id`)
 );
 
 ALTER TABLE `quickslot_keymap`
@@ -21479,15 +21479,15 @@ CREATE TABLE IF NOT EXISTS `world_transfers` (
   `request_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `completion_time` timestamp NULL,
   PRIMARY KEY (`id`),
-  INDEX (characterid)
+  INDEX (character_id)
 ) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 
 ALTER TABLE `duey_items`
-  ADD CONSTRAINT `dueyitems_ibfk_1` FOREIGN KEY (`packet_id`) REFERENCES `duey_packages` (`package_id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `dueyitems_ibfk_1` FOREIGN KEY (`package_id`) REFERENCES `duey_packages` (`package_id`) ON DELETE CASCADE;
 
-ALTER TABLE `famelog`
-  ADD CONSTRAINT `famelog_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
+ALTER TABLE `fame_log`
+  ADD CONSTRAINT `famelog_ibfk_1` FOREIGN KEY (`sender_character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
   
 ALTER TABLE `family_character`
   ADD CONSTRAINT `family_character_ibfk_1` FOREIGN KEY (`character_id`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
