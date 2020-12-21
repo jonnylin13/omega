@@ -23,6 +23,8 @@ export class MasterServer {
 
     private in_login_state: Map<MapleClient, bigint> = new Map();
     private transitioning_characters: Map<string, number> = new Map();
+    private account_characters: Map<number, Set<number>> = new Map();
+    private world_characters: Map<number, number> = new Map();
 
     static get_instance(): MasterServer {
         return this.instance;
@@ -103,6 +105,29 @@ export class MasterServer {
         if (Config.properties.server.use_ip_validation) return true;
         let remote_ip = c.session.remoteAddress;
         return this.transitioning_characters.has(remote_ip);
+    }
+
+    has_character_entry(account_id: number, character_id: number): boolean {
+        let acc_chars = this.account_characters.get(account_id);
+        return acc_chars.has(character_id);
+    }
+
+    get_world_id_from_character_id(character_id: number): number {
+        let world_id = this.world_characters.get(character_id);
+        return world_id != undefined ? world_id : -1;
+    }
+
+    get_world(world_id: number): World {
+        return this.worlds[world_id];
+    }
+
+    get_address(world_id: number, channel_id: number) {
+        return this.worlds[world_id].get_channel(channel_id).socket.address;
+    }
+
+    set_character_id_in_transition(c: MapleClient, character_id: number) {
+        let remote_host = MapleSessionCoordinator.get_remote_host(c.session);
+        this.transitioning_characters.set(remote_host, character_id);
     }
 
 }

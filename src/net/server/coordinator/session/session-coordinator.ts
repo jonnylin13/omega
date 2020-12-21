@@ -21,6 +21,8 @@ export class MapleSessionCoordinator {
     private pooled_remote_hosts: Set<string>;
     private online_remote_hwids: Set<string>;
     private login_storage: LoginStorage = new LoginStorage();
+    private cached_host_hwids: Map<string, string>;
+    private cached_host_timeout: Map<string, bigint>;
 
     static get_instance() {
         if (this.instance === undefined) this.instance = new MapleSessionCoordinator();
@@ -111,7 +113,7 @@ export class MapleSessionCoordinator {
             return AntiMultiClientResult.SUCCESS;
         }
 
-        let remote_host = session.remoteAddress;
+        let remote_host = MapleSessionCoordinator.get_remote_host(session);
         try {
             // TODO: Multithreading ???
             if (this.pooled_remote_hosts.has(remote_host)) 
@@ -137,6 +139,75 @@ export class MapleSessionCoordinator {
         this.pooled_remote_hosts.delete(remote_host);
         return AntiMultiClientResult.SUCCESS;
         
+    }
+
+    private register_remote_host_hwid(remote_host: string, remote_hwid: string) {
+        this.cached_host_hwids.set(remote_host, remote_hwid);
+        this.cached_host_timeout.set(remote_host, MasterServer.get_instance().get_current_time() + BigInt(604800000));
+    }
+
+    private async register_access_account(remote_hwid: string, account_id: number) {
+        let result = await DatabaseConnection.knex('hwid_accounts')
+            .insert({account_id: account_id, remote_hwid: remote_hwid, expires_at: MasterServer.get_instance().get_current_time() + MapleSessionCoordinator.hwid_expiration_update(0)});
+        if (result.length === 0) {
+            // TODO: Handle error
+        }
+    }
+
+    private async register_hwid_account_if_absent(remote_hwid: string, account_id: number) {
+        let rows = await DatabaseConnection.knex('hwid_accounts')
+            .where({account_id: account_id})
+            .select('SQL_CACHE hwid');
+        let hwid_count = 0;
+        if (rows.length === 0) {
+            // TODO: Handle error
+        } else {
+            for (let data of rows) {
+                if (remote_hwid == data.hwid) return false;
+                hwid_count++;
+            }
+            if (hwid_count < Config.properties.server.max_allowed_account_hwid) {
+                await this.register_access_account(remote_hwid, account_id);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static get_remote_host(session: Session) {
+        let nibble_hwid = session.nibble_hwid;
+        if (nibble_hwid) return session.remoteAddress + '-' + nibble_hwid;
+        else return session.remoteAddress;
+    }
+
+    attempt_game_session(session: Session, account_id: number, remote_hwid: string): AntiMultiClientResult {
+        let remote_host = MapleSessionCoordinator.get_remote_host(session);
+        if (!Config.properties.server.deterred_multiclient) {
+            this.register_remote_host_hwid(remote_host, remote_hwid);
+            this.register_remote_host_hwid(session.remoteAddress, remote_hwid);
+            return AntiMultiClientResult.SUCCESS;
+        }
+
+        if (this.pooled_remote_hosts.has(remote_host)) return AntiMultiClientResult.REMOTE_PROCESSING;
+        this.pooled_remote_hosts.add(remote_host);
+        try {
+            let nibble_hwid = session.nibble_hwid;
+            if (nibble_hwid) {
+                this.online_remote_hwids.delete(nibble_hwid);
+                if (remote_hwid.endsWith(nibble_hwid)) {
+                    if (!this.online_remote_hwids.has(remote_hwid)) {
+                        this.online_remote_hwids.add(remote_hwid);
+                        this.register_remote_host_hwid(remote_host, remote_hwid);
+                        this.register_remote_host_hwid(session.remoteAddress, remote_hwid);
+                        this.register_hwid_account_if_absent(remote_hwid, account_id);
+                        return AntiMultiClientResult.SUCCESS;
+                    } else return AntiMultiClientResult.REMOTE_LOGGED_IN;
+                } else return AntiMultiClientResult.REMOTE_NO_MATCH;
+            } else return AntiMultiClientResult.REMOTE_NO_MATCH;
+        } finally {
+            this.pooled_remote_hosts.delete(remote_host);
+        }
+
     }
 
 

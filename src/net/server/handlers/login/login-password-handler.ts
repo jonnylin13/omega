@@ -8,6 +8,7 @@ import { DatabaseConnection } from '../../../../util/db';
 import * as bcrypt from 'bcrypt';
 import * as sha from 'sha.js';
 import { MasterServer } from "../../server";
+import { MapleSessionCoordinator } from "../../coordinator/session/session-coordinator";
 
 
 
@@ -17,7 +18,7 @@ export class LoginPasswordHandler implements AbstractMaplePacketHandler {
     }
 
     async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
-        let remote_host = c.session.remoteAddress;
+        let remote_host = MapleSessionCoordinator.get_remote_host(c.session);
         if (remote_host) {
 
             // TODO: Fix confusing if structure

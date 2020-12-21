@@ -24,4 +24,9 @@ export class Convert {
     static int8_to_hexstr(arr: Int8Array) {
         return arr.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
     }
+
+    static ip_to_bytes(ip: string, separator='.'): Int8Array {
+        let ip_arr = ip.split(separator);
+        return Int8Array.from(ip_arr.map((decimal) => parseInt(decimal)));
+    }
 }

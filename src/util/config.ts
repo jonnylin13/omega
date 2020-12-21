@@ -19,6 +19,7 @@ interface ServerConfig extends ConfigType {
     login_attempt_duration: number;
     max_allowed_account_hwid: number;
     use_character_account_check: boolean;
+    channel_load: number;
 }
 
 interface ConfigType {}

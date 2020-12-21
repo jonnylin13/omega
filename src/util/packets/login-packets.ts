@@ -3,7 +3,8 @@ import { MaplePacketLittleEndianWriter } from '../data/output/maple-lew';
 import { SendOpcode } from '../../net/opcodes/send';
 import { MasterServer } from '../../net/server/server';
 import { Config } from '../config';
-import { Time } from './time';
+import { Time } from '../time';
+import { Convert } from '../convert';
 
 
 export class LoginPackets {
@@ -110,6 +111,25 @@ export class LoginPackets {
         mplew.write_long(BigInt(Time.get_time(BigInt(new Date().getTime()))));
         mplew.write_int(0);
         mplew.write_maple_ascii_string(url);
+        return mplew.get_packet();
+    }
+
+    static get_after_login_error(reason: number): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(8);
+        mplew.write_short(SendOpcode.SELECT_CHARACTER_BY_VAC.get_value());
+        mplew.write_short(reason);
+        return mplew.get_packet();
+    }
+
+    static get_server_ip(remote_address: string, port: number, client_id: number): Buffer {
+        let addr = Convert.ip_to_bytes(remote_address);
+        const mplew = new MaplePacketLittleEndianWriter(15 + addr.length);
+        mplew.write_short(SendOpcode.SERVER_IP.get_value());
+        mplew.write_short(0);
+        mplew.write(addr); // TODO: Needs validation
+        mplew.write_short(port);
+        mplew.write_int(client_id);
+        mplew.write(Int8Array.from([0, 0, 0, 0, 0]));
         return mplew.get_packet();
     }
 

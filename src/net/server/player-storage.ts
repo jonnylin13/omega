@@ -23,4 +23,8 @@ export class PlayerStorage {
     get_all_players() {
         return this.storage.values();
     }
+
+    size() {
+        return this.storage.size();
+    }
 }

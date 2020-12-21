@@ -1,3 +1,5 @@
+import { createBuilderStatusReporter } from "typescript";
+import { Config } from "../../../util/config";
 import { Channel } from "../channel/channel";
 import { PlayerStorage } from "../player-storage";
 
@@ -54,5 +56,19 @@ export class World {
         if (ch_idx === this.channels.length - 1) this.channels.pop();
         ch.shutdown();
         return ch.id;
+    }
+
+    is_capacity_full(): boolean {
+        return this.get_capacity_status() === 2;
+    }
+
+    get_capacity_status(): number {
+        let world_cap = this.channels.length * Config.properties.server.channel_load;
+        let num_players = this.player_storage.size();
+        let status;
+        if (num_players >= world_cap) status = 2;
+        else if (num_players >= world_cap * 0.8) status = 1;
+        else status = 0;
+        return status;
     }
 }

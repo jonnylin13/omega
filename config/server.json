@@ -11,5 +11,6 @@
     "max_account_login_attempts": 5,
     "login_attempt_duration": 5000,
     "max_allowed_account_hwid": 1,
-    "use_character_account_check": true
+    "use_character_account_check": true,
+    "channel_load": 200
 }

@@ -1,3 +1,4 @@
+import * as net from 'net';
 
 
 export class Channel {
@@ -5,6 +6,7 @@ export class Channel {
     channel: number;
     world: number;
     id: number;
+    socket: net.Socket;
 
     constructor(world: number, channel: number, start_time: number) {
         this.world = world;

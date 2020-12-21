@@ -6,6 +6,7 @@ import * as sha from 'sha.js'
 import { Config } from "../util/config";
 import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/coordinator/session/session-coordinator";
 import { MapleCharacter } from "./character";
+import { World } from "../net/server/world/world";
 
 
 export class MapleClient {
@@ -38,6 +39,8 @@ export class MapleClient {
     disconnecting: boolean;
     player: MapleCharacter;
     last_pong: bigint;
+    world_id: number;
+    channel_id: number;
 
     pong_received(): void {
         this.last_pong = MasterServer.get_instance().get_current_time();
@@ -115,6 +118,34 @@ export class MapleClient {
     // TODO: Needs implementation
     check_pic(pic: string): boolean {
         return false;
+    }
+
+    async update_macs(macs: string) {
+        this.macs = this.macs.concat(macs.split(', '));
+        let result = await DatabaseConnection.knex('accounts')
+            .where({id: this.account_id})
+            .update({macs: this.macs.join(', ')});
+        if (result.length === 0) {
+            // TODO: Handle error
+        }
+    }
+
+    async update_hwid(new_hwid: string) {
+        let split = new_hwid.split('_');
+        if (split.length > 1 && split[1].length === 8) {
+            let convert = split[1];
+            let hwid = '';
+            for (let i = convert.length - 2; i >= 0; i -= 2) 
+                hwid += convert.substring(i, i + 2);
+
+            hwid = hwid.slice(0, 4) + '-' + hwid.slice(4);
+            let result = DatabaseConnection.knex('accounts')
+                .where({id: this.account_id})
+                .update({hwid: hwid});
+            if (result.length === 0) {
+                // TODO: Handle error
+            }
+        } else this.disconnect(false, false);
     }
 
     async get_temp_ban_from_db(): Promise<Date> {
@@ -320,6 +351,12 @@ export class MapleClient {
         if (this.disconnecting) return false;
         this.disconnecting = true;
         return true;
+    }
+
+    set_character_on_session_transition_state(character_id: number) {
+        this.update_login_state(MapleClient.LOGIN.SERVER_TRANSITION);
+        this.session.in_transition = true;
+        MasterServer.get_instance().set_character_id_in_transition(this, character_id);
     }
 
 }
