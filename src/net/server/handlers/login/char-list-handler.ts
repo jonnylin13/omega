@@ -29,6 +29,6 @@ export class CharListRequestHandler extends AbstractMaplePacketHandler {
 
         c.world_id = world_id;
         c.channel_id = channel_id;
-        c.send_char_list(world);
+        c.send_char_list(world_id);
     }
 }

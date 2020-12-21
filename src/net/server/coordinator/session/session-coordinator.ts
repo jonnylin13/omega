@@ -1,5 +1,5 @@
 import { Config } from '../../../../util/config';
-import { DatabaseConnection } from '../../../../util/db';
+import { AccountDB } from '../../../../util/db/account';
 import { MasterServer } from '../../server';
 import { Session } from '../../session';
 import { LoginStorage } from '../login/login-storage';
@@ -71,35 +71,31 @@ export class MapleSessionCoordinator {
         if (relevance < 127) // Max value of a byte ??
             relevance++;
 
-        let result = await DatabaseConnection.knex('hwid_accounts')
-            .where({account_id: account_id})
-            .andWhere('hwid', 'like', `%${hwid}%`)
-            .update({
-                relevance: relevance,
-                expires_at: timestamp
-            });
-        
-        // TODO: Check the result
+        try {
+            await AccountDB.update_hwid_accounts(account_id, hwid, relevance, timestamp);
+        } catch (err) {
+            // TODO: Handle SQL error
+        }
     }
 
     private static async attempt_access_account(nibble_hwid: string, account_id: number, routine_check: boolean): Promise<boolean> {
-        let rows = await DatabaseConnection.knex('hwid_accounts')
-            .where({account_id: account_id})
-            .select('SQL_CACHE *');
+        
         let hwid_count = 0;
-        for (let data of rows) {
-            let hwid = data.hwid;
-            if (hwid.endsWith(nibble_hwid)) {
-                if (!routine_check) {
-                    let relevance = data.relevance;
-                    await this.update_access_account(hwid, account_id, relevance);
+        try {
+            let rows = await AccountDB.get_hwid_accounts(account_id);
+            for (let data of rows) {
+                let hwid = data.hwid;
+                if (hwid.endsWith(nibble_hwid)) {
+                    if (!routine_check) {
+                        let relevance = data.relevance;
+                        await this.update_access_account(hwid, account_id, relevance);
+                    }
+                    return true;
                 }
-                return true;
+                hwid_count++;
             }
-            hwid_count++;
-        }
-        if (rows.length === 0) {
-            // TODO: Handle no account records found error
+        } catch (err) {
+            // TODO: Handle error
             return false;
         }
         if (hwid_count < Config.properties.server.max_allowed_account_hwid) return true;
@@ -147,21 +143,17 @@ export class MapleSessionCoordinator {
     }
 
     private async register_access_account(remote_hwid: string, account_id: number) {
-        let result = await DatabaseConnection.knex('hwid_accounts')
-            .insert({account_id: account_id, remote_hwid: remote_hwid, expires_at: MasterServer.get_instance().get_current_time() + MapleSessionCoordinator.hwid_expiration_update(0)});
-        if (result.length === 0) {
+        try {
+            await AccountDB.create_hwid_account(account_id, remote_hwid, MasterServer.get_instance().get_current_time() + MapleSessionCoordinator.hwid_expiration_update(0));
+        } catch (err) {
             // TODO: Handle error
         }
     }
 
     private async register_hwid_account_if_absent(remote_hwid: string, account_id: number) {
-        let rows = await DatabaseConnection.knex('hwid_accounts')
-            .where({account_id: account_id})
-            .select('SQL_CACHE hwid');
-        let hwid_count = 0;
-        if (rows.length === 0) {
-            // TODO: Handle error
-        } else {
+        try {
+            let rows = await AccountDB.get_hwid_accounts(account_id);
+            let hwid_count = 0;
             for (let data of rows) {
                 if (remote_hwid == data.hwid) return false;
                 hwid_count++;
@@ -170,7 +162,10 @@ export class MapleSessionCoordinator {
                 await this.register_access_account(remote_hwid, account_id);
                 return true;
             }
+        } catch (err) {
+            // TODO: Handle error
         }
+        
         return false;
     }
 

@@ -1,13 +1,12 @@
 import { MasterServer } from "../net/server/server";
 import { Session } from "../net/server/session";
-import { DatabaseConnection } from "../util/db";
 import * as bcrypt from 'bcrypt';
 import * as sha from 'sha.js'
 import { Config } from "../util/config";
 import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/coordinator/session/session-coordinator";
 import { MapleCharacter } from "./character";
-import { World } from "../net/server/world/world";
 import { LoginPackets } from "../util/packets/login-packets";
+import { AccountDB } from "../util/db/account";
 
 
 export class MapleClient {
@@ -125,10 +124,9 @@ export class MapleClient {
 
     async update_macs(macs: string) {
         this.macs = this.macs.concat(macs.split(', '));
-        let result = await DatabaseConnection.knex('accounts')
-            .where({id: this.account_id})
-            .update({macs: this.macs.join(', ')});
-        if (result.length === 0) {
+        try {
+            await AccountDB.update_macs(this.account_id, this.macs.join(', '));
+        } catch (err) {
             // TODO: Handle error
         }
     }
@@ -142,65 +140,64 @@ export class MapleClient {
                 hwid += convert.substring(i, i + 2);
 
             hwid = hwid.slice(0, 4) + '-' + hwid.slice(4);
-            let result = DatabaseConnection.knex('accounts')
-                .where({id: this.account_id})
-                .update({hwid: hwid});
-            if (result.length === 0) {
+            try {
+                await AccountDB.update_hwid(this.account_id, hwid);
+            } catch (err) {
                 // TODO: Handle error
             }
         } else this.disconnect(false, false);
     }
 
     async get_temp_ban_from_db(): Promise<Date> {
-        let rows = await DatabaseConnection.knex('accounts')
-            .where({id: this.account_id})
-            .select('temp_ban');
-        if (rows.length > 0) {
-            let data = rows[0];
+        try {
+
+            let data = await AccountDB.get_temp_ban(this.account_id);
             let blubb = data.temp_ban;
             if (blubb == 0 || blubb == '2018-06-20 00:00:00.0') return null;
             this.temp_ban = new Date(blubb);
             return this.temp_ban;
-
-        } else return null;
+        } catch (err) {
+            // TODO: Handle error
+            return null;
+        }
     }
 
     async has_banned_ip(): Promise<boolean> {
-        let rows = await DatabaseConnection.knex('ip_bans')
-            .where(this.session.remoteAddress, 'like', `CONCAT(ip, '%')`)
-            .count({count: '*'});
-        let result = false;
-        if (rows.length > 0) {
-            let count = rows[0]['COUNT(*)'];
-            if (count >= 1) result = true;
+        try {
+
+            let count = await AccountDB.get_ip_ban(this.session.remoteAddress);
+            if (count >= 1) return true;
+        } catch (err) {
+            // TODO: Handle error
+        } finally {
+            return false;
         }
-        return result;
     }
 
     async has_banned_mac(): Promise<boolean> {
         if (this.macs.length === 0) return false;
 
-        let rows = await DatabaseConnection.knex('mac_bans')
-            .where('mac', 'in', this.macs.join(', '))
-            .count({count: '*'});
-        let result = false;
-        if (rows.length > 0) {
-            let count = rows[0]['COUNT(*)'];
-            if (count >= 1) result = true;
+        try {
+            let count = await AccountDB.get_mac_bans(this.macs);
+            if (count >= 1) return true;
+        } catch (err) {
+            // TODO: Handle error
+        } finally {
+            return false;
         }
-        return result;
     }
 
     async update_login_state(new_state: number) {
         if (new_state === MapleClient.LOGIN.LOGGED_IN) {
             // TODO: MapleSessionCoordinator.get_instance().update_online_session(this.session);
         }
-
-        // TODO: Check result
-        let result = await DatabaseConnection.knex('accounts')
-            .where({id: this.account_id})
-            .update({logged_in: new_state, last_login: MasterServer.get_instance().get_current_time()});
-
+        try {
+            await AccountDB.update_login_state(this.account_id, new_state, MasterServer.get_instance().get_current_time());
+        } catch (err) {
+            // TODO: Handle error
+        }
+        
+        // TODO: Should we continue this code if error or return in the catch block?
         if (new_state === MapleClient.LOGIN.LOGGED_OUT) {
             this.logged_in = false;
             this.server_transition = false;
@@ -212,46 +209,33 @@ export class MapleClient {
     }
 
     async get_login_state() {
-        let rows = await DatabaseConnection.knex
-            .where({id: this.account_id})
-            .select('logged_in', 'last_login', 'birthday')
-            .from('accounts');
-        if (rows.length > 0) {
-
+        try {
+            let data = await AccountDB.get_login_state(this.account_id);
+            let state = data.logged_in;
             // From HeavenMS
             // birthday = Calendar.getInstance();
             // try {
             //     birthday.setTime(rs.getDate("birthday"));
             // } catch(SQLException e) {}
-
-            let data = rows[0];
-            let state = data.logged_in;
             if (state === MapleClient.LOGIN.SERVER_TRANSITION) {
                 if (data.last_login + 30000 < MasterServer.get_instance().get_current_time()) {
-
                     // Not quite sure what this re-assigning does
                     // let account_id = this.account_id;
                     state = MapleClient.LOGIN.LOGGED_OUT;
                     await this.update_login_state(state);
                     // this.account_id = account_id;
-
                 }
+                if (state === MapleClient.LOGIN.LOGGED_IN) {
+                    this.logged_in = true;
+                } else if (state === MapleClient.LOGIN.SERVER_TRANSITION) {
+                    await AccountDB.update_logged_in(this.account_id, 0);
+                } else this.logged_in = false;
+    
+                return state;
             }
-
-            if (state === MapleClient.LOGIN.LOGGED_IN) {
-                this.logged_in = true;
-            } else if (state === MapleClient.LOGIN.SERVER_TRANSITION) {
-                // TODO: Check result
-                let result = await DatabaseConnection.knex('accounts')
-                    .where({id: this.account_id})
-                    .update({logged_in: 0});
-
-            } else this.logged_in = false;
-
-            return state;
- 
-        } else {
-            // TODO: Handle account not found
+        } catch (err) {
+            // TODO: Handle error
+            return null;
         }
     }
 
@@ -268,12 +252,8 @@ export class MapleClient {
             return 6;
         }
 
-        let rows = await DatabaseConnection.knex
-            .where({name: user})
-            .select('id', 'password', 'gender', 'banned', 'pin', 'pic', 'character_slots', 'tos', 'language')
-            .from('accounts');
-        if (rows.length > 0) {
-            let data = rows[0];
+        try {
+            let data = await AccountDB.get_account_login_info(this.account_id);
             this.account_id = data.id;
             if (this.account_id <= 0) {
                 // TODO: Log error
@@ -306,7 +286,8 @@ export class MapleClient {
                 this.logged_in = false;
                 loginok = 4;
             }
-        } else {
+        } catch (err) {
+            // TODO: Log error
             this.account_id = -3;
         }
 

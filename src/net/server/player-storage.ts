@@ -3,7 +3,7 @@ import { MapleCharacter } from '../../client/character';
 
 export class PlayerStorage {
     private storage: Map<number, MapleCharacter> = new Map();
-    private name_storage: Map<string, MapleCharacter> = new Map();\
+    private name_storage: Map<string, MapleCharacter> = new Map();
 
     add_player(chr: MapleCharacter) {
         this.storage.set(chr.id, chr);
@@ -25,6 +25,6 @@ export class PlayerStorage {
     }
 
     size() {
-        return this.storage.size();
+        return this.storage.size;
     }
 }

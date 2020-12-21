@@ -1,6 +1,19 @@
 require('dotenv').config();
 const knex = require('knex');
 
+
+export enum SQLErrorType {
+    NO_RESULTS_FOUND
+}
+
+export class SQLError extends Error {
+    type: SQLErrorType;
+    constructor(error: string, type: SQLErrorType = SQLErrorType.NO_RESULTS_FOUND) {
+        super(error);
+        this.type = type;
+    }
+}
+
 export class DatabaseConnection {
 
     static knex: any;

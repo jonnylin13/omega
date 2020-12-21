@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import { File } from '../provider/wz/file';
 
 interface SystemConfig extends ConfigType {
-    wz_path: string;
+    wzpath: string;
 }
 
 interface ServerConfig extends ConfigType {

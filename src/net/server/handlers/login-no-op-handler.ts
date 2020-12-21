@@ -13,6 +13,6 @@ export class LoginRequiringNoOpHandler implements MaplePacketHandler {
     handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {}
 
     validate_state(c: MapleClient) {
-        return c.is_logged_in();
+        return c.logged_in;
     }
 }

@@ -4,11 +4,11 @@ import { LoginPackets } from "../../../../util/packets/login-packets";
 import { AbstractMaplePacketHandler } from "../../../abstract-packet-handler";
 import { Config } from '../../../../util/config';
 import { Convert } from "../../../../util/convert";
-import { DatabaseConnection } from '../../../../util/db';
 import * as bcrypt from 'bcrypt';
 import * as sha from 'sha.js';
 import { MasterServer } from "../../server";
 import { MapleSessionCoordinator } from "../../coordinator/session/session-coordinator";
+import { AccountDB } from "../../../../util/db/account";
 
 
 
@@ -49,25 +49,20 @@ export class LoginPasswordHandler implements AbstractMaplePacketHandler {
         let loginok = await c.login(user, pwd, hwid_hex);
 
         if (Config.properties.server.automatic_register && loginok === 5) {
-            let result = await DatabaseConnection.knex('accounts')
-                .insert({
-                    name: user,
-                    password: Config.properties.server.bcrypt_migration ? bcrypt.hashSync(pwd, 12) : sha('sha256').update(pwd).digest('hex'),
-                    birthday: '2018-06-20',
-                    tempban: '2018-06-20'
-                }, ['id']);
-            if (result.length < 1) {
+            try {
+                let hashed_password = Config.properties.server.bcrypt_migration ? bcrypt.hashSync(pwd, 12) : sha('sha256').update(pwd).digest('hex');
+                await AccountDB.create_auto_account(user, hashed_password);
+            } catch (err) {
                 c.account_id = -1;
-                // TODO: Handle SQL error
+                // TODO: Handle error
             }
             loginok = await c.login(user, pwd, hwid_hex);
         }
 
         if (Config.properties.server.bcrypt_migration && (loginok <= -10)) { // -10 means bcrypt migration, -23 means TOS wasn't accepted
-            let result = await DatabaseConnection.knex('accounts')
-                .where({name: user})
-                .update({password: bcrypt.hashSync(pwd, 12)}, ['id']);
-            if (result.length < 1) {
+            try {
+                await AccountDB.update_password(c.account_id, bcrypt.hashSync(pwd, 12));
+            } catch (err) {
                 // TODO: Handle SQL error
             }
             loginok = (loginok == -10) ? 0 : 23;

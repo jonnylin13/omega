@@ -6,7 +6,7 @@ import { MaplePacketHandler } from "../../../packet-handler";
 
 export class AcceptTOSHandler implements MaplePacketHandler {
     validate_state(c: MapleClient) {
-        return c.is_logged_in();
+        return c.logged_in;
     }
 
     handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
