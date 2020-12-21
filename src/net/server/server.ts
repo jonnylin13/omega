@@ -13,7 +13,7 @@ export class MasterServer {
 
     port: number;
     started: boolean = false;
-    // current_time: number = 0; // BigInt here?
+    // current_time: number = 0; // bigint here?
     server_current_time: bigint = BigInt(0);
     uptime: bigint = BigInt(new Date().getTime());
 

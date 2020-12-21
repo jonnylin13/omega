@@ -1,5 +1,5 @@
-import { RecvOpcode } from '../opcodes/recv';
-import { MaplePacketHandler } from '../packet-handler';
+import { RecvOpcode } from './opcodes/recv';
+import { MaplePacketHandler } from './packet-handler';
 
 
 export class PacketDelegator {
