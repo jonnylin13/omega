@@ -262,16 +262,16 @@ export class LoginPackets {
         mplew.write_short(chr.dex);
         mplew.write_short(chr.int);
         mplew.write_short(chr.luk);
-        mplew.write_short(chr.hp);
+        mplew.write_short(chr.get_hp());
         mplew.write_short(chr.client_max_hp);
-        mplew.write_short(chr.mp);
+        mplew.write_short(chr.get_mp());
         mplew.write_short(chr.client_max_mp);
         mplew.write_short(chr.remaining_ap);
 
         if (GameConstants.has_sp_table(chr.job))
             this.add_remaining_skill_info(mplew, chr);
 
-        else mplew.write_short(chr.remaining_sp);
+        else mplew.write_short(chr.get_remaining_sp());
         mplew.write_int(chr.exp);
         mplew.write_short(chr.fame);
         mplew.write_int(chr.gacha_exp);

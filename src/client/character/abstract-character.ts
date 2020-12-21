@@ -2,6 +2,7 @@ import { AbstractAnimatedMapleMapObject } from "../../server/maps/abstract-anim-
 import { EventEmitter } from 'events';
 import { MapleStat } from "./stat";
 import { Config } from "../../util/config";
+import { GameConstants } from "../../constants/game/game-constants";
 
 
 export class Short {
@@ -26,7 +27,7 @@ export abstract class AbstractMapleCharacter extends AbstractAnimatedMapleMapObj
     transient_hp: number; transient_mp: number;
     events: EventEmitter = new EventEmitter();
 
-    lister: AbstractCharacterListener = null;
+    listener: AbstractCharacterListener = null;
     stat_updates: Map<MapleStat, number> = new Map();
 
     private static ap_assigned(x: number) {
@@ -53,8 +54,8 @@ export abstract class AbstractMapleCharacter extends AbstractAnimatedMapleMapObj
         return this.max_mp;
     }
 
-    get_remaining_sp() {
-        return this.remaining_sp;
+    protected _get_remaining_sp(job_id: number) {
+        return this.remaining_sp[GameConstants.get_skill_book(job_id)];
     }
 
     set_hp(new_hp: number) {

@@ -47,4 +47,8 @@ export class MapleCharacter extends AbstractMapleCharacter {
         let ret = new MapleCharacter();
         return ret; // TODO: Needs implementation
     }
+
+    get_remaining_sp() {
+        return this._get_remaining_sp(this.job.id);
+    }
 }
