@@ -4,5 +4,6 @@
     "enable_pic": true,
     "enable_pin": true,
     "use_ip_validation": true,
-    "local_server": true
+    "local_server": true,
+    "automatic_register": false
 }

@@ -11,25 +11,16 @@ export class DatabaseConnection {
     }
 
     static init() {
-
-        this.get_num_accounts().then(num_accounts => {
-
-            let max_pool_size = Math.ceil(0.00202020202 * num_accounts + 9.797979798);
-            if (max_pool_size < 10) max_pool_size = 10;
-            else if (max_pool_size > 30) max_pool_size = 30;
-
-            this.knex = knex({
-                client: 'mysql',
-                connection: {
-                    host: process.env.DB_HOST,
-                    user: process.env.DB_USER,
-                    password: process.env.DB_PASSWORD,
-                    database: process.env.DB_SCHEMA
-                },
-                pool: { min: 0, max: max_pool_size }
-            });
+        this.knex = knex({
+            client: 'mysql',
+            connection: {
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_SCHEMA
+            },
+            pool: { min: 0, max: 30 }
         });
-        
     }
 }
 DatabaseConnection.init();

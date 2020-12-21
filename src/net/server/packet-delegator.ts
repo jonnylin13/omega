@@ -30,7 +30,7 @@ export class PacketDelegator {
     static get_processor(world: number, channel: number) {
         let lolpair = world + ' ' + channel;
         let delegator = this.instances.get(lolpair);
-        if (delegator = null) {
+        if (delegator === undefined) {
             delegator = new PacketDelegator();
             delegator.reset(channel);
             this.instances.set(lolpair, delegator);

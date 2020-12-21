@@ -4,6 +4,7 @@ import { LoginPackets } from "../../../../util/packets/login-packets";
 import { AbstractMaplePacketHandler } from "../../../abstract-packet-handler";
 import { Config } from '../../../../util/config';
 import { Convert } from "../../../../util/convert";
+import { DatabaseConnection } from '../../../../util/db';
 
 
 
@@ -41,5 +42,10 @@ export class LoginPasswordHandler implements AbstractMaplePacketHandler {
         slea.skip(6);
         let hwid_nibbles = slea.read(6);
         let hwid_hex = Convert.int8_to_hexstr(hwid_nibbles);
+        let loginok = c.login(user, pwd, hwid_hex);
+
+        if (Config.properties.server.automatic_register && loginok === 5) {
+            
+        }
     }
 }

@@ -1,4 +1,5 @@
 import { Session } from "../net/server/session";
+import { DatabaseConnection } from "../util/db";
 
 
 export class MapleClient {
@@ -9,17 +10,18 @@ export class MapleClient {
         LOGGED_IN: 2
     };
 
+    private login_attempt = 0;
+    private logged_in = false;
     gm_level: number;
     session: Session;
-    pic: string;
-    pin: string;
-    account_id: number;
+    private pic: string;
+    private pin: string;
+    private account_id: number;
     account_name: string;
     gender: number;
 
-    // TODO: Needs implementation
     is_logged_in(): boolean {
-        return true;
+        return this.logged_in;
     }
 
     // TODO: Needs implementation
@@ -64,6 +66,22 @@ export class MapleClient {
     // TODO
     update_login_state(state: number) {
 
+    }
+
+    async login(user: string, pwd: string, hwid_hex: string): Promise<number> {
+        let loginok = 5;
+        this.login_attempt++;
+        if (this.login_attempt > 4) {
+            this.logged_in = false;
+            this.session.destroy();
+            return 6;
+        }
+
+        let res = await DatabaseConnection.knex
+            .where({name: user})
+            .select('id', 'password', 'gender', 'banned', 'pin', 'pic', 'characterslots', 'tos', 'language')
+            .from('accounts');
+        
     }
 
 }
