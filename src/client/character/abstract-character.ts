@@ -1,7 +1,6 @@
 import { AbstractAnimatedMapleMapObject } from "../../server/maps/abstract-anim-map-object";
 import { MapleMapObjectType } from "../../server/maps/map-object.type";
 import { EventEmitter } from 'events';
-import { isThisTypeNode } from "typescript";
 
 
 export class Short {

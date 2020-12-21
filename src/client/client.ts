@@ -8,7 +8,6 @@ import { MapleCharacter } from "./character/character";
 import { LoginPackets } from "../util/packets/login-packets";
 import { AccountDB } from "../util/db/account";
 import { MapleAESOFB } from "../util/aes";
-import * as Long from 'long';
 
 
 export class MapleClient {
@@ -40,11 +39,11 @@ export class MapleClient {
     greason: number;
     disconnecting: boolean;
     player: MapleCharacter;
-    last_pong: Long;
+    last_pong: bigint;
     world_id: number;
     channel_id: number;
     num_worlds_visible: number;
-    last_npc_click: Long;
+    last_npc_click: bigint;
     send: MapleAESOFB;
     receive: MapleAESOFB;
     session_id: string;
