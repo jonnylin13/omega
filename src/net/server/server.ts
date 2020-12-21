@@ -112,10 +112,14 @@ export class MasterServer {
         this.transitioning_characters.set(remote_host, character_id);
     }
 
-    free_character_id_in_transition(c: MapleClient) {
+    free_character_id_in_transition(c: MapleClient): number {
         if (Config.properties.server.use_ip_validation) return null;
         let remote_host = MapleSessionCoordinator.get_remote_host(c.session);
-        return this.transitioning_characters.delete(remote_host);
+        if (this.transitioning_characters.has(remote_host)) {
+            let character_id = this.transitioning_characters.get(remote_host);
+            this.transitioning_characters.delete(remote_host);
+            return character_id;
+        } else return null;
     }
 
 }

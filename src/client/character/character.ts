@@ -41,4 +41,8 @@ export class MapleCharacter {
     is_gm(): boolean {
         return this.gm_level > 0;
     }
+
+    static load_from_db(character_id: number, c: MapleClient, channel_server: boolean): MapleCharacter {
+        return null; // TODO: Needs implementation
+    }
 }
