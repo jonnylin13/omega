@@ -7,7 +7,7 @@ import { Time } from '../time';
 import { Convert } from '../convert';
 import { Channel } from '../../net/server/channel/channel';
 import { Pair } from '../pair';
-import { MapleCharacter } from '../../client/character';
+import { MapleCharacter } from '../../client/character/character';
 import { GameConstants } from '../../constants/game/game-constants';
 
 

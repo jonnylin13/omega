@@ -4,7 +4,7 @@ import * as bcrypt from 'bcrypt';
 import * as sha from 'sha.js'
 import { Config } from "../util/config";
 import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/coordinator/session/session-coordinator";
-import { MapleCharacter } from "./character";
+import { MapleCharacter } from "./character/character";
 import { LoginPackets } from "../util/packets/login-packets";
 import { AccountDB } from "../util/db/account";
 

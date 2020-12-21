@@ -1,4 +1,6 @@
-import { MapleClient } from "./client";
+import { MapleClient } from "../client";
+import { MapleJob } from "./job";
+import { MapleSkinColor } from "./skin-color";
 
 
 export class MapleCharacter {
@@ -12,6 +14,7 @@ export class MapleCharacter {
     rank_move: number;
     job_rank: number;
     job_rank_move: number;
+    job: MapleJob;
     gender: number;
     face: number;
     hair: number;
@@ -31,6 +34,7 @@ export class MapleCharacter {
     gacha_exp: number;
     map_id: number;
     spawn_point: number;
+    skin_color: MapleSkinColor;
 
     is_gm(): boolean {
         return this.gm_level > 0;
