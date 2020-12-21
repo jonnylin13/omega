@@ -9,7 +9,7 @@ export class Time {
     private static PERMANENT = BigInt(50841440000000000); // 00 C0 9B 90 7D E5 17 02
 
     // TODO: Needs validation
-    static get_time(utc_timestamp: BigInt): BigInt {
+    static get_time(utc_timestamp: bigint): bigint {
 
         if (utc_timestamp < BigInt(0) && utc_timestamp >= BigInt(-3)) {
             if (utc_timestamp === BigInt(-1)) {

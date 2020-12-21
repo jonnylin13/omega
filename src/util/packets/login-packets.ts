@@ -14,6 +14,28 @@ export class LoginPackets {
         return mplew.get_packet();
     }
 
+    static get_perma_ban(reason: number): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(17);
+        mplew.write_short(SendOpcode.LOGIN_STATUS.get_value());
+        mplew.write_byte(2);
+        mplew.write_byte(0);
+        mplew.write_int(0);
+        mplew.write_byte(0);
+        mplew.write_long(Time.get_time(BigInt(-1)));
+        return mplew.get_packet();
+    }
+
+    static get_temp_ban(timestamp: bigint, reason: number): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(17);
+        mplew.write_short(SendOpcode.LOGIN_STATUS.get_value());
+        mplew.write_byte(2);
+        mplew.write_byte(0);
+        mplew.write_int(0);
+        mplew.write_byte(0);
+        mplew.write_long(Time.get_time(timestamp));
+        return mplew.get_packet();
+    }
+
     // TODO: MaplePacketLEW must dynamically allocate buffers when needed
     static get_auth_success(c: MapleClient): Buffer {
         // Server.getInstance().loadAccountCharacters(c);
@@ -27,8 +49,8 @@ export class LoginPackets {
         mplew.write_byte(c.gender);
         
         let can_fly = MasterServer.get_instance().can_fly(c.account_id);
-        mplew.write_bool((Config.properties.server.use_enforce_admin_account || can_fly) ? c.get_gm_level() > 1 : false);    // thanks Steve(kaito1410) for pointing the GM account boolean here
-        mplew.write_byte(((Config.properties.server.use_enforce_admin_account || can_fly) && c.get_gm_level() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
+        mplew.write_bool((Config.properties.server.use_enforce_admin_account || can_fly) ? c.gm_level > 1 : false);    // thanks Steve(kaito1410) for pointing the GM account boolean here
+        mplew.write_byte(((Config.properties.server.use_enforce_admin_account || can_fly) && c.gm_level > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
         mplew.write_byte(0); // Country Code.
         
         mplew.write_maple_ascii_string(c.account_name);
@@ -39,8 +61,8 @@ export class LoginPackets {
 
         mplew.write_int(1); // 1: Remove the "Select the world you want to play in"
         
-        mplew.write_byte(Config.properties.server.use_pin && !c.can_bypass_pin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
-        mplew.write_byte(Config.properties.server.use_pic && !c.can_bypass_pic() ? (c.pic == null || c.pic === '' ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
+        mplew.write_byte(Config.properties.server.enable_pin && !c.can_bypass_pin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+        mplew.write_byte(Config.properties.server.enable_pic && !c.can_bypass_pic() ? (c.pic == null || c.pic === '' ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
         
         return mplew.get_packet();
     }

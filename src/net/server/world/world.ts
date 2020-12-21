@@ -1,4 +1,5 @@
 import { Channel } from "../channel/channel";
+import { PlayerStorage } from "../player-storage";
 
 export class World {
     id: number;
@@ -12,6 +13,7 @@ export class World {
     fishing_rate: number;
     event_msg: string;
     private channels: Array<Channel> = [];
+    player_storage: PlayerStorage = new PlayerStorage();
 
 
     constructor(world: number, flag: number, event_msg: string, exp_rate: number, drop_rate: number, boss_drop_rate: number, meso_rate: number, quest_rate: number, travel_rate: number, fishing_rate: number) {

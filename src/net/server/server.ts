@@ -1,30 +1,33 @@
 import * as net from 'net';
+import { MapleClient } from '../../client/client';
 import { Config } from '../../util/config';
+import { MapleSessionCoordinator } from './coordinator/session/session-coordinator';
 const shortid = require('shortid');
 import { Session } from './session';
+import { World } from './world/world';
 
 
 // Master server
 export class MasterServer {
 
     port: number;
-    sockets: Map<string, Session>;
     started: boolean = false;
     // current_time: number = 0; // BigInt here?
-    server_current_time: number = 0;
-    uptime: number = new Date().getTime();
+    server_current_time: bigint = BigInt(0);
+    uptime: bigint = BigInt(new Date().getTime());
+
+    worlds: Array<World> = [];
 
     private server: net.Server;
     private static instance: MasterServer = null;
 
+    private in_login_state: Map<MapleClient, bigint> = new Map();
+
     static get_instance(): MasterServer {
-        if (this.instance === null) this.instance = new MasterServer();
         return this.instance;
     }
 
     constructor(port=3000) {
-        this.port = port;
-        this.sockets = new Map();
     }
 
     start() {
@@ -40,7 +43,8 @@ export class MasterServer {
     stop() {
         if (this.server) {
             this.server.close();
-            for (let socket of this.sockets.values()) socket.destroy(); // TODO: Should be using socket.end()?
+            for (let session of MapleSessionCoordinator.get_instance().sessions.values()) session.destroy();
+            // TODO: Should be using socket.end()?
         }
         this.started = false;
         delete this.server;
@@ -48,11 +52,11 @@ export class MasterServer {
 
     private on_connect(socket: net.Socket) {
         
-        let id_socket = (socket as Session);
-        id_socket.id = this.assign_id();
-        socket.on('data', (data: Buffer) => this.on_data(id_socket.id, data));
-        socket.on('close', had_error => this.on_disconnect(id_socket.id, had_error));
-        this.sockets.set(id_socket.id, id_socket);
+        let session = (socket as Session);
+        session.id = this.assign_id();
+        socket.on('data', (data: Buffer) => this.on_data(session.id, data));
+        socket.on('close', had_error => this.on_disconnect(session.id, had_error));
+        MapleSessionCoordinator.get_instance().sessions.set(session.id, session);
     }
 
     private assign_id(): string {
@@ -64,19 +68,19 @@ export class MasterServer {
     }
 
     private on_disconnect(socket_id: string, had_error: boolean) {
-        this.sockets.delete(socket_id);
+        MapleSessionCoordinator.get_instance().sessions.delete(socket_id);
     }
 
-    get_current_timestamp() {
-        return this.server_current_time - this.uptime;
+    get_current_time(): bigint {
+        return (this.server_current_time) - (this.uptime);
     }
 
     update_current_time() {
-        this.server_current_time += Config.properties.server.time_update_interval;
+        this.server_current_time += BigInt(Config.properties.server.time_update_interval);
     }
 
-    force_update_current_time() {
-        let time_now = new Date().getTime();
+    force_update_current_time(): bigint {
+        let time_now = BigInt(new Date().getTime());
         this.server_current_time = time_now;
         return time_now;
     }
@@ -84,6 +88,10 @@ export class MasterServer {
     // TODO: Needs implementation
     can_fly(account_id: number): boolean {
         return false;
+    }
+    
+    register_login_state(c: MapleClient) {
+        this.in_login_state.set(c, BigInt(new Date().getUTCMilliseconds() + 600000));
     }
 
 }
