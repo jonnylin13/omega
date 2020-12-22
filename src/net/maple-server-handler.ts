@@ -20,12 +20,12 @@ export class MapleServerHandler implements ServerHandler {
 
     constructor(world_id: number = -1, channel_id: number = -1) {
         this.world_id = world_id;
-        this.channel__id = channel_id;
+        this.channel_id = channel_id;
         this.delegator = PacketDelegator.get_delegator(world_id, channel_id);
     }
 
     is_login_server_handler() {
-        return this.world_id === -1 && this.channel__id === -1;
+        return this.world_id === -1 && this.channel_id === -1;
     }
 
     close_maple_session(session: Session) {

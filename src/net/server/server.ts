@@ -4,6 +4,7 @@ import { MapleClient } from '../../client/client';
 import { Config } from '../../util/config';
 import { Pair } from '../../util/pair';
 import { MapleServerHandler } from '../maple-server-handler';
+import { Channel } from './channel/channel';
 import { MapleSessionCoordinator } from './coordinator/session/session-coordinator';
 import { World } from './world/world';
 
@@ -103,6 +104,10 @@ export class MasterServer {
 
     get_world(world_id: number): World {
         return this.worlds[world_id];
+    }
+
+    get_channel(world_id: number, channel_id: number): Channel {
+        return this.worlds[world_id].get_channel(channel_id);
     }
 
     get_address(world_id: number, channel_id: number) {

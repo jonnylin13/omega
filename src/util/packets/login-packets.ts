@@ -13,8 +13,20 @@ import { GameConstants } from '../../constants/game/game-constants';
 
 export class LoginPackets {
 
-    static custom_packet(packet: Int8Array): Buffer {
+    static get_hello(maple_version: number, iv_send: Int8Array, iv_recv: Int8Array): Buffer {
         const mplew = new MaplePacketLittleEndianWriter();
+        mplew.write_short(0x0E);
+        mplew.write_short(maple_version);
+        mplew.write_short(1);
+        mplew.write_byte(49);
+        mplew.write(iv_send);
+        mplew.write(iv_recv);
+        mplew.write_byte(8);
+        return mplew.get_packet();
+    }
+
+    static custom_packet(packet: Int8Array): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(packet.length);
         mplew.write(packet);
         return mplew.get_packet();
     }
@@ -41,7 +53,6 @@ export class LoginPackets {
         return mplew.get_packet();
     }
 
-    // TODO: MaplePacketLEW must dynamically allocate buffers when needed
     static get_auth_success(c: MapleClient): Buffer {
         // Server.getInstance().loadAccountCharacters(c);
         // Server.getInstance().loadAccountStorages(c);
@@ -276,7 +287,7 @@ export class LoginPackets {
         mplew.write_short(chr.fame);
         mplew.write_int(chr.gacha_exp);
         mplew.write_int(chr.map_id);
-        mplew.write_byte(chr.spawn_point);
+        mplew.write_byte(chr.initial_spawnpoint);
         mplew.write_int(0);
     }
 

@@ -63,6 +63,10 @@ export class MapleClient {
         session.client = this;
     }
 
+    update_last_packet(): void {
+        this.last_packet = BigInt(new Date().getUTCMilliseconds());
+    }
+
     pong_received(): void {
         this.last_pong = MasterServer.get_instance().get_current_time();
     }

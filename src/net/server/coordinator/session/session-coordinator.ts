@@ -19,7 +19,7 @@ export enum AntiMultiClientResult {
 export class MapleSessionCoordinator {
 
     static instance: MapleSessionCoordinator;
-    private pooled_remote_hosts: Set<string>= new Set();
+    private pooled_remote_hosts: Set<string>= new Set(); // Seems unnecessary but I'll keep it for now
     private online_remote_hwids: Set<string>= new Set();
     private login_storage: LoginStorage = new LoginStorage();
     private cached_host_hwids: Map<string, string> = new Map();
@@ -52,6 +52,23 @@ export class MapleSessionCoordinator {
     get_game_session_hwid(session: Session) {
         let remote_host = MapleSessionCoordinator.get_remote_host(session);
         return this.cached_host_hwids.get(remote_host);
+    }
+
+    can_start_login_session(session: Session): boolean {
+        if (!Config.properties.server.deterred_multiclient) return true;
+        let remote_host = MapleSessionCoordinator.get_remote_host(session);
+        if (this.pooled_remote_hosts.has(remote_host)) return false;
+        this.pooled_remote_hosts.add(remote_host);
+        let known_hwid = this.cached_host_hwids.get(remote_host);
+
+        if (known_hwid != null && known_hwid != undefined)
+            if (this.online_remote_hwids.has(known_hwid)) return false;
+        
+        let lrh: Set<Session> = new Set();
+        lrh.add(session);
+        this.login_remote_hosts.set(remote_host, lrh);
+        this.pooled_remote_hosts.delete(remote_host);
+        return true;
     }
 
     close_login_session(session: Session) {
