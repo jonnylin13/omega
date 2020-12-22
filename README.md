@@ -44,12 +44,13 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 * [x] Implement WZ loading (might need rework)
     * [x] Parse a single WZ XML file
     * [x] Parse a WZ directory
-* [ ] Implement packet delegation
+* [x] Implement packet delegation
+    * [ ] Register login packet handlers
 * [ ] Implement packet handling
     * [ ] Login
     * [ ] Character list/select
 * [x] Implement database layer
-* [ ] Implement logging
+* [x] Implement logging
 
 ### Long goals
 * [ ] Design worker_threads system to fork the cash shop server, world servers, channel servers

@@ -7,7 +7,12 @@ import { MapleServerHandler } from '../maple-server-handler';
 import { Channel } from './channel/channel';
 import { MapleSessionCoordinator } from './coordinator/session/session-coordinator';
 import { World } from './world/world';
+import * as winston from 'winston';
 
+const format = winston.format.combine(
+    winston.format.colorize(),
+    winston.format.simple()
+);
 
 // Master server
 export class MasterServer {
@@ -31,12 +36,24 @@ export class MasterServer {
     private account_character_count: Map<number, number> = new Map();
     world_recommended_list: Array<Pair<number, string>> = [];
 
+    logger: winston.Logger = winston.createLogger({
+        format: format,
+        transports: [
+            new winston.transports.File({ filename: 'logs/error.log', level: 'error'}),
+            new winston.transports.File({ filename: 'logs/debug.log', level: 'debug'})
+        ]
+    });
+
     static get_instance(): MasterServer {
         if (this.instance === null) this.instance = new MasterServer();
         return this.instance;
     }
 
     constructor(port=3000) {
+        if (process.env.NODE_ENV !== 'production') {
+            this.logger.add(new winston.transports.Console({ level: 'info' }));
+        } else this.logger.add(new winston.transports.Console({ level: 'debug' }));
+        this.port = port;
     }
 
     start() {
@@ -46,6 +63,7 @@ export class MasterServer {
         this.server.on('connection', socket => this.maple_server_handler.on_connection(socket))
         this.server.listen(this.port);
         this.started = true;
+        this.logger.log('info', `MasterServer has started on port ${this.port}`);
 
     }
 
@@ -57,6 +75,7 @@ export class MasterServer {
         }
         this.started = false;
         delete this.server;
+        this.logger.log('info', `MasterServer has been terminated`);
     }
 
     get_current_time(): bigint {

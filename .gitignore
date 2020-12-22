@@ -3,3 +3,4 @@ node_modules/
 java/
 .vscode/
 .env
+logs/*.log
