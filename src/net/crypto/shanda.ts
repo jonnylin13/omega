@@ -1,6 +1,6 @@
 import { Convert } from '../../util/convert';
 
-export class MapleCustomEncryption {
+export class Shanda {
 
     static roll_left(input_byte: number, bit_length: number) {
         let temp = input_byte & 0xFF;
@@ -21,11 +21,11 @@ export class MapleCustomEncryption {
             if (i % 2 === 0) {
                 for (let j = 0; j < data.length; j++) {
                     let cur = data[j];
-                    cur = MapleCustomEncryption.roll_left(cur, 3);
+                    cur = Shanda.roll_left(cur, 3);
                     cur += length;
                     cur ^= remember;
                     remember = cur;
-                    cur = MapleCustomEncryption.roll_right(cur, length & 0xFF);
+                    cur = Shanda.roll_right(cur, length & 0xFF);
                     cur = ((~cur) & 0xFF);
                     cur += 0x48;
                     length--;
@@ -34,12 +34,12 @@ export class MapleCustomEncryption {
             } else {
                 for (let j = data.length - 1; j >= 0; j--) {
                     let cur = data[j];
-                    cur = MapleCustomEncryption.roll_left(cur, 4);
+                    cur = Shanda.roll_left(cur, 4);
                     cur += length;
                     cur ^= remember;
                     remember = cur;
                     cur ^= 0x13;
-                    cur = MapleCustomEncryption.roll_right(cur, 3);
+                    cur = Shanda.roll_right(cur, 3);
                     length--;
                     data[j] = cur;
                 }
@@ -58,25 +58,25 @@ export class MapleCustomEncryption {
                     let cur = data[j];
                     cur -= 0x48;
                     cur = ((~cur) & 0xFF);
-                    cur = MapleCustomEncryption.roll_left(cur, length & 0xFF);
+                    cur = Shanda.roll_left(cur, length & 0xFF);
                     next_remember = cur;
                     cur ^= remember;
                     remember = next_remember;
                     cur -= length;
-                    cur = MapleCustomEncryption.roll_right(cur, 3);
+                    cur = Shanda.roll_right(cur, 3);
                     data[j] = cur;
                     length--;
                 }
             } else {
                 for (let j = data.length - 1; j >= 0; j--) {
                     let cur = data[j];
-                    cur = MapleCustomEncryption.roll_left(cur, 3);
+                    cur = Shanda.roll_left(cur, 3);
                     cur ^= 0x13;
                     next_remember = cur;
                     cur ^= remember;
                     remember = next_remember;
                     cur -= length;
-                    cur = MapleCustomEncryption.roll_right(cur, 4);
+                    cur = Shanda.roll_right(cur, 4);
                     data[j] = cur;
                     length--;
                 }

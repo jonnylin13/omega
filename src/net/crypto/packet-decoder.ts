@@ -1,7 +1,7 @@
 import { MapleClient } from "../../client/client";
 import { MapleSessionCoordinator } from "../server/coordinator/session/session-coordinator";
 import { Session } from "../server/session";
-import { MapleCustomEncryption } from "./crypto";
+import { Shanda } from "./shanda";
 
 
 export class MaplePacketDecoder {
@@ -13,16 +13,16 @@ export class MaplePacketDecoder {
             return;
         }
         let recv_crypto = client.receive;
-        let packet_header = data.readInt32LE();
+        let packet_header = data.readUInt16LE();
         console.log(packet_header);
+
         if (!recv_crypto.check_packet_by_header(packet_header)) {
             MapleSessionCoordinator.get_instance().close_session(session, true);
             return;
         }
         // console.log(packet_header);
-        let decrypted = recv_crypto.encrypt(data.slice(4, data.length));
-        decrypted = MapleCustomEncryption.decrypt(decrypted);
-        return decrypted;
+        let decrypted = recv_crypto.transform(data.slice(4));
+        return Shanda.decrypt(decrypted);
     }    
 
 }

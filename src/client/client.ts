@@ -7,9 +7,9 @@ import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/co
 import { CharNameAndId, MapleCharacter } from "./character/character";
 import { LoginPackets } from "../util/packets/login-packets";
 import { AccountDB } from "../util/db/account";
-import { MapleAESOFB } from "../util/aes";
+import { MapleAESOFB } from "../net/crypto/aes";
 import { CharacterDB } from "../util/db/character";
-import { MaplePacketEncoder } from '../net/mina/packet-encoder';
+import { MaplePacketEncoder } from '../net/crypto/packet-encoder';
 
 
 export class MapleClient {

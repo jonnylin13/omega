@@ -11,7 +11,8 @@ import { RegisterPinHandler } from './server/handlers/login/register-pin-handler
 import { RelogRequestHandler } from './server/handlers/login/relog-handler';
 import { ServerListRequestHandler } from './server/handlers/login/server-list-handler';
 import { SetGenderHandler } from './server/handlers/login/set-gender-handler';
-import { MaplePacketHandler } from './server/interface/packet-handler';
+import { MaplePacketHandler } from './server/handlers/interface/packet-handler';
+import { ServerType } from './interface/server-handler';
 
 
 export class PacketDelegator {
@@ -39,23 +40,31 @@ export class PacketDelegator {
         this.handlers[code.get_value()] = handler;
     }
 
-    static get_delegator(world: number, channel: number) {
-        let lolpair = world + ' ' + channel;
+    static get_delegator(server_type: ServerType, world?: number, channel?: number) {
+
+        let lolpair = '';
+
+        if (server_type === ServerType.LOGIN)
+            lolpair = '-1 -1';
+        else 
+            lolpair = world + ':' + channel
+        
         let delegator = this.instances.get(lolpair);
         if (delegator === undefined) {
             delegator = new PacketDelegator();
-            delegator.reset(channel);
+            delegator.reset(server_type);
             this.instances.set(lolpair, delegator);
         }
         return delegator;
     }
 
-    reset(channel: number) {
-        // TODO: Needs implementation
+    reset(server_type: ServerType) {
+
         this.handlers = [];
         this.register_handler(RecvOpcode.PONG, new KeepAliveHandler());
         this.register_handler(RecvOpcode.CUSTOM_PACKET, new CustomPacketHandler());
-        if (channel < 0) {
+
+        if (server_type === ServerType.LOGIN) {
             // Login server
             this.register_handler(RecvOpcode.ACCEPT_TOS, new AcceptTOSHandler());
             this.register_handler(RecvOpcode.AFTER_LOGIN, new PostLoginHandler());
@@ -77,8 +86,11 @@ export class PacketDelegator {
             this.register_handler(RecvOpcode.SET_GENDER, new SetGenderHandler());
             // View all with PIC
             // View all PIC register
-        } else {
+
+        } else if (server_type === ServerType.CHANNEL) {
             // Channel server
+        } else if (server_type === ServerType.CASH_SHOP) {
+            // Cash shop
         }
     } 
 

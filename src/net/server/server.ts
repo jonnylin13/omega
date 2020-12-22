@@ -3,7 +3,7 @@ import { MapleCharacter } from '../../client/character/character';
 import { MapleClient } from '../../client/client';
 import { Config } from '../../util/config';
 import { Pair } from '../../util/pair';
-import { MapleServerHandler } from '../maple-server-handler';
+import { LoginServerHandler } from '../login-server-handler';
 import { Channel } from './channel/channel';
 import { MapleSessionCoordinator } from './coordinator/session/session-coordinator';
 import { World } from './world/world';
@@ -28,7 +28,7 @@ export class MasterServer {
 
     private server: net.Server;
     private static instance: MasterServer = null;
-    private maple_server_handler: MapleServerHandler = new MapleServerHandler();
+    private login_server_handler: LoginServerHandler = new LoginServerHandler();
 
     private in_login_state: Map<MapleClient, bigint> = new Map();
     private transitioning_characters: Map<string, number> = new Map();
@@ -59,13 +59,13 @@ export class MasterServer {
 
     start() {
         if (this.server && this.started) return;
-        this.logger.log('info', `Starting up omega v${ServerConstants.VERSION}`);
+        this.logger.info(`Starting up omega v${ServerConstants.VERSION}`);
 
         this.server = net.createServer();
-        this.server.on('connection', socket => this.maple_server_handler.on_connection(socket));
+        this.server.on('connection', socket => this.login_server_handler.on_connection(socket));
         this.server.listen(this.port);
         this.started = true;
-        this.logger.log('info', `MasterServer has started on port ${this.port}`);
+        this.logger.info(`MasterServer has started on port ${this.port}`);
 
     }
 
@@ -77,7 +77,7 @@ export class MasterServer {
         }
         this.started = false;
         delete this.server;
-        this.logger.log('info', `MasterServer has been terminated`);
+        this.logger.info(`MasterServer has been terminated`);
     }
 
     get_current_time(): bigint {

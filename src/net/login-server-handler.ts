@@ -1,40 +1,29 @@
 import { PacketDelegator } from "./packet-delegator";
-import { ServerHandler } from "./server/interface/server-handler";
+import { ServerHandler, ServerType } from "./interface/server-handler";
 import { MapleSessionCoordinator } from "./server/coordinator/session/session-coordinator";
 import { Session } from "./server/session";
 import * as net from 'net';
 import { MasterServer } from "./server/server";
-import { MapleAESOFB } from "../util/aes";
+import { MapleAESOFB } from "./crypto/aes";
 import { MapleClient } from "../client/client";
 import { LoginPackets } from "../util/packets/login-packets";
 import { GenericSeekableLittleEndianAccessor } from "../util/data/input/generic-seekable-lea";
 import { ServerConstants } from "../constants/server/server-constants";
 const shortid = require('shortid');
-import * as crypto from 'crypto';
-import { MaplePacketDecoder } from "./mina/packet-decoder";
-import { MaplePacketEncoder } from "./mina/packet-encoder";
+import { MaplePacketDecoder } from "./crypto/packet-decoder";
 
 
-export class MapleServerHandler implements ServerHandler {
+export class LoginServerHandler implements ServerHandler {
 
-    world_id: number;
-    channel_id: number;
+    type: ServerType = ServerType.LOGIN;
     delegator: PacketDelegator;
 
-    constructor(world_id: number = -1, channel_id: number = -1) {
-        this.world_id = world_id;
-        this.channel_id = channel_id;
-        this.delegator = PacketDelegator.get_delegator(world_id, channel_id);
-    }
-
-    is_login_server_handler() {
-        return this.world_id === -1 && this.channel_id === -1;
+    constructor() {
+        this.delegator = PacketDelegator.get_delegator(this.type);
     }
 
     close_maple_session(session: Session) {
-        if (this.is_login_server_handler())
-            MapleSessionCoordinator.get_instance().close_login_session(session);
-        else MapleSessionCoordinator.get_instance().close_session(session, false);
+        MapleSessionCoordinator.get_instance().close_login_session(session);
 
         let client = session.client;
         if (client != undefined && client != null)
@@ -45,7 +34,7 @@ export class MapleServerHandler implements ServerHandler {
     }
 
     on_connection(socket: net.Socket) {
-        MasterServer.get_instance().logger.log('info', `Received a socket connection from ${socket.remoteAddress}`);
+        MasterServer.get_instance().logger.info(`Login server received a socket connection from ${socket.remoteAddress}`);
         let session = socket as Session;
         session.id = this.assign_id();
 
@@ -54,15 +43,8 @@ export class MapleServerHandler implements ServerHandler {
             return;
         }
 
-        if (!this.is_login_server_handler()) {
-            if (MasterServer.get_instance().get_channel(this.world_id, this.channel_id) == null) {
-                MapleSessionCoordinator.get_instance().close_session(session, true);
-                return;
-            }
-        } else {
-            if (!MapleSessionCoordinator.get_instance().can_start_login_session(session)) {
-                return;
-            }
+        if (!MapleSessionCoordinator.get_instance().can_start_login_session(session)) {
+            return;
         }
 
         let iv_recv = Buffer.from([70, 114, 122, 82]);
@@ -72,8 +54,7 @@ export class MapleServerHandler implements ServerHandler {
         let send_cypher = new MapleAESOFB(iv_send, (0xFFFF - ServerConstants.VERSION));
         let recv_cypher = new MapleAESOFB(iv_recv, (ServerConstants.VERSION));
         let client = new MapleClient(send_cypher, recv_cypher, session);
-        client.world_id = this.world_id;
-        client.channel_id = this.channel_id;
+        // client.announce(LoginPackets.get_hello(ServerConstants.VERSION, iv_send, iv_recv));
         session.write(LoginPackets.get_hello(ServerConstants.VERSION, iv_send, iv_recv));
         session.on('data', (data: Buffer) => this.on_data(session, data));
         session.on('close', had_error => this.on_disconnect(session, had_error));
@@ -82,6 +63,10 @@ export class MapleServerHandler implements ServerHandler {
 
     on_data(session: Session, data: Buffer) {
         let decrypted = MaplePacketDecoder.decode(session, data);
+        if (!decrypted) {
+            MasterServer.get_instance().logger.error(`Login server could not decode packet sent from ${session.remoteAddress}`);
+            return;
+        }
         const slea = new GenericSeekableLittleEndianAccessor(decrypted);
         const packet_id = slea.read_byte();
         const client = session.client;
@@ -102,7 +87,7 @@ export class MapleServerHandler implements ServerHandler {
     }
 
     on_error(err: any) {
-        MasterServer.get_instance().logger.log('error', err);
+        MasterServer.get_instance().logger.error(err);
     }
 
     private assign_id(): string {

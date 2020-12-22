@@ -45,8 +45,7 @@ export class MapleAESOFB {
         return ret;
     }
 
-    // TODO: Needs rework
-    encrypt(data: Buffer) {
+    transform(data: Buffer) {
         let remaining = data.length;
         let chunk_length = 0x5B0;
         let start = 0;
