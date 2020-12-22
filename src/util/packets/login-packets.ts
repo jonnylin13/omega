@@ -13,14 +13,14 @@ import { GameConstants } from '../../constants/game/game-constants';
 
 export class LoginPackets {
 
-    static get_hello(maple_version: number, iv_send: Int8Array, iv_recv: Int8Array): Buffer {
-        const mplew = new MaplePacketLittleEndianWriter();
+    static get_hello(maple_version: number, iv_send: Buffer, iv_recv: Buffer): Buffer {
+        const mplew = new MaplePacketLittleEndianWriter(iv_send.length + iv_recv.length + 8);
         mplew.write_short(0x0E);
         mplew.write_short(maple_version);
         mplew.write_short(1);
         mplew.write_byte(49);
-        mplew.write(iv_send);
-        mplew.write(iv_recv);
+        mplew.write_buffer(iv_recv);
+        mplew.write_buffer(iv_send);
         mplew.write_byte(8);
         return mplew.get_packet();
     }

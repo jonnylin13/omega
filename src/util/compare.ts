@@ -15,4 +15,12 @@ export class Compare {
         }
         return true;
     }
+
+    static compare_buffers(buf1: Buffer, buf2: Buffer) {
+        if (buf1.length !== buf2.length) return false;
+        for (let i = 0; i < buf1.length; i++) {
+            if (buf1[i] !== buf2[i]) return false;
+        }
+        return true;
+    }
 }

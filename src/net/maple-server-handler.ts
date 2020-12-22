@@ -10,6 +10,9 @@ import { LoginPackets } from "../util/packets/login-packets";
 import { GenericSeekableLittleEndianAccessor } from "../util/data/input/generic-seekable-lea";
 import { ServerConstants } from "../constants/server/server-constants";
 const shortid = require('shortid');
+import * as crypto from 'crypto';
+import { MaplePacketDecoder } from "./mina/packet-decoder";
+import { MaplePacketEncoder } from "./mina/packet-encoder";
 
 
 export class MapleServerHandler implements ServerHandler {
@@ -42,6 +45,7 @@ export class MapleServerHandler implements ServerHandler {
     }
 
     on_connection(socket: net.Socket) {
+        MasterServer.get_instance().logger.log('info', `Received a socket connection from ${socket.remoteAddress}`);
         let session = socket as Session;
         session.id = this.assign_id();
 
@@ -61,8 +65,8 @@ export class MapleServerHandler implements ServerHandler {
             }
         }
 
-        let iv_recv = new Int8Array([70, 114, 122, 82]);
-        let iv_send = new Int8Array([82, 48, 120, 115]);
+        let iv_recv = Buffer.from([70, 114, 122, 82]);
+        let iv_send = Buffer.from([82, 48, 120, 115]);
         iv_recv[3] = Math.random() * 255;
         iv_recv[3] = Math.random() * 255;
         let send_cypher = new MapleAESOFB(iv_send, (0xFFFF - ServerConstants.VERSION));
@@ -73,10 +77,12 @@ export class MapleServerHandler implements ServerHandler {
         session.write(LoginPackets.get_hello(ServerConstants.VERSION, iv_send, iv_recv));
         session.on('data', (data: Buffer) => this.on_data(session, data));
         session.on('close', had_error => this.on_disconnect(session, had_error));
+        session.on('error', err => this.on_error(err));
     }
 
     on_data(session: Session, data: Buffer) {
-        const slea = new GenericSeekableLittleEndianAccessor(data);
+        let decrypted = MaplePacketDecoder.decode(session, data);
+        const slea = new GenericSeekableLittleEndianAccessor(decrypted);
         const packet_id = slea.read_byte();
         const client = session.client;
 
@@ -93,9 +99,10 @@ export class MapleServerHandler implements ServerHandler {
         if (session != null && session != undefined) {
             this.close_maple_session(session);
         }
-        if (had_error) {
-            // TODO: Handle error
-        }
+    }
+
+    on_error(err: any) {
+        MasterServer.get_instance().logger.log('error', err);
     }
 
     private assign_id(): string {

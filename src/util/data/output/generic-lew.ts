@@ -49,7 +49,7 @@ export class GenericLittleEndianWriter implements LittleEndianWriter {
     }
 
     write_buffer(buf: Buffer): void {
-        for (let byte of buf) this.write_byte(byte);
+        this.write(new Int8Array(buf));
     }
 
     write_ascii_string(str: string): void {

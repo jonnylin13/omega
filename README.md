@@ -26,8 +26,15 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 
 ## Checklist
 
-### Features
-* [ ] None yet... stay tuned!
+### Milestones
+* [ ] Login
+    * [ ] Get to login screen
+    * [ ] Login
+    * [ ] Select a world
+    * [ ] Select a channel
+    * [ ] Character list
+    * [ ] Create a character
+    * [ ] Delete a character
 
 ### Short goals
 * [x] Implement Maple custom encryption algorithms

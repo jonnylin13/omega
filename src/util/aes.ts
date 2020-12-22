@@ -1,11 +1,11 @@
 // const aes = require('aes-js');
 import * as crypto from 'crypto';
 
-const skey: Uint8Array = new Uint8Array([0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 
+const skey: Buffer = Buffer.from([0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 
     0x06, 0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x00, 
     0x1B, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00, 
     0x33, 0x00, 0x00, 0x00, 0x52, 0x00, 0x00, 0x00]);
-const funny_bytes: Int8Array = new Int8Array([
+const morph_bytes: Buffer = Buffer.from([
     0xEC,  0x3F,  0x77,  0xA4,  0x45,  0xD0,  0x71,  0xBF,  0xB7,  0x98,  0x20,  0xFC,
     0x4B,  0xE9,  0xB3,  0xE1,  0x5C,  0x22,  0xF7,  0x0C,  0x44,  0x1B,  0x81,  0xBD,  0x63,  0x8D,  0xD4,  0xC3,
     0xF2,  0x10,  0x19,  0xE0,  0xFB,  0xA1,  0x6E,  0x66,  0xEA,  0xAE,  0xD6,  0xCE,  0x06,  0x18,  0x4E,  0xEB,
@@ -28,25 +28,25 @@ const funny_bytes: Int8Array = new Int8Array([
 export class MapleAESOFB {
 
     maple_version: number;
-    iv: Int8Array;
-    cipher: any;
+    iv: Buffer;
+    cipher: crypto.Cipher;
 
-    constructor(iv: Int8Array, maple_version: number) {
+    constructor(iv: Buffer, maple_version: number) {
         this.iv = iv;
         this.maple_version = ((maple_version >> 8) & 0xFF) | ((maple_version << 8) & 0xFF00);
-        this.cipher = crypto.createCipheriv('aes-256-ofb', skey, this.iv);
+        this.cipher = crypto.createCipheriv('aes-256-ecb', skey, '');
     }
 
-    static multiply_bytes(bytes: Int8Array, count: number, multiply: number): Int8Array {
-        let ret = [];
+    static multiply_bytes(bytes: Buffer, count: number, multiply: number): Buffer {
+        let ret = Buffer.alloc(count * multiply);
         for (let x = 0; x < count * multiply; x++) {
             ret[x] = bytes[x % count];
         }
-        return new Int8Array(ret);
+        return ret;
     }
 
     // TODO: Needs rework
-    encrypt(data: Int8Array) {
+    encrypt(data: Buffer) {
         let remaining = data.length;
         let chunk_length = 0x5B0;
         let start = 0;
@@ -57,18 +57,7 @@ export class MapleAESOFB {
             }
             for (let x = start; x < (start + chunk_length); x++) {
                 if ((x - start) % my_iv.length === 0) {
-
-                    // let new_iv = this.cipher.encrypt(my_iv);
-                    // for (let j = 0; j < my_iv.length; j++) {
-                    //     my_iv[j] = new_iv[j];
-                    // }
-                    // console.log(my_iv);
-
-                    // let cipher = new aes.ModeOfOperation.ofb(skey, my_iv);
-                    
-                    // let cipher = crypto.createCipheriv('aes-256-ofb', skey, this.iv);
-                    my_iv = new Int8Array(this.cipher.update(my_iv));
-                    // console.log(my_iv);
+                    my_iv = this.cipher.update(my_iv);
                 }
                 data[x] ^= my_iv[(x - start) % my_iv.length];
             }
@@ -84,13 +73,13 @@ export class MapleAESOFB {
         this.iv = MapleAESOFB.get_new_iv(this.iv);
     }
 
-    get_packet_header(length: number): Int8Array {
+    get_packet_header(length: number): Buffer {
         let iiv = (this.iv[3]) & 0xFF;
         iiv |= (this.iv[2] << 8) & 0xFF00;
         iiv ^= this.maple_version;
         let m_length = ((length << 8) & 0xFF00) | (length >>> 8);
         let xored_iv = iiv ^ m_length;
-        let ret = new Int8Array();
+        let ret = Buffer.alloc(4);
         ret[0] = ((iiv >>> 8) & 0x0F);
         ret[1] = (iiv & 0xFF);
         ret[2] = ((xored_iv >>> 8) & 0xFF);
@@ -104,44 +93,43 @@ export class MapleAESOFB {
         return packet_length;
     }
 
-    check_packet(packet: Int8Array): boolean {
+    check_packet(packet: Buffer): boolean {
         return ((((packet[0] ^ this.iv[2]) & 0xFF) == ((this.maple_version >> 8) & 0xFF)) && (((packet[1] ^ this.iv[3]) & 0xFF) == (this.maple_version & 0xFF)));
     }
 
     check_packet_by_header(packet_header: number): boolean {
-        let packet = new Int8Array();
+        let packet = Buffer.alloc(2);
         packet[0] = (packet_header >> 24) & 0xFF;
         packet[1] = (packet_header >> 16) & 0xFF;
         return this.check_packet(packet);
     }
 
-    static get_new_iv(iv: Int8Array): Int8Array {
-        let wtf: Int8Array = new Int8Array([0xf2, 0x53, 0x50, 0xc6]);
+    static get_new_iv(iv: Buffer): Buffer {
+        let wtf: Buffer = Buffer.from([0xf2, 0x53, 0x50, 0xc6]);
         for (let x = 0; x < 4; x++) {
-            MapleAESOFB.funny_shit(iv[x], wtf);
+            MapleAESOFB.morph_iv(iv[x], wtf);
         }
         return wtf;
     }
 
-    // Someone pls explain this
-    static funny_shit(input_byte: number, wtf: Int8Array) {
+    static morph_iv(input_byte: number, wtf: Buffer) {
         let elina = wtf[1];
         let anna = input_byte;
-        let moritz = funny_bytes[elina & 0xFF];
+        let moritz = morph_bytes[elina & 0xFF];
         moritz -= input_byte;
         wtf[0] += moritz;
         moritz = wtf[2];
-        moritz ^= funny_bytes[anna & 0xFF];
+        moritz ^= morph_bytes[anna & 0xFF];
         elina -= moritz & 0xFF;
         wtf[1] = elina;
         elina = wtf[3];
         moritz = elina;
         elina -= wtf[0] & 0xFF;
-        moritz = funny_bytes[moritz & 0xFF];
+        moritz = morph_bytes[moritz & 0xFF];
         moritz += input_byte;
         moritz ^= wtf[2];
         wtf[2] = moritz;
-        elina += funny_bytes[anna & 0xFF] & 0xFF;
+        elina += morph_bytes[anna & 0xFF] & 0xFF;
         wtf[3] = elina;
         let merry = (wtf[0]) & 0xFF;
         merry |= (wtf[1] << 8) & 0xFF00;

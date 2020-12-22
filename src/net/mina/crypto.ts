@@ -14,7 +14,7 @@ export class MapleCustomEncryption {
         return Convert.sign_byte((temp & 0xFF) | (temp >>> 8));
     }
 
-    static encrypt(data: Int8Array) {
+    static encrypt(data: Buffer) {
         for (let i = 0; i < 6; i++) {
             let remember = 0;
             let length = (data.length & 0xFF);
@@ -48,7 +48,7 @@ export class MapleCustomEncryption {
         return data;
     }
 
-    static decrypt(data: Int8Array) {
+    static decrypt(data: Buffer) {
         for (let i = 1; i <= 6; i++) {
             let remember = 0;
             let length = (data.length & 0xFF);

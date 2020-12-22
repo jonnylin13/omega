@@ -9,6 +9,7 @@ import { LoginPackets } from "../util/packets/login-packets";
 import { AccountDB } from "../util/db/account";
 import { MapleAESOFB } from "../util/aes";
 import { CharacterDB } from "../util/db/character";
+import { MaplePacketEncoder } from '../net/mina/packet-encoder';
 
 
 export class MapleClient {
@@ -72,7 +73,8 @@ export class MapleClient {
     }
 
     announce(packet: Buffer) {
-        this.session.write(packet);
+        let encrypted = MaplePacketEncoder.encode(this.session, packet);
+        this.session.write(encrypted);
     }
 
     disconnect(shutdown: boolean, cash_shop: boolean) {

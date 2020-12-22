@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha -r ts-node/register \"test/**/*.test.ts\"",
-    "start": "npm run build && node dist/index.js",
-    "build": "tsc"
+    "start": "npm run build && NODE_ENV=production node dist/index.js",
+    "build": "tsc",
+    "dev": "npm run build && NODE_ENV=development node dist/index.js"
   },
   "author": "jonnylin13",
   "license": "ISC",

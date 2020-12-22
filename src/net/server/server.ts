@@ -8,6 +8,7 @@ import { Channel } from './channel/channel';
 import { MapleSessionCoordinator } from './coordinator/session/session-coordinator';
 import { World } from './world/world';
 import * as winston from 'winston';
+import { ServerConstants } from '../../constants/server/server-constants';
 
 const format = winston.format.combine(
     winston.format.colorize(),
@@ -49,7 +50,7 @@ export class MasterServer {
         return this.instance;
     }
 
-    constructor(port=3000) {
+    constructor(port=8484) {
         if (process.env.NODE_ENV !== 'production') {
             this.logger.add(new winston.transports.Console({ level: 'info' }));
         } else this.logger.add(new winston.transports.Console({ level: 'debug' }));
@@ -58,9 +59,10 @@ export class MasterServer {
 
     start() {
         if (this.server && this.started) return;
+        this.logger.log('info', `Starting up omega v${ServerConstants.VERSION}`);
 
         this.server = net.createServer();
-        this.server.on('connection', socket => this.maple_server_handler.on_connection(socket))
+        this.server.on('connection', socket => this.maple_server_handler.on_connection(socket));
         this.server.listen(this.port);
         this.started = true;
         this.logger.log('info', `MasterServer has started on port ${this.port}`);
