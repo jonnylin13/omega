@@ -1,6 +1,6 @@
 import { MapleClient } from "../../../client/client";
 import { SeekableLittleEndianAccessor } from "../../../util/data/input/interface/seekable-lea";
-import { MaplePacketHandler } from '../../packet-handler';
+import { MaplePacketHandler } from '../interface/packet-handler';
 
 
 export class KeepAliveHandler implements MaplePacketHandler {

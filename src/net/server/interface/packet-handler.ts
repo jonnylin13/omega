@@ -1,5 +1,5 @@
-import { SeekableLittleEndianAccessor } from "../util/data/input/interface/seekable-lea";
-import { MapleClient } from '../client/client';
+import { SeekableLittleEndianAccessor } from "../../../util/data/input/interface/seekable-lea";
+import { MapleClient } from '../../../client/client';
 
 
 export interface MaplePacketHandler {
