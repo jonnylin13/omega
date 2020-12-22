@@ -8,6 +8,7 @@ export class MaplePacketDecoder {
 
     static decode(session: Session, data: Buffer): Buffer {
         let client: MapleClient = session.client;
+        console.log(data);
         if (client == null || client == undefined) {
             MapleSessionCoordinator.get_instance().close_session(session, true);
             return;

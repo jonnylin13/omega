@@ -4,7 +4,7 @@ import { MapleSessionCoordinator } from "./server/coordinator/session/session-co
 import { Session } from "./server/session";
 import * as net from 'net';
 import { MasterServer } from "./server/server";
-import { MapleAESOFB } from "./crypto/aes";
+import { AES } from "./crypto/aes";
 import { MapleClient } from "../client/client";
 import { LoginPackets } from "../util/packets/login-packets";
 import { GenericSeekableLittleEndianAccessor } from "../util/data/input/generic-seekable-lea";
@@ -51,17 +51,18 @@ export class LoginServerHandler implements ServerHandler {
         let iv_send = Buffer.from([82, 48, 120, 115]);
         iv_recv[3] = Math.random() * 255;
         iv_recv[3] = Math.random() * 255;
-        let send_cypher = new MapleAESOFB(iv_send, (0xFFFF - ServerConstants.VERSION));
-        let recv_cypher = new MapleAESOFB(iv_recv, (ServerConstants.VERSION));
+        let send_cypher = new AES(iv_send, -(ServerConstants.VERSION + 1));
+        let recv_cypher = new AES(iv_recv, (ServerConstants.VERSION));
         let client = new MapleClient(send_cypher, recv_cypher, session);
-        // client.announce(LoginPackets.get_hello(ServerConstants.VERSION, iv_send, iv_recv));
-        session.write(LoginPackets.get_hello(ServerConstants.VERSION, iv_send, iv_recv));
+        // client.announce(LoginPackets.handshake(ServerConstants.VERSION, iv_send, iv_recv));
+        session.write(LoginPackets.handshake(ServerConstants.VERSION, iv_send, iv_recv));
         session.on('data', (data: Buffer) => this.on_data(session, data));
         session.on('close', had_error => this.on_disconnect(session, had_error));
         session.on('error', err => this.on_error(err));
     }
 
     on_data(session: Session, data: Buffer) {
+        console.log(data);
         let decrypted = MaplePacketDecoder.decode(session, data);
         if (!decrypted) {
             MasterServer.get_instance().logger.error(`Login server could not decode packet sent from ${session.remoteAddress}`);

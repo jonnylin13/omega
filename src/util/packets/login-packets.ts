@@ -13,15 +13,15 @@ import { GameConstants } from '../../constants/game/game-constants';
 
 export class LoginPackets {
 
-    static get_hello(maple_version: number, iv_send: Buffer, iv_recv: Buffer): Buffer {
+    static handshake(maple_version: number, iv_send: Buffer, iv_recv: Buffer): Buffer {
         const mplew = new MaplePacketLittleEndianWriter(iv_send.length + iv_recv.length + 8);
-        mplew.write_short(0x0E);
-        mplew.write_short(maple_version);
-        mplew.write_short(1);
-        mplew.write_byte(49);
-        mplew.write_buffer(iv_recv);
-        mplew.write_buffer(iv_send);
-        mplew.write_byte(8);
+        mplew.write_short(15); // length of packet
+        mplew.write_short(maple_version); // maple version
+        mplew.write_short(1); // subversion
+        // mplew.write_byte(49); // what is this byte?
+        mplew.write_buffer(iv_recv); // recv iv
+        mplew.write_buffer(iv_send); // send iv
+        mplew.write_byte(8); // locale
         return mplew.get_packet();
     }
 

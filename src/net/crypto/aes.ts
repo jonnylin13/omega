@@ -25,7 +25,7 @@ const morph_bytes: Buffer = Buffer.from([
     0xC6,  0xE5,  0x08,  0x49
 ]);
 
-export class MapleAESOFB {
+export class AES {
 
     maple_version: number;
     iv: Buffer;
@@ -33,7 +33,7 @@ export class MapleAESOFB {
 
     constructor(iv: Buffer, maple_version: number) {
         this.iv = iv;
-        this.maple_version = ((maple_version >> 8) & 0xFF) | ((maple_version << 8) & 0xFF00);
+        this.maple_version = maple_version;
         this.cipher = crypto.createCipheriv('aes-256-ecb', skey, '');
     }
 
@@ -46,44 +46,47 @@ export class MapleAESOFB {
     }
 
     transform(data: Buffer) {
-        let remaining = data.length;
-        let chunk_length = 0x5B0;
-        let start = 0;
-        while (remaining > 0) {
-            let my_iv = MapleAESOFB.multiply_bytes(this.iv, 4, 4);
-            if (remaining < chunk_length) {
-                chunk_length = remaining;
-            }
-            for (let x = start; x < (start + chunk_length); x++) {
-                if ((x - start) % my_iv.length === 0) {
-                    my_iv = this.cipher.update(my_iv);
+        const blockLength = 1460;
+        let currentBlockLength = 1456;
+
+        for (let i = 0; i < length; ) {
+            const block = Math.min(length - i, currentBlockLength);
+
+            // Get a new copy of the key
+            let xor_key = AES.multiply_bytes(this.iv, 4, 4).slice();
+
+            for (let j = 0; j < block; j++) {
+                if (j % 16 === 0) {
+                xor_key = this.cipher.update(xor_key);
                 }
-                data[x] ^= my_iv[(x - start) % my_iv.length];
+
+                data[i + j] ^= xor_key[j % 16];
             }
-            start += chunk_length;
-            remaining -= chunk_length;
-            chunk_length = 0x5B4;
+
+            i += block;
+            currentBlockLength = blockLength;
         }
         this.update_iv();
         return data;
     }
 
     update_iv() {
-        this.iv = MapleAESOFB.get_new_iv(this.iv);
+        this.iv = AES.get_new_iv(this.iv);
     }
 
-    get_packet_header(length: number): Buffer {
-        let iiv = (this.iv[3]) & 0xFF;
-        iiv |= (this.iv[2] << 8) & 0xFF00;
-        iiv ^= this.maple_version;
-        let m_length = ((length << 8) & 0xFF00) | (length >>> 8);
-        let xored_iv = iiv ^ m_length;
-        let ret = Buffer.alloc(4);
-        ret[0] = ((iiv >>> 8) & 0x0F);
-        ret[1] = (iiv & 0xFF);
-        ret[2] = ((xored_iv >>> 8) & 0xFF);
-        ret[3] = (xored_iv & 0xFF);
-        return ret;
+    generate_packet_header(length: number): Buffer {
+        let a = this.iv[2] | (this.iv[3] << 8);
+
+        a ^= -(this.maple_version + 1);
+        const b = a ^ length;
+
+        const header = Buffer.from([
+            a & 0xff,
+            (a >>> 8) & 0xff,
+            b & 0xff,
+            (b >>> 8) & 0xff,
+        ]);
+        return header;
     }
 
     static get_packet_length(packet_header: number): number {
@@ -106,7 +109,7 @@ export class MapleAESOFB {
     static get_new_iv(iv: Buffer): Buffer {
         let wtf: Buffer = Buffer.from([0xf2, 0x53, 0x50, 0xc6]);
         for (let x = 0; x < 4; x++) {
-            MapleAESOFB.morph_iv(iv[x], wtf);
+            AES.morph_iv(iv[x], wtf);
         }
         return wtf;
     }

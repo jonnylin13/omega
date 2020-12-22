@@ -9,7 +9,7 @@ export class MaplePacketEncoder {
         let client = session.client;
         let send_crypto = client.send;
 
-        let header = Buffer.from(send_crypto.get_packet_header(data.length));
+        let header = Buffer.from(send_crypto.generate_packet_header(data.length));
         let encrypted = Shanda.encrypt(data.slice(4));
         encrypted = send_crypto.transform(encrypted);
         let ret = Buffer.concat([header, encrypted]);

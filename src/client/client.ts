@@ -7,7 +7,7 @@ import { MapleSessionCoordinator, AntiMultiClientResult } from "../net/server/co
 import { CharNameAndId, MapleCharacter } from "./character/character";
 import { LoginPackets } from "../util/packets/login-packets";
 import { AccountDB } from "../util/db/account";
-import { MapleAESOFB } from "../net/crypto/aes";
+import { AES } from "../net/crypto/aes";
 import { CharacterDB } from "../util/db/character";
 import { MaplePacketEncoder } from '../net/crypto/packet-encoder';
 
@@ -50,13 +50,13 @@ export class MapleClient {
     num_worlds_visible: number;
     last_npc_click: bigint;
     last_packet: bigint = BigInt(new Date().getUTCMilliseconds());
-    send: MapleAESOFB;
-    receive: MapleAESOFB;
+    send: AES;
+    receive: AES;
     session_id: string;
 
     // vote_points, vote_time, engines
 
-    constructor(send: MapleAESOFB, receive: MapleAESOFB, session: Session) {
+    constructor(send: AES, receive: AES, session: Session) {
         this.send = send;
         this.receive = receive;
         this.session = session;
