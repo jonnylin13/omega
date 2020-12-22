@@ -13,8 +13,8 @@ describe('MapleAESOFB test', () => {
         expect(result).equal(true);
     });
 
-    it('test funny_shit()', () => {
-        let result = Compare.compare_buffers(MapleAESOFB.funny_shit(0x01, wtf), Buffer.from([-9, 32, 31, 63]));
+    it('test morph_iv()', () => {
+        let result = Compare.compare_buffers(MapleAESOFB.morph_iv(0x01, wtf), Buffer.from([-9, 32, 31, 63]));
         expect(result).equal(true);
     });
 
