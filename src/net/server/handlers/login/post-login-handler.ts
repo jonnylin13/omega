@@ -5,7 +5,7 @@ import { AbstractMaplePacketHandler } from "../../../abstract-packet-handler";
 
 
 export class PostLoginHandler extends AbstractMaplePacketHandler {
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         let c2 = slea.read_byte();
         let c3 = 5;
         if (slea.available() > 0) {

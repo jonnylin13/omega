@@ -12,7 +12,7 @@ export class SetGenderHandler extends AbstractMaplePacketHandler {
         return true;
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         if (c.gender === 10) {
             let confirmed = slea.read_byte();
             if (confirmed === 0x01) {

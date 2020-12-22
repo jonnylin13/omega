@@ -9,7 +9,7 @@ export class AcceptTOSHandler implements MaplePacketHandler {
         return c.logged_in;
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         if (slea.available() === 0 || slea.read_byte() !== 1 || c.accept_tos()) {
             c.disconnect(false, false);
             return;

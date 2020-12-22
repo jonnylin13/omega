@@ -9,7 +9,7 @@ export class RelogRequestHandler extends AbstractMaplePacketHandler {
         return !c.logged_in;
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         c.announce(LoginPackets.get_relog_response());
     }
 }

@@ -12,7 +12,7 @@ export class ServerListRequestHandler extends AbstractMaplePacketHandler {
         return true;
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         let server = MasterServer.get_instance();
         let worlds = server.worlds;
         c.requested_server_list(worlds.length);

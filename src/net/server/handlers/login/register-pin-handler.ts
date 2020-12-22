@@ -11,7 +11,7 @@ export class RegisterPinHandler extends AbstractMaplePacketHandler {
         return true;
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         let c2 = slea.read_byte();
         if (c2 === 0) {
             MapleSessionCoordinator.get_instance().close_session(c.session, false);

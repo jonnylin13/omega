@@ -10,7 +10,7 @@ export class CharListRequestHandler extends AbstractMaplePacketHandler {
         return true;
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         slea.read_byte();
         let world_id = slea.read_byte();
         let world = MasterServer.get_instance().get_world(world_id);

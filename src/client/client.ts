@@ -60,6 +60,7 @@ export class MapleClient {
         this.receive = receive;
         this.session = session;
         this.session_id = session.id;
+        session.client = this;
     }
 
     pong_received(): void {

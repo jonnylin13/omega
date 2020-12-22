@@ -6,7 +6,7 @@ import { LoginPasswordHandler } from './login-password-handler';
 
 
 export class GuestLoginHandler implements AbstractMaplePacketHandler {
-    handlePacket(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handlePacket(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         c.announce(LoginPackets.send_guest_tos());
         // TODO: Needs validation
         new LoginPasswordHandler().handle_packet(slea, c);

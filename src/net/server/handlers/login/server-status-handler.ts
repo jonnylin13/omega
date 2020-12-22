@@ -11,7 +11,7 @@ export class ServerStatusRequestHandler extends AbstractMaplePacketHandler {
         return true;
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         let world_id = slea.read_short();
         let world = MasterServer.get_instance().get_world(world_id);
         if (world !== undefined) {

@@ -4,7 +4,7 @@ import { MaplePacketHandler } from '../../packet-handler';
 
 
 export class KeepAliveHandler implements MaplePacketHandler {
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         c.pong_received();
     }
 

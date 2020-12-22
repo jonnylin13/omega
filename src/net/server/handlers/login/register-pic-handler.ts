@@ -23,7 +23,7 @@ export class RegisterPICHandler extends AbstractMaplePacketHandler {
         }
     }
 
-    handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
+    async handle_packet(slea: SeekableLittleEndianAccessor, c: MapleClient) {
         slea.read_byte();
         let character_id = slea.read_int();
         let macs = slea.read_maple_ascii_string();
