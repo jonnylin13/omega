@@ -11,6 +11,8 @@ import { GenericSeekableLittleEndianAccessor } from "../util/data/input/generic-
 import { ServerConstants } from "../constants/server/server-constants";
 const shortid = require('shortid');
 import { MaplePacketDecoder } from "./crypto/packet-decoder";
+import { RecvOpcode } from "./opcodes/recv";
+import { Convert } from "../util/convert";
 
 
 export class LoginServerHandler implements ServerHandler {
@@ -55,15 +57,17 @@ export class LoginServerHandler implements ServerHandler {
         let recv_cypher = new AES(iv_recv, (ServerConstants.VERSION));
         let client = new MapleClient(send_cypher, recv_cypher, session);
         // client.announce(LoginPackets.handshake(ServerConstants.VERSION, iv_send, iv_recv));
-        session.write(LoginPackets.handshake(ServerConstants.VERSION, iv_send, iv_recv));
+        let handshake = LoginPackets.handshake(ServerConstants.VERSION, iv_send, iv_recv);
+        MasterServer.get_instance().logger.info(`Sending handshake: ${handshake.toString('hex')}`);
+        session.write(handshake);
         session.on('data', (data: Buffer) => this.on_data(session, data));
         session.on('close', had_error => this.on_disconnect(session, had_error));
         session.on('error', err => this.on_error(err));
     }
 
     on_data(session: Session, data: Buffer) {
-        console.log(data);
         let decrypted = MaplePacketDecoder.decode(session, data);
+
         if (!decrypted) {
             MasterServer.get_instance().logger.error(`Login server could not decode packet sent from ${session.remoteAddress}`);
             return;
@@ -71,18 +75,21 @@ export class LoginServerHandler implements ServerHandler {
         const slea = new GenericSeekableLittleEndianAccessor(decrypted);
         const packet_id = slea.read_byte();
         const client = session.client;
-
         const packet_handler = this.delegator.get_handler(packet_id);
+
+        MasterServer.get_instance().logger.info(`Received packet: ${data.toString('hex').}`);
         if (packet_handler != null && packet_handler != undefined) {
+            MasterServer.get_instance().logger.info(`Handling packet: 0x${packet_id.toString(16).padStart(2, '0')}`);
             packet_handler.handle_packet(slea, client); // TODO: Validate that this works with async calls
         } else {
-            // TODO: Handle no packet handler
+            MasterServer.get_instance().logger.warn(`Unhandled packet: 0x${packet_id.toString(16)}`);
         }
         client.update_last_packet();
     }
 
     on_disconnect(session: Session, had_error: any) {
         if (session != null && session != undefined) {
+            MasterServer.get_instance().logger.info(`Login server disconnected address ${session.remoteAddress}`);
             this.close_maple_session(session);
         }
     }

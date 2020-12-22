@@ -16,7 +16,7 @@ export class LoginPackets {
     static handshake(maple_version: number, iv_send: Buffer, iv_recv: Buffer): Buffer {
         const mplew = new MaplePacketLittleEndianWriter(16);
         mplew.write_short(14); // length of packet
-        mplew.write_short(83); // maple version
+        mplew.write_short(maple_version); // maple version
         mplew.write_maple_ascii_string('1'); // subversion
         mplew.write_buffer(iv_recv); // recv iv
         mplew.write_buffer(iv_send); // send iv

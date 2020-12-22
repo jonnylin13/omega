@@ -12,15 +12,17 @@ export class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
     }
 
     read_byte(): number {
+        const ret = this.buf.readIntLE(this.pos, 1);
         this.bytes_read += 1;
         this.pos += 1;
-        return this.buf.readIntLE(this.pos-1, 1);
+        return ret;
     }
 
     read_short(): number {
+        const ret = this.buf.readInt16LE(this.pos);
         this.bytes_read += 2;
         this.pos += 2;
-        return this.buf.readInt16LE(this.pos-2);
+        return ret;
     }
 
     read_char(): string {
@@ -28,27 +30,31 @@ export class GenericSeekableLittleEndianAccessor extends GenericLittleEndianAcce
     }
 
     read_int(): number {
+        const ret = this.buf.readInt32LE(this.pos);
         this.bytes_read += 4;
         this.pos += 4;
-        return this.buf.readInt32LE(this.pos-4);
+        return ret;
     }
 
     read_float(): number {
+        const ret = this.buf.readFloatLE(this.pos);
         this.bytes_read += 4;
         this.pos += 4;
-        return this.buf.readFloatLE(this.pos-4);
+        return ret;
     }
 
     read_long(): bigint {
+        const ret = this.buf.readBigInt64LE(this.pos);
         this.bytes_read += 8;
         this.pos += 8;
-        return this.buf.readBigInt64LE(this.pos-8);
+        return ret;
     }
 
     read_double(): number {
+        const ret = this.buf.readDoubleLE(this.pos);
         this.bytes_read += 8;
         this.pos += 8;
-        return this.buf.readDoubleLE(this.pos-8);
+        return ret;
     }
 
     read_ascii_string(length: number): string {

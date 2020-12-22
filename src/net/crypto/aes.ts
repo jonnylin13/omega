@@ -30,12 +30,12 @@ export class AES {
 
     maple_version: number;
     iv: Buffer;
-    cipher: crypto.Cipher;
+    // cipher: crypto.Cipher;
 
     constructor(iv: Buffer, maple_version: number) {
         this.iv = iv;
         this.maple_version = maple_version;
-        this.cipher = crypto.createCipheriv('aes-256-ecb', skey, '');
+        // this.cipher = crypto.createCipheriv('aes-256-ecb', skey, '');
     }
 
     static multiply_bytes(bytes: Buffer, count: number, multiply: number): Buffer {
@@ -47,25 +47,25 @@ export class AES {
     }
 
     transform(data: Buffer) {
-        const block_length = 1460;
-        let current_block_length = 1456;
-
-        for (let i = 0; i < length; ) {
-            const block = Math.min(length - i, current_block_length);
-
-            // Get a new copy of the key
-            let xor_key = AES.multiply_bytes(this.iv, 4, 4).slice();
-
-            for (let j = 0; j < block; j++) {
-                if (j % 16 === 0) {
-                    xor_key = this.cipher.update(xor_key);
-                }
-
-                data[i + j] ^= xor_key[j % 16];
+        let remaining = data.length;
+        let chunk_length = 0x5B0;
+        let start = 0;
+        while (remaining > 0) {
+            let my_iv = AES.multiply_bytes(this.iv, 4, 4);
+            if (remaining < chunk_length) {
+                chunk_length = remaining;
             }
-
-            i += block;
-            current_block_length = block_length;
+            for (let x = start; x < (start + chunk_length); x++) {
+                if ((x - start) % my_iv.length === 0) {
+                    let cipher = crypto.createCipheriv('aes-256-ecb', skey, null);
+                    my_iv = cipher.update(my_iv);
+                    my_iv = Buffer.concat([my_iv, cipher.final()]);
+                }
+                data[x] ^= my_iv[(x - start) % my_iv.length];
+            }
+            start += chunk_length;
+            remaining -= chunk_length;
+            chunk_length = 0x5B4;
         }
         this.morph_iv();
         return data;
