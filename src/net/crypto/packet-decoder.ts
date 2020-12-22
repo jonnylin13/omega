@@ -8,14 +8,13 @@ export class MaplePacketDecoder {
 
     static decode(session: Session, data: Buffer): Buffer {
         let client: MapleClient = session.client;
-        console.log(data);
         if (client == null || client == undefined) {
             MapleSessionCoordinator.get_instance().close_session(session, true);
             return;
         }
         let recv_crypto = client.receive;
+
         let packet_header = data.readUInt16LE();
-        console.log(packet_header);
 
         if (!recv_crypto.check_packet_by_header(packet_header)) {
             MapleSessionCoordinator.get_instance().close_session(session, true);

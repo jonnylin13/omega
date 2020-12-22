@@ -5,7 +5,8 @@ const skey: Buffer = Buffer.from([0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00
     0x06, 0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x00, 
     0x1B, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00, 
     0x33, 0x00, 0x00, 0x00, 0x52, 0x00, 0x00, 0x00]);
-const morph_bytes: Buffer = Buffer.from([
+    
+const shift: Buffer = Buffer.from([
     0xEC,  0x3F,  0x77,  0xA4,  0x45,  0xD0,  0x71,  0xBF,  0xB7,  0x98,  0x20,  0xFC,
     0x4B,  0xE9,  0xB3,  0xE1,  0x5C,  0x22,  0xF7,  0x0C,  0x44,  0x1B,  0x81,  0xBD,  0x63,  0x8D,  0xD4,  0xC3,
     0xF2,  0x10,  0x19,  0xE0,  0xFB,  0xA1,  0x6E,  0x66,  0xEA,  0xAE,  0xD6,  0xCE,  0x06,  0x18,  0x4E,  0xEB,
@@ -46,32 +47,28 @@ export class AES {
     }
 
     transform(data: Buffer) {
-        const blockLength = 1460;
-        let currentBlockLength = 1456;
+        const block_length = 1460;
+        let current_block_length = 1456;
 
         for (let i = 0; i < length; ) {
-            const block = Math.min(length - i, currentBlockLength);
+            const block = Math.min(length - i, current_block_length);
 
             // Get a new copy of the key
             let xor_key = AES.multiply_bytes(this.iv, 4, 4).slice();
 
             for (let j = 0; j < block; j++) {
                 if (j % 16 === 0) {
-                xor_key = this.cipher.update(xor_key);
+                    xor_key = this.cipher.update(xor_key);
                 }
 
                 data[i + j] ^= xor_key[j % 16];
             }
 
             i += block;
-            currentBlockLength = blockLength;
+            current_block_length = block_length;
         }
-        this.update_iv();
+        this.morph_iv();
         return data;
-    }
-
-    update_iv() {
-        this.iv = AES.get_new_iv(this.iv);
     }
 
     generate_packet_header(length: number): Buffer {
@@ -106,46 +103,33 @@ export class AES {
         return this.check_packet(packet);
     }
 
-    static get_new_iv(iv: Buffer): Buffer {
-        let wtf: Buffer = Buffer.from([0xf2, 0x53, 0x50, 0xc6]);
-        for (let x = 0; x < 4; x++) {
-            AES.morph_iv(iv[x], wtf);
-        }
-        return wtf;
-    }
+    morph_iv(): Buffer {
 
-    static morph_iv(input_byte: number, wtf: Buffer) {
-        let elina = wtf[1];
-        let anna = input_byte;
-        let moritz = morph_bytes[elina & 0xFF];
-        moritz -= input_byte;
-        wtf[0] += moritz;
-        moritz = wtf[2];
-        moritz ^= morph_bytes[anna & 0xFF];
-        elina -= moritz & 0xFF;
-        wtf[1] = elina;
-        elina = wtf[3];
-        moritz = elina;
-        elina -= wtf[0] & 0xFF;
-        moritz = morph_bytes[moritz & 0xFF];
-        moritz += input_byte;
-        moritz ^= wtf[2];
-        wtf[2] = moritz;
-        elina += morph_bytes[anna & 0xFF] & 0xFF;
-        wtf[3] = elina;
-        let merry = (wtf[0]) & 0xFF;
-        merry |= (wtf[1] << 8) & 0xFF00;
-        merry |= (wtf[2] << 16) & 0xFF0000;
-        merry |= (wtf[3] << 24) & 0xFF000000;
-        let ret_value = merry;
-        ret_value = ret_value >>> 0x1d;
-        merry = merry << 3;
-        ret_value = ret_value | merry;
-        wtf[0] = (ret_value & 0xFF);
-        wtf[1] = ((ret_value >> 8) & 0xFF);
-        wtf[2] = ((ret_value >> 16) & 0xFF);
-        wtf[3] = ((ret_value >> 24) & 0xFF);
-        return wtf;
+        const new_sequence = Buffer.from([0xf2, 0x53, 0x50, 0xc6]);
+        for (let i = 0; i < 4; i++) {
+            const input = this.iv[i];
+            const table_input = shift[input];
+            new_sequence[0] += shift[new_sequence[1]] - input;
+            new_sequence[1] -= new_sequence[2] ^ table_input;
+            new_sequence[2] ^= shift[new_sequence[3]] + input;
+            new_sequence[3] -= new_sequence[0] - table_input;
+        
+            let val =
+                (new_sequence[0] |
+                ((new_sequence[1] & 0xff) << 8) |
+                ((new_sequence[2] & 0xff) << 16) |
+                ((new_sequence[3] & 0xff) << 24)) >>>
+                0;
+            let val2 = val >>> 0x1d;
+            val = (val << 0x03) >>> 0;
+            val2 |= val;
+            new_sequence[0] = val2 & 0xff;
+            new_sequence[1] = (val2 >> 8) & 0xff;
+            new_sequence[2] = (val2 >> 16) & 0xff;
+            new_sequence[3] = (val2 >> 24) & 0xff;
+        }
+        return new_sequence;
+
     }
 
 

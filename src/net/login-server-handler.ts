@@ -51,7 +51,7 @@ export class LoginServerHandler implements ServerHandler {
         let iv_send = Buffer.from([82, 48, 120, 115]);
         iv_recv[3] = Math.random() * 255;
         iv_recv[3] = Math.random() * 255;
-        let send_cypher = new AES(iv_send, -(ServerConstants.VERSION + 1));
+        let send_cypher = new AES(iv_send, (0xFFFF - ServerConstants.VERSION));
         let recv_cypher = new AES(iv_recv, (ServerConstants.VERSION));
         let client = new MapleClient(send_cypher, recv_cypher, session);
         // client.announce(LoginPackets.handshake(ServerConstants.VERSION, iv_send, iv_recv));
