@@ -1,18 +1,19 @@
 # omega
-v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https://github.com/ronancpl/HeavenMS)
+v83 MapleStory Server emulator written in TypeScript. Inspired by projects like [HeavenMS](https://github.com/ronancpl/HeavenMS), though I plan on removing a lot of "bloat" and creating more of a general framework that I can build off of.
 
 ## Project goals
 * Provide an easy development environment for beginners
 * Provide a usable source for low population servers (hosting for friends)
+* Squeeze as much performance as I can with Node.js
 
 ## Setup and contribution
 * Fork the repository
 * Run `npm install` in the project directory to install the dependencies
 
 ## Convention
-* Function and variable names will use snake_case
 * Class names will use PascalCase
-* File names will use kebab-case
+* Filenames, function, and variable names will use camelCase
+* SQL tables and columns will use snake_case
 * Tests will be written as `*.test.ts` and placed in the `test/` directory
 
 ## Running the server
@@ -60,6 +61,8 @@ v83 MapleStory Server emulator written in TypeScript. Based on [HeavenMS](https:
 * [x] Implement logging
 
 ### Long goals
-* [ ] Design worker_threads system to fork the cash shop server, world servers, channel servers
+* [ ] Design worker_threads system to fork worker threads (will introduce race conditions)
+* [ ] Design cluster system to increase throughput (probably unnecessary)
+* [ ] De-couple state in order to achieve micro-server architecture
 * [ ] Docker support
 * [ ] Performance benchmarking

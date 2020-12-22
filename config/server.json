@@ -1,18 +1,3 @@
 {
-    "time_update_interval": 1,
-    "use_enforce_admin_account": true,
-    "enable_pic": true,
-    "enable_pin": true,
-    "use_ip_validation": true,
-    "local_server": true,
-    "automatic_register": false,
-    "bcrypt_migration": true,
-    "deterred_multiclient": true,
-    "max_account_login_attempts": 5,
-    "login_attempt_duration": 5000,
-    "max_allowed_account_hwid": 1,
-    "use_character_account_check": true,
-    "channel_load": 200,
-    "collective_charslot": true,
-    "max_ap": 32767
+    
 }

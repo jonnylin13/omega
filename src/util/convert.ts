@@ -1,36 +1,55 @@
-export class Convert {
 
-    // Implementation of 2s complement
-    static sign(value: number, bit_length: number) {
-        let is_negative = value & (1 << (bit_length - 1));
-        let boundary = (1 << bit_length);
-        let min_val = -boundary;
-        let mask = boundary - 1;
-        return is_negative ? min_val + (value & mask) : value;
+
+
+export module Convert {
+
+    abstract class convert {
+
+        data: any;
+
+        constructor(data: any) {
+            this.data = data
+        }
+
+        get(): any {
+            return this.data;
+        }
+
     }
 
-    static sign_byte(value: number) {
-        return Convert.sign(value, 8);
+    export class buffer extends convert {
+
+        constructor(data: Buffer) {
+            super(data);
+        }
+    
+        toString(): string {
+            return String.fromCharCode.apply(this.data);
+        }
+
+        toHexString(): string {
+            return this.data.reduce((str: string, byte: number) =>  str + byte.toString(16).padStart(2, '0'), '');
+        }
+    
+        toInt8Array(): Int8Array {
+            return new Int8Array(this.data);
+        }
+
+        toUint8Array(): Uint8Array {
+            return new Uint8Array(this.data);
+        }
+
     }
 
-    static sign_array(arr: Array<number>, bit_length: number) {
-        return arr.map((val) => Convert.sign(val, bit_length));
-    }
+    export class ipAddress extends convert {
 
-    static buf_to_string(buf: ArrayBuffer) {
-        return String.fromCharCode.apply(null, buf);
-    }
+        constructor(data: string) {
+            super(data);
+        }
 
-    static int8_to_hexstr(arr: Int8Array) {
-        return arr.reduce((str, byte) => str + byte.toString(16).padStart(2, '0'), '');
-    }
-
-    static ip_to_bytes(ip: string, separator='.'): Int8Array {
-        let ip_arr = ip.split(separator);
-        return Int8Array.from(ip_arr.map((decimal) => parseInt(decimal)));
-    }
-
-    static right_padded_str(str: string, padding: string, length: number): string {
-        return str; // TODO: Needs implementation
+        toBuffer(separator='.'): Buffer {
+            let ipArray = this.data.split(separator);
+            return Buffer.from(ipArray.map((dec: string) => parseInt(dec)));
+        }
     }
 }

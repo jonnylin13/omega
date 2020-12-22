@@ -1,3 +1,4 @@
 {
-    "wzpath": "wz/"
+    "WZ_PATH": "wz/",
+    "USE_WORKER_THREADS": true
 }
