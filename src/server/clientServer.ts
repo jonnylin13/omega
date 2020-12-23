@@ -31,7 +31,7 @@ export abstract class ClientServer {
     }
 
     private getNextSessionId() {
-        return ++this._nextSessionId;
+        return this._nextSessionId++;
     }
 
     async start(): Promise<boolean> {

@@ -8,6 +8,8 @@ import * as net from 'net';
 import { PacketDelegator } from "../baseDelegator";
 import { BaseServer, ServerType, WINSTON_FORMAT } from "../baseServer";
 import { CenterPackets } from "./centerPackets";
+import { PacketReader } from "../../protocol/packet/packetReader";
+import { CenterServerDelegator } from "./centerServerDelegator";
 
 
 export class CenterServer extends ClientServer implements BaseServer {
@@ -22,11 +24,14 @@ export class CenterServer extends ClientServer implements BaseServer {
     });;
 
     private ready: boolean = false;
-    private loginServerId: number;
+    loginServerId: number;
     packetDelegator: PacketDelegator;
+    static instance: CenterServer;
 
     constructor(port: number = 8484) {
         super(ServerType.CENTER, port);
+        CenterServer.instance = this;
+        this.packetDelegator = new CenterServerDelegator();
     }
 
     private isWorker(session: Session): boolean {
@@ -57,10 +62,13 @@ export class CenterServer extends ClientServer implements BaseServer {
     }
 
     onData(session: Session, data: Buffer): void {
-        if (this.isWorker(session)) {
-            console.log(data);
+        const packet = new PacketReader(data);
+        const opcode = packet.readShort();
+        if (opcode >= 0x200) {
+            // WorkerServer packet
+            this.packetDelegator.getHandler(opcode).handlePacket(packet, session);
         } else {
-            
+            // MapleStory client packet
         }
     }
 

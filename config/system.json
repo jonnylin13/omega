@@ -1,6 +1,0 @@
-{
-    "WZ_PATH": "wz/",
-    "NUM_CHANNELS": 1,
-    "LOGIN_SERVER_PORT": 8483,
-    "CHANNEL_SERVER_STARTING_PORT": 7575
-}

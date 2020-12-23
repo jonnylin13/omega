@@ -39,6 +39,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 
 ### Short goals
 * [ ] Bootstrap servers
+    * [x] Fork processes for each server type
     * [x] Implement CenterServer
     * [x] Implement LoginServer
     * [ ] Implement ChannelServer
@@ -62,8 +63,8 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 * [ ] Implement configuration
 
 ### Long goals
-* [ ] Design worker_threads system to fork worker threads (will introduce race conditions)
-* [ ] Design cluster system to increase throughput (probably unnecessary)
+* [x] Design cluster system to fork worker processes
+* [ ] Design worker_threads system to delegate compute-heavy tasks
 * [ ] De-couple state in order to achieve micro-server architecture
 * [ ] Docker support
 * [ ] Performance benchmarking

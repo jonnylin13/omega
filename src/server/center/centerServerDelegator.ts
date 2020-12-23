@@ -1,10 +1,11 @@
 import { PacketDelegator } from "../baseDelegator";
-
+import { LoginSendOpcode } from '../../protocol/opcode/login/send';
+import { LoginHandshakeAckHandler } from "./handlers/loginHandshakeAckHandler";
 
 export class CenterServerDelegator extends PacketDelegator {
 
     init(): void {
-        throw new Error("Method not implemented.");
+        this.handlers.set(LoginSendOpcode.CENTER_HANDSHAKE_ACK.getValue(), new LoginHandshakeAckHandler());
     }
 
 }

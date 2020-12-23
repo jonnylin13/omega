@@ -2,7 +2,7 @@
 
 export class CenterSendOpcode {
 
-    static WORKER_HANDSHAKE = new CenterSendOpcode(0x00);
+    static WORKER_HANDSHAKE = new CenterSendOpcode(0x200);
 
     private code: number;
 
