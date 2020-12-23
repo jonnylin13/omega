@@ -71,6 +71,7 @@ export class CenterServer extends ClientServer implements BaseServer {
 
             if (!this.isWorker(session)) {
                 session.destroy();
+                CenterServer.logger.warn(`Potential malicious attack from ${session.remoteAddress}`);
                 return;
             }
 

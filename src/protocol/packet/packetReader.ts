@@ -112,5 +112,9 @@ export class PacketReader {
         this.offset = offset;
     }
 
+    getRemainingPacket(): Buffer {
+        return this.data.slice(this.offset);
+    }
+
 
 }

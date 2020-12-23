@@ -3,7 +3,6 @@ import { PacketHandler } from "../../baseHandler";
 import { Session } from "../../session";
 import { ServerType } from '../../baseServer';
 import { CenterServer } from "../centerServer";
-import { CenterPackets } from "../centerPackets";
 
 
 export class LoginHandshakeAckHandler implements PacketHandler {
