@@ -5,7 +5,7 @@ import { ServerType } from '../../baseServer';
 import { CenterServer } from "../centerServer";
 
 
-export class LoginHandshakeAckHandler implements PacketHandler {
+export class CenterHandshakeAckHandler implements PacketHandler {
     async handlePacket(packet: PacketReader, session: Session): Promise<void> {
         const serverType = packet.readByte();
         if (ServerType[serverType] === 'LOGIN') {

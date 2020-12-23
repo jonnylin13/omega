@@ -30,7 +30,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 
 ### Milestones
 * [ ] Login
-    * [ ] Get to login screen (handshake)
+    * [x] Get to login screen (handshake)
     * [ ] Login
     * [ ] Select a world
     * [ ] Select a channel
@@ -41,11 +41,12 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 ### Short goals
 * [ ] Bootstrap servers
     * [x] Fork processes for each server type
-    * [x] Implement CenterServer
-    * [x] Implement LoginServer
+    * [ ] Implement CenterServer
+    * [ ] Implement LoginServer
     * [ ] Implement ChannelServer
+    * [ ] Implement ShopServer
 * [ ] Encryption
-    * [x] Implementing AES encryption
+    * [x] Implement AES encryption
         * [ ] Write unit tests
     * [x] Implement Shanda encryption
         * [ ] Write unit tests

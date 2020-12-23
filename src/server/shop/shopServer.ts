@@ -19,7 +19,7 @@ export class ShopServer extends BaseServer{
         ]
     });
 
-    centerServerSocket: net.Socket;
+    centerServerSession: Session;
     connected: boolean = false;
     packetDelegator: PacketDelegator;
     static instance: ShopServer;
@@ -28,17 +28,19 @@ export class ShopServer extends BaseServer{
         super(ServerType.SHOP, 8485);
         // Establish connection with CenterServer
         this.packetDelegator = new ShopServerPacketDelegator();
-        this.centerServerSocket = net.createConnection({ port: 8483 });
+        this.centerServerSession = (net.createConnection({ port: 8483 }) as Session);
+        this.centerServerSession.id = -1; // id reserved for CenterServer
         ShopServer.instance = this;
     }
 
-    isCenterServerSocket(session: Session) {
-        return this.centerServerSocket.remoteAddress === session.remoteAddress;
+    isCenterServer(session: Session) {
+        return this.centerServerSession.id === session.id;
     }
 
     isConnected(): boolean {
-        return this.connected && (this.centerServerSocket !== undefined);
+        return this.connected && (this.centerServerSession !== undefined);
     }
+
     onConnection(session: Session): void {
         // TODO: Authenticate with one-time generated key
         this.connected = true;
@@ -46,9 +48,9 @@ export class ShopServer extends BaseServer{
     }
 
     onClose(session: Session, hadError: any): void {
-        if (this.isCenterServerSocket(session)) {
+        if (this.isCenterServer(session)) {
             this.connected = false;
-            delete this.centerServerSocket;
+            delete this.centerServerSession;
         }
         // TODO: Retry connection ???
     }
@@ -58,8 +60,8 @@ export class ShopServer extends BaseServer{
         const packet = new PacketReader(data);
         const opcode = packet.readShort();
 
-        if (this.isCenterServerSocket(session)) {
-            this.packetDelegator.getHandler(opcode).handlePacket(packet, this.centerServerSocket);
+        if (this.isCenterServer(session)) {
+            this.packetDelegator.getHandler(opcode).handlePacket(packet, this.centerServerSession);
         } else {
             // Potential malicious attack?
         }

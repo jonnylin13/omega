@@ -31,7 +31,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
         }
 
         // Send request to CenterServer to get account information
-        LoginServer.instance.centerServerSocket.write(LoginPackets.getPreLoginRequest(preLoginClient));
+        LoginServer.instance.centerServerSession.write(LoginPackets.getPreLoginRequest(preLoginClient));
     }
 }
 

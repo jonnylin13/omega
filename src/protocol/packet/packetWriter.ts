@@ -67,7 +67,7 @@ export class PacketWriter {
     }
 
     write(buf: Buffer): void {
-        for (let byte of buf) this.writeByte(byte);
+        for (let byte of new Int8Array(buf)) this.writeByte(byte);
     }
 
     private writeAsciiString(str: string): void {

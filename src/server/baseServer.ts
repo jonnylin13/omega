@@ -52,7 +52,7 @@ export abstract class BaseServer {
 
         });
         this.online = true;
-        this.server.listen(this.port, '127.0.0.1');
+        this.server.listen(this.port);
         this.onStart();
         return true;
     }

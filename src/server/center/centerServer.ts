@@ -21,6 +21,7 @@ export class CenterServer extends BaseServer {
 
     loginServerSessionId: number;
     shopServerSessionId: number;
+    workerSessionStore: Set<number> = new Set();
 
     packetDelegator: PacketDelegator;
     static instance: CenterServer;
@@ -31,21 +32,23 @@ export class CenterServer extends BaseServer {
         this.packetDelegator = new CenterServerDelegator();
     }
 
+    // Temporary, needs rewrite with token authentication instead
     private isWorker(session: Session): boolean {
-        const addressInfo: net.AddressInfo | string = this.server.address();
-        const thisAddress = typeof addressInfo === 'string' ? addressInfo : addressInfo.address;
-        return thisAddress === session.remoteAddress;
+        return this.workerSessionStore.has(session.id);
     }
 
     onConnection(session: Session): void {
         // WorkerServer connection
         // Send handshake to establish ServerType
         CenterServer.logger.info(`CenterServer received a worker connection from ${session.remoteAddress}`);
+        this.workerSessionStore.add(session.id);
         session.write(CenterPackets.getWorkerHandshake());
     }
 
     onClose(session: Session, hadError: any): void {
-        throw new Error("Method not implemented.");
+        if (this.isWorker(session)) {
+            this.workerSessionStore.delete(session.id);
+        }
     }
 
     onData(session: Session, data: Buffer): void {
@@ -60,7 +63,13 @@ export class CenterServer extends BaseServer {
                 session.destroy();
                 return;
             }
-            this.packetDelegator.getHandler(opcode).handlePacket(packet, session);
+            const packetHandler = this.packetDelegator.getHandler(opcode);
+            if (packetHandler === undefined) {
+                CenterServer.logger.warn(`CenterServer unhandled packet id 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+                return;
+            }
+            CenterServer.logger.debug(`CenterServer handling packet id 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+            packetHandler.handlePacket(packet, session);
 
         }
     }
