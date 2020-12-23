@@ -53,12 +53,12 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
     * [ ] Write unit tests for output
     * [x] Input classes/interfaces
     * [ ] Write unit tests for input
-* [ ] Implement WZ loading (might need rework)
+* [ ] Implement WZ loading
     * [ ] Parse a single WZ XML file
     * [ ] Parse a WZ directory
 * [x] Implement packet delegation
 * [x] Implement packet handling
-* [ ] Implement database layer
+* [x] Implement database layer
 * [x] Implement logging
 * [ ] Implement configuration
 

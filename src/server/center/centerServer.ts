@@ -21,10 +21,11 @@ export class CenterServer extends ClientServer implements BaseServer {
             new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }),
             new winston.transports.Console({ level: 'debug' })
         ]
-    });;
+    });
 
-    private ready: boolean = false;
-    loginServerId: number;
+    loginServerSessionId: number;
+    shopServerSessionId: number;
+
     packetDelegator: PacketDelegator;
     static instance: CenterServer;
 
@@ -45,7 +46,7 @@ export class CenterServer extends ClientServer implements BaseServer {
             // WorkerServer connection
             // Send handshake to establish ServerType
             CenterServer.logger.info(`CenterServer received a worker connection from ${session.remoteAddress}`);
-            session.write(CenterPackets.getLoginHandshake());
+            session.write(CenterPackets.getWorkerHandshake());
         } else {
             // MapleStory client connection
             CenterServer.logger.info(`CenterServer received a client connection from ${session.remoteAddress}`);
@@ -64,11 +65,21 @@ export class CenterServer extends ClientServer implements BaseServer {
     onData(session: Session, data: Buffer): void {
         const packet = new PacketReader(data);
         const opcode = packet.readShort();
+
         if (opcode >= 0x200) {
             // WorkerServer packet
+
+            if (!this.isWorker(session)) {
+                session.destroy();
+                return;
+            }
+
             this.packetDelegator.getHandler(opcode).handlePacket(packet, session);
+
         } else {
+
             // MapleStory client packet
+
         }
     }
 

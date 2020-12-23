@@ -3,6 +3,7 @@ import { LoginServer } from "./src/server/login/loginServer";
 import * as winston from 'winston';
 import { WINSTON_FORMAT } from "./src/server/baseServer";
 import * as cluster from 'cluster';
+import { ShopServer } from "./src/server/shop/shopServer";
 
 const logger = winston.createLogger({
     format: WINSTON_FORMAT,
@@ -20,15 +21,19 @@ function getWorker(id: number) {
 if (cluster.isMaster) {
 
     logger.debug(`Master process ${process.pid} has started`);
-    
-    // Start CenterServer
+
     const centerServer = new CenterServer();
+
     const loginServerProcess = cluster.fork();
     loginServerProcess.send({serverType: 1});
     const loginServerProcessId = loginServerProcess.id;
 
+    const shopServerProcess = cluster.fork();
+    shopServerProcess.send({serverType: 3});
+    const shopServerProcessId = shopServerProcess.id;
+
     const channelServerProcessIds = [];
-    // NUM_CHANNELS
+
     for (let i = 0; i < 1; i++) {
         const channelServerProcess = cluster.fork();
         channelServerProcessIds.push(channelServerProcess.id);
@@ -49,6 +54,9 @@ if (cluster.isMaster) {
                 break;
             case 2:
                 process.kill(process.pid);
+                break;
+            case 3:
+                new ShopServer();
                 break;
         }
     });

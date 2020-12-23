@@ -11,5 +11,5 @@ export const WINSTON_FORMAT = winston.format.combine(
 );
 
 export enum ServerType {
-    CENTER, LOGIN, CHANNEL
+    CENTER, LOGIN, CHANNEL, SHOP
 }

@@ -1,11 +1,11 @@
 import { PacketDelegator } from "../baseDelegator";
-import { LoginSendOpcode } from '../../protocol/opcode/login/send';
+import { CommonSendOpcode } from '../../protocol/opcode/common/send';
 import { LoginHandshakeAckHandler } from "./handlers/loginHandshakeAckHandler";
 
 export class CenterServerDelegator extends PacketDelegator {
 
     init(): void {
-        this.handlers.set(LoginSendOpcode.CENTER_HANDSHAKE_ACK.getValue(), new LoginHandshakeAckHandler());
+        this.handlers.set(CommonSendOpcode.CENTER_HANDSHAKE_ACK.getValue(), new LoginHandshakeAckHandler());
     }
 
 }
