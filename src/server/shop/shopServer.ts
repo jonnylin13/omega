@@ -1,14 +1,14 @@
-import { WorkerServer } from "../workerServer";
 import * as net from 'net';
 import * as winston from 'winston';
-import { WINSTON_FORMAT } from "../baseServer";
+import { ServerType, WINSTON_FORMAT } from "../baseServer";
 import { BaseServer } from "../baseServer";
 import { PacketDelegator } from "../baseDelegator";
 import { PacketReader } from "../../protocol/packet/packetReader";
 import { ShopServerPacketDelegator } from "./shopServerDelegator";
+import { Session } from "../session";
 
 
-export class ShopServer implements WorkerServer, BaseServer {
+export class ShopServer extends BaseServer{
 
     static logger: winston.Logger = winston.createLogger({
         format: WINSTON_FORMAT,
@@ -25,38 +25,56 @@ export class ShopServer implements WorkerServer, BaseServer {
     static instance: ShopServer;
 
     constructor() {
+        super(ServerType.SHOP, 8485);
         // Establish connection with CenterServer
         this.packetDelegator = new ShopServerPacketDelegator();
-        this.centerServerSocket = net.createConnection({ port: 8484 }, () => this.onCenterServerConnection());
-        this.centerServerSocket.on('data', (data) => this.onCenterServerData(data));
-        this.centerServerSocket.on('close', (hadError) => this.onCenterServerClose(hadError));
-        this.centerServerSocket.on('error', (error) => this.onCenterServerError(error));
+        this.centerServerSocket = net.createConnection({ port: 8483 });
         ShopServer.instance = this;
     }
 
-    onCenterServerConnection(): void {
-        this.connected = true;
-        ShopServer.logger.info(`ShopServer has established CenterServer connection`);
-    }
-
-    onCenterServerData(data: any): void {
-        const packet = new PacketReader(data);
-        const opcode = packet.readShort();
-        this.packetDelegator.getHandler(opcode).handlePacket(packet, this.centerServerSocket);
-    }
-
-    onCenterServerClose(hadError: boolean): void {
-        this.connected = false;
-        delete this.centerServerSocket;
-        // TODO: Retry connection ???
-    }
-
-    onCenterServerError(err: any): void {
-        throw new Error("Method not implemented.");
+    isCenterServerSocket(session: Session) {
+        return this.centerServerSocket.remoteAddress === session.remoteAddress;
     }
 
     isConnected(): boolean {
         return this.connected && (this.centerServerSocket !== undefined);
+    }
+    onConnection(session: Session): void {
+        // TODO: Authenticate with one-time generated key
+        this.connected = true;
+        ShopServer.logger.info(`ShopServer has established CenterServer connection`);
+    }
+
+    onClose(session: Session, hadError: any): void {
+        if (this.isCenterServerSocket(session)) {
+            this.connected = false;
+            delete this.centerServerSocket;
+        }
+        // TODO: Retry connection ???
+    }
+
+    onData(session: Session, data: Buffer): void {
+
+        const packet = new PacketReader(data);
+        const opcode = packet.readShort();
+
+        if (this.isCenterServerSocket(session)) {
+            this.packetDelegator.getHandler(opcode).handlePacket(packet, this.centerServerSocket);
+        } else {
+            // Potential malicious attack?
+        }
+    }
+
+    onError(error: any): void {
+        throw new Error("Method not implemented.");
+    }
+
+    onStart(): void {
+        ShopServer.logger.info(`ShopServer has started listening on port ${this.port}`);
+    }
+
+    onShutdown(): void {
+        throw new Error("Method not implemented.");
     }
 
 }

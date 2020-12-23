@@ -1,6 +1,6 @@
-export class CommonSendOpcode {
+export class LoginSendOpcode {
 
-    static CENTER_HANDSHAKE_ACK = new CommonSendOpcode(0x400);
+    static PRE_LOGIN_REQUEST = new LoginSendOpcode(0x500);
 
     private code: number;
 

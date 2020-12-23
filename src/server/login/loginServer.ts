@@ -1,14 +1,18 @@
-import { WorkerServer } from "../workerServer";
 import * as net from 'net';
 import * as winston from 'winston';
-import { WINSTON_FORMAT } from "../baseServer";
+import { ServerType, WINSTON_FORMAT } from "../baseServer";
 import { BaseServer } from "../baseServer";
 import { PacketDelegator } from "../baseDelegator";
 import { PacketReader } from "../../protocol/packet/packetReader";
 import { LoginServerPacketDelegator } from "./loginServerDelegator";
+import { Session } from "../session";
+import { Crypto } from '../../protocol/crypto/crypto';
+import { AES } from '../../protocol/crypto/aes';
+import { Client } from '../../game/client';
+import { PreLoginClient } from './type/preLoginClient';
 
 
-export class LoginServer implements WorkerServer, BaseServer {
+export class LoginServer extends BaseServer {
 
     static logger: winston.Logger = winston.createLogger({
         format: WINSTON_FORMAT,
@@ -22,39 +26,68 @@ export class LoginServer implements WorkerServer, BaseServer {
     centerServerSocket: net.Socket;
     connected: boolean = false;
     packetDelegator: PacketDelegator;
+    preLoginStore: Map<number, PreLoginClient> = new Map();
+    static instance: LoginServer;
 
     constructor() {
+        super(ServerType.LOGIN, 8484);
         // Establish connection with CenterServer
         this.packetDelegator = new LoginServerPacketDelegator();
-        this.centerServerSocket = net.createConnection({ port: 8484 }, () => this.onCenterServerConnection());
-        this.centerServerSocket.on('data', (data) => this.onCenterServerData(data));
-        this.centerServerSocket.on('close', (hadError) => this.onCenterServerClose(hadError));
-        this.centerServerSocket.on('error', (error) => this.onCenterServerError(error));
+        this.centerServerSocket = net.createConnection({ port: 8483 });
+        LoginServer.instance = this;
     }
 
-    onCenterServerConnection(): void {
+    isCenterServerSocket(session: Session) {
+        return this.centerServerSocket.remoteAddress === session.remoteAddress;
+    }
+
+    isConnected(): boolean {
+        return this.connected && (this.centerServerSocket !== undefined);
+    }
+
+    onConnection(session: Session): void {
         this.connected = true;
         LoginServer.logger.info(`LoginServer has established CenterServer connection`);
     }
 
-    onCenterServerData(data: any): void {
-        const packet = new PacketReader(data);
-        const opcode = packet.readShort();
-        this.packetDelegator.getHandler(opcode).handlePacket(packet, this.centerServerSocket);
-    }
-
-    onCenterServerClose(hadError: boolean): void {
+    onClose(session: Session, hadError: any): void {
         this.connected = false;
         delete this.centerServerSocket;
         // TODO: Retry connection ???
     }
 
-    onCenterServerError(err: any): void {
+    onData(session: Session, data: Buffer): void {
+        const packet = new PacketReader(data);
+        const opcode = packet.readShort();
+        if (this.isCenterServerSocket(session)) {
+            this.packetDelegator.getHandler(opcode).handlePacket(packet, session);
+        } else {
+
+            if (opcode >= 0x200) {
+                LoginServer.logger.warn(`Potential malicious attack to LoginServer from ${session.remoteAddress}`);
+                session.destroy();
+                return;
+            }
+            // MapleStory client connection
+            LoginServer.logger.info(`LoginServer received a client connection from ${session.remoteAddress}`);
+            let ivRecv = Crypto.generateIv();
+            let ivSend = Crypto.generateIv();
+            const sendCypher = new AES(ivSend, 83);
+            const recvCypher = new AES(ivRecv, 83);
+            const client = new Client(sendCypher, recvCypher, session);
+        }
+    }
+
+    onError(error: any): void {
         throw new Error("Method not implemented.");
     }
 
-    isConnected(): boolean {
-        return this.connected && (this.centerServerSocket !== undefined);
+    onStart(): void {
+        LoginServer.logger.info(`LoginServer has started listening on port ${this.port}`);
+    }
+
+    onShutdown(): void {
+        throw new Error("Method not implemented.");
     }
 
 }
