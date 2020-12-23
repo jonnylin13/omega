@@ -8,8 +8,8 @@ export class PacketWriter {
     data: Buffer;
     bytesWritten: number = 0;
 
-    constructor(data: Buffer) {
-        this.data = data;
+    constructor(length: number = 32) {
+        this.data = Buffer.alloc(length);
     }
 
     private dynamicAllocation(byteSize: number): void {

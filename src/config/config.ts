@@ -1,17 +1,18 @@
-import { System } from "typescript";
 import { File } from "../util/structs/file";
-import { ServerConfig } from "./interface/serverConfig";
+import { GameConfig } from "./interface/gameConfig";
+import { SystemConfig } from "./interface/systemConfig";
 
 
 export interface ConfigType {}
 
 export class Properties {
-    SERVER: ServerConfig;
-    SYSTEM: System;
+    server: GameConfig;
+    system: SystemConfig;
     [key: string]: ConfigType;
 }
 
 export class Config {
+
     static properties: Properties = new Properties();
     static configDirectory: File = new File('config');
 
