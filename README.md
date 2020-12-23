@@ -7,6 +7,12 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
     * Provide configuration for multi-threading, multi-processing, or running microservices independently
 * Squeeze as much performance as I can out of Node.js
 
+## Features
+* Uses a microservice architecture where state is decoupled into CenterServer, LoginServer, ShopServer, and ChannelServers
+    * Can be run in cluster mode (multiple processes on one machine), or each service can be run independently on a different machine
+    * Can use token-based authentication for intra-server communication
+* Utilizes worker_threads to delegate compute-heavy tasks
+
 ## Setup and contribution
 * Fork the repository
 * Run `npm install` in the project directory to install the dependencies
