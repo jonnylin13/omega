@@ -28,8 +28,12 @@ export class ShopServer extends BaseServer{
         super(ServerType.SHOP, 8485);
         // Establish connection with CenterServer
         this.packetDelegator = new ShopServerPacketDelegator();
-        this.centerServerSession = (net.createConnection({ port: 8483 }) as Session);
-        this.centerServerSession.id = -1; // id reserved for CenterServer
+        this.centerServerSession = (net.connect({ port: 8483 }) as Session);
+        this.centerServerSession.id = -1;
+        this.centerServerSession.on('connect', () => this.onConnection(this.centerServerSession));
+        this.centerServerSession.on('data', (data: Buffer) => this.onData(this.centerServerSession, data));
+        this.centerServerSession.on('close', (hadError: boolean) => this.onClose(this.centerServerSession, hadError));
+        this.centerServerSession.on('error', (error: any) => this.onError(error));
         ShopServer.instance = this;
     }
 
@@ -61,7 +65,16 @@ export class ShopServer extends BaseServer{
         const opcode = packet.readShort();
 
         if (this.isCenterServer(session)) {
-            this.packetDelegator.getHandler(opcode).handlePacket(packet, this.centerServerSession);
+
+            const packetHandler = this.packetDelegator.getHandler(opcode);
+            if (packetHandler === undefined) {
+
+                ShopServer.logger.debug(`ShopServer unhandled packet 0x${opcode.toString(16)} from CenterServer`);
+                return;
+            }
+
+            ShopServer.logger.debug(`ShopServer handling packet 0x${opcode.toString(16)} from CenterServer`);
+            packetHandler.handlePacket(packet, this.centerServerSession);
         } else {
             // Potential malicious attack?
         }

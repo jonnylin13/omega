@@ -38,8 +38,13 @@ export class LoginServer extends BaseServer {
         super(ServerType.LOGIN, 8484);
         // Establish connection with CenterServer
         this.packetDelegator = new LoginServerPacketDelegator();
-        this.centerServerSession = (net.createConnection({ port: 8483 }) as Session);
-        this.centerServerSession.id = -1; // Reserved session id for CenterServer
+        this.centerServerSession = (net.connect({ port: 8483 }) as Session);
+        this.centerServerSession.id = -1;
+        this.centerServerSession.setKeepAlive(true);
+        this.centerServerSession.on('connect', () => this.onConnection(this.centerServerSession));
+        this.centerServerSession.on('data', (data: Buffer) => this.onData(this.centerServerSession, data));
+        this.centerServerSession.on('close', (hadError: boolean) => this.onClose(this.centerServerSession, hadError));
+        this.centerServerSession.on('error', (err: any) => this.onError(err));
         LoginServer.instance = this;
     }
 
@@ -82,23 +87,19 @@ export class LoginServer extends BaseServer {
     }
 
     onData(session: Session, data: Buffer): void {
-        console.log('test1');
         if (this.isCenterServer(session)) {
-            console.log('test2');
             const packet = new PacketReader(data);
             const opcode = packet.readShort();
-
-            LoginServer.logger.debug(`LoginServer received packet 0x${opcode} from CenterServer`);
 
             const packetHandler = this.packetDelegator.getHandler(opcode);
 
             if (packetHandler === undefined) {
-                LoginServer.logger.warn(`LoginServer unhandled packet from CenterServer 0x${opcode.toString(16)}`);
+                LoginServer.logger.warn(`LoginServer unhandled packet 0x${opcode.toString(16)} from CenterServer`);
                 return;
             }
+            LoginServer.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from CenterServer`);
             packetHandler.handlePacket(packet, session);
         } else {
-            console.log('test3');
             if (!this.sessionStore.has(session.id)) {
                 // Never reached
                 LoginServer.logger.warn(`LoginServer received a packet from ${session.remoteAddress} before session could be registered`);
@@ -122,7 +123,7 @@ export class LoginServer extends BaseServer {
             
             const packetHandler = this.packetDelegator.getHandler(opcode);
             if (packetHandler === undefined) {
-                LoginServer.logger.warn(`LoginServer unhandled packet from client 0x${opcode.toString(16)}`);
+                LoginServer.logger.warn(`LoginServer unhandled packet 0x${opcode.toString(16)} from client`);
                 return;
             }
             LoginServer.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
