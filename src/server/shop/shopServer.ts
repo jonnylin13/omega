@@ -5,6 +5,7 @@ import { PacketDelegator } from "../baseDelegator";
 import { PacketReader } from "../../protocol/packets/packetReader";
 import { ShopServerPacketDelegator } from "./shopServerDelegator";
 import { Session } from "../session";
+import { Config } from '../../util/config';
 
 
 export class ShopServer extends BaseServer{
@@ -15,7 +16,7 @@ export class ShopServer extends BaseServer{
     static instance: ShopServer;
 
     constructor() {
-        super(ServerType.SHOP, 8485);
+        super(ServerType.SHOP, Config.instance.shop.host, Config.instance.shop.port);
         // Establish connection with CenterServer
         this.packetDelegator = new ShopServerPacketDelegator();
         this.centerServerSession = (net.connect({ port: 8483 }) as Session);

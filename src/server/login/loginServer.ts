@@ -11,6 +11,7 @@ import { EncryptedSession } from '../../protocol/crypto/encryptedSession';
 import { PreLoginClient } from './types/preLoginClient';
 import { LoginPackets } from './loginPackets';
 import { Shanda } from '../../protocol/crypto/shanda';
+import { Config } from '../../util/config';
 
 
 export class LoginServer extends BaseServer {
@@ -26,7 +27,7 @@ export class LoginServer extends BaseServer {
     static instance: LoginServer;
 
     constructor() {
-        super(ServerType.LOGIN, 8484);
+        super(ServerType.LOGIN, Config.instance.login.host, Config.instance.login.port);
         // Establish connection with CenterServer
         this.packetDelegator = new LoginServerPacketDelegator();
         this.centerServerSession = (net.connect({ port: 8483 }) as Session);
@@ -53,7 +54,7 @@ export class LoginServer extends BaseServer {
             this.logger.info(`LoginServer has established CenterServer connection`);
         } else {
             // MapleStory client connection
-            this.logger.info(`LoginServer received a client connection from ${session.remoteAddress}`);
+            this.logger.info(`LoginServer received a client connection: session ${session.id} @ ${session.remoteAddress}`);
             let ivRecv = Crypto.generateIv();
             let ivSend = Crypto.generateIv();
             const sendCypher = new AES(ivSend, 83);

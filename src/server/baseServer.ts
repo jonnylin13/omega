@@ -14,15 +14,17 @@ export abstract class BaseServer {
     loggerFormat: winston.Logform.Format;
     logger: winston.Logger;
     protected port: number;
+    protected host: string;
     private online: boolean = false;
     protected type: ServerType;
     protected server: net.Server;
     private _nextSessionId: number = 0;
     protected packetDelegator: PacketDelegator;
 
-    constructor(type: ServerType, port: number) {
+    constructor(type: ServerType, host: string, port: number) {
         this.port = port;
         this.type = type;
+        this.host = host;
         this.loggerFormat = winston.format.combine(
             winston.format.label({ label: ServerType[this.type] }),
             winston.format.colorize(),
@@ -63,7 +65,7 @@ export abstract class BaseServer {
 
         });
         this.online = true;
-        this.server.listen(this.port);
+        this.server.listen(this.port, this.host);
         this.onStart();
         return true;
     }

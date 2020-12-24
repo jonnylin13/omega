@@ -6,6 +6,7 @@ import { PacketReader } from "../../protocol/packets/packetReader";
 import { CenterServerDelegator } from "./centerServerDelegator";
 import * as prometheus from 'prom-client';
 import * as process from 'process';
+import { Config } from "../../util/config";
 
 const requestCounter = new prometheus.Counter({
     name: 'center_request_counter',
@@ -33,8 +34,8 @@ export class CenterServer extends BaseServer {
     packetDelegator: PacketDelegator;
     static instance: CenterServer;
 
-    constructor(port: number = 8483) {
-        super(ServerType.CENTER, port);
+    constructor() {
+        super(ServerType.CENTER, Config.instance.center.host, Config.instance.center.port);
         CenterServer.instance = this;
         this.packetDelegator = new CenterServerDelegator();
     }

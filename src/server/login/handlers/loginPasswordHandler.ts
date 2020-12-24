@@ -4,6 +4,7 @@ import { LoginServer } from "../loginServer";
 import { Session } from "../../session";
 import { LoginPackets } from "../loginPackets";
 import * as bcrypt from 'bcrypt';
+import { Config } from "../../../util/config";
 
 
 export class PreLoginPasswordHandler implements PacketHandler {
@@ -52,6 +53,11 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
 
         if (!found) {
             // Account not found
+            if (Config.instance.login.useAutoRegister) {
+                // Write AutoRegister packet to CenterServer using username and password
+                LoginServer.instance.logger.info(`Auto register`);
+                return;
+            }
             LoginServer.instance.logger.debug(`Username ${username} not found when attempting login`);
             encSession.write(LoginPackets.getLoginFailed(5));
             return;

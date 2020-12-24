@@ -28,6 +28,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "fast-xml-parser": "^3.17.5",
+    "hjson": "^3.2.2",
     "knex": "^0.21.12",
     "mysql": "^2.18.1",
     "prom-client": "^13.0.0",
