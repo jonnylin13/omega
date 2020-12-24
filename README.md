@@ -6,7 +6,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 * Uses a microservice architecture where state is decoupled into center, login, shop, and channel servers
 * Can be run in a cluster of processes, or each service can be run independently on a different machine
 * Uses token-based authentication for intra-server communication
-* Utilizes multi-threading to delegate compute-heavy tasks
+* Uses multi-threading to delegate compute-heavy tasks
 * Advanced metrics with Prometheus
 
 ## Setup and contribution
@@ -32,35 +32,38 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 ### Milestones
 * [ ] Login
     * [x] Get to login screen (handshake)
-    * [ ] Login
+    * [ ] Password verification
+    * [ ] Accept TOS
+    * [ ] Register gender
+    * [ ] Register pin
+    * [ ] Pin verification
     * [ ] Select a world
     * [ ] Select a channel
     * [ ] Character list
     * [ ] Create a character
+    * [ ] Register PIC
+    * [ ] Select a character
     * [ ] Delete a character
+    * [ ] PIC verification
 
 ### Short goals
-* [ ] Bootstrap servers
-    * [x] Fork processes for each server type
+* [ ] Server infrastructure
+    * [x] Bootstrap process
     * [x] Implement CenterServer
     * [x] Implement LoginServer
     * [ ] Implement ChannelServer
     * [ ] Implement ShopServer
-* [ ] Encryption
+    * [x] Implement packet delegation
+    * [x] Implement packet handling
+* [x] Encryption
     * [x] Implement AES encryption
-        * [ ] Write unit tests
     * [x] Implement Shanda encryption
-        * [ ] Write unit tests
 * [x] Implement packet readers/writers with Buffer
     * [x] Output classes/interfaces
-    * [ ] Write unit tests for output
     * [x] Input classes/interfaces
-    * [ ] Write unit tests for input
 * [ ] Implement WZ loading
     * [ ] Parse a single WZ XML file
     * [ ] Parse a WZ directory
-* [x] Implement packet delegation
-* [x] Implement packet handling
 * [x] Implement database layer
 * [x] Implement logging
 * [ ] Implement configuration
