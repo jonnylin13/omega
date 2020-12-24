@@ -72,6 +72,7 @@ export class LoginServer extends BaseServer {
         if (this.isCenterServer(session)) {
             this.connected = false;
             delete this.centerServerSession;
+            LoginServer.logger.error(`LoginServer disconnected from CenterServer`);
             // TODO: Retry connection ???
         } else {
             // Clear local stores
@@ -81,20 +82,23 @@ export class LoginServer extends BaseServer {
     }
 
     onData(session: Session, data: Buffer): void {
+        console.log('test1');
         if (this.isCenterServer(session)) {
+            console.log('test2');
             const packet = new PacketReader(data);
             const opcode = packet.readShort();
 
             LoginServer.logger.debug(`LoginServer received packet 0x${opcode} from CenterServer`);
 
             const packetHandler = this.packetDelegator.getHandler(opcode);
+
             if (packetHandler === undefined) {
                 LoginServer.logger.warn(`LoginServer unhandled packet from CenterServer 0x${opcode.toString(16)}`);
                 return;
             }
             packetHandler.handlePacket(packet, session);
         } else {
-
+            console.log('test3');
             if (!this.sessionStore.has(session.id)) {
                 // Never reached
                 LoginServer.logger.warn(`LoginServer received a packet from ${session.remoteAddress} before session could be registered`);
@@ -116,13 +120,12 @@ export class LoginServer extends BaseServer {
                 return;
             }
             
-            LoginServer.logger.debug(`LoginServer received packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
             const packetHandler = this.packetDelegator.getHandler(opcode);
             if (packetHandler === undefined) {
                 LoginServer.logger.warn(`LoginServer unhandled packet from client 0x${opcode.toString(16)}`);
                 return;
             }
-            LoginServer.logger.debug(`LoginServer processing packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+            LoginServer.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
             packetHandler.handlePacket(packet, session);
         }
     }

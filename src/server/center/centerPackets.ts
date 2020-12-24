@@ -12,12 +12,12 @@ export class CenterPackets {
     }
 
     static getPreLoginPasswordAck(found: boolean, obj: any) {
-        const packet = new PacketWriter(found ? 1 : 0);
+        const packetLength = (found ? obj.password.length + obj.pin.length + obj.pic.length + 14 : 0) + 9 + obj.username.length;
+        const packet = new PacketWriter(packetLength);
         packet.writeShort(CenterSendOpcode.PRE_LOGIN_PASSWORD_ACK.getValue());
         packet.writeBoolean(found);
         packet.writeInt(obj.sessionId);
         if (found) {
-            packet.writeMapleAsciiString(obj.username);
             packet.writeInt(obj.id);
             packet.writeMapleAsciiString(obj.password);
             packet.writeByte(obj.gender);

@@ -78,7 +78,7 @@ export class PacketReader {
         const stringBuffer = Buffer.alloc(length);
         for (let i = 0; i < length; i++)
             stringBuffer[i] = this.readByte();
-        return new Convert.buffer(stringBuffer).toString();
+        return stringBuffer.toString('ascii');
     }
 
     readNullTerminatedAsciiString(): string {
@@ -88,7 +88,7 @@ export class PacketReader {
             if (byte === 0) break;
             stringArray.push(byte);
         }
-        return new Convert.buffer(Buffer.from(stringArray)).toString();
+        return Buffer.from(stringArray).toString('ascii');
     }
 
     readMapleAsciiString(): string {

@@ -14,7 +14,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
         const password = packet.readMapleAsciiString();
         packet.skip(6);
         const hwidBytes = packet.read(4);
-        const hwidNibbles = new Convert.buffer(hwidBytes).toHexString();
+        const hwidNibbles = hwidBytes.toString('hex');
 
         let preLoginClient;
         if (LoginServer.instance.preLoginStore.has(session.id)) {
@@ -22,6 +22,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
             preLoginClient.attempts++;
 
             if (preLoginClient.attempts > 3) {
+                // TODO: Do something else here lol
                 LoginServer.instance.preLoginStore.delete(session.id);
                 session.destroy();
                 return;
@@ -67,8 +68,12 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
         const tos = packet.readBoolean();
         const language = packet.readByte();
 
-        // TODO: Check if already logged in
+        // TODO: Check if ip banned or mac banned or temp banned
+        if (banned) return; // TODO: Return correct ban message
+
         // TODO: Check if multiclient
+        
+        if (!tos) encSession.write(LoginPackets.getLoginFailed(23));
 
         // Compare password
         const success = await bcrypt.compare(preLoginClient.password, hashedPassword);
@@ -77,8 +82,9 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
             encSession.write(LoginPackets.getLoginFailed(4));
             return;
         }
+        // TODO: Check if already logged in
 
-        encSession.write(LoginPackets.getLoginFailed(tos ? 0 : 23));
-
+        // Success
+        // TODO: Return authentication success packet
     }
 }

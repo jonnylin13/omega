@@ -43,4 +43,8 @@ export class LoginPackets {
         return packet.getPacket();
     }
 
+    static getAuthSuccess(): Buffer {
+        return null; // TODO
+    }
+
 }

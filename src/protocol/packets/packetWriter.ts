@@ -12,6 +12,7 @@ export class PacketWriter {
         this.data = Buffer.alloc(length);
     }
 
+    // TODO: Fix this
     private dynamicAllocation(byteSize: number): void {
         const bytesAvailable = this.data.length - this.bytesWritten;
         if (bytesAvailable < byteSize)

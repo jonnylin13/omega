@@ -82,10 +82,10 @@ export class CenterServer extends BaseServer {
             }
             const packetHandler = this.packetDelegator.getHandler(opcode);
             if (packetHandler === undefined) {
-                CenterServer.logger.warn(`CenterServer unhandled packet id 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+                CenterServer.logger.warn(`CenterServer unhandled packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
                 return;
             }
-            CenterServer.logger.debug(`CenterServer handling packet id 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+            CenterServer.logger.debug(`CenterServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
             packetHandler.handlePacket(packet, session);
 
         }
