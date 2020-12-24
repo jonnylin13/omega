@@ -1,4 +1,4 @@
-import { PacketReader } from "../../../protocol/packet/packetReader";
+import { PacketReader } from "../../../protocol/packets/packetReader";
 import { PacketHandler } from "../../baseHandler";
 import { ServerType } from "../../baseServer";
 import * as net from 'net';

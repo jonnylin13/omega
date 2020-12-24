@@ -1,12 +1,28 @@
 import { Session } from "../session";
 import * as winston from 'winston';
-import * as net from 'net';
 import { PacketDelegator } from "../baseDelegator";
 import { BaseServer, ServerType, WINSTON_FORMAT } from "../baseServer";
 import { CenterPackets } from "./centerPackets";
-import { PacketReader } from "../../protocol/packet/packetReader";
+import { PacketReader } from "../../protocol/packets/packetReader";
 import { CenterServerDelegator } from "./centerServerDelegator";
+import * as prometheus from 'prom-client';
+import * as process from 'process';
 
+const requestCounter = new prometheus.Counter({
+    name: 'center_request_counter',
+    help: 'Number of requests to CenterServer'
+});
+
+const memGauge = new prometheus.Gauge({
+    name: 'center_memory_gauge',
+    help: 'CenterServer heap used',
+    labelNames: ['ServerType']
+});
+
+setInterval(() => {
+    const memUsed = process.memoryUsage();
+    memGauge.set({ServerType: 'CENTER'}, Math.round(memUsed.heapUsed / 1024 / 1024 * 100) / 100);
+}, 15000);
 
 export class CenterServer extends BaseServer {
 
@@ -54,6 +70,7 @@ export class CenterServer extends BaseServer {
     onData(session: Session, data: Buffer): void {
         const packet = new PacketReader(data);
         const opcode = packet.readShort();
+        requestCounter.inc(1);
 
         if (opcode >= 0x200) {
             // WorkerServer packet

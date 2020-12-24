@@ -7,6 +7,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 * Can be run in a cluster of processes, or each service can be run independently on a different machine
 * Uses token-based authentication for intra-server communication
 * Utilizes multi-threading to delegate compute-heavy tasks
+* Advanced metrics with Prometheus
 
 ## Setup and contribution
 * Fork the repository
@@ -41,8 +42,8 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 ### Short goals
 * [ ] Bootstrap servers
     * [x] Fork processes for each server type
-    * [ ] Implement CenterServer
-    * [ ] Implement LoginServer
+    * [x] Implement CenterServer
+    * [x] Implement LoginServer
     * [ ] Implement ChannelServer
     * [ ] Implement ShopServer
 * [ ] Encryption
@@ -63,10 +64,11 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 * [x] Implement database layer
 * [x] Implement logging
 * [ ] Implement configuration
+* [x] Implement prometheus (performance benchmarking/metrics)
 
 ### Long goals
 * [x] Design cluster system to fork worker processes
 * [x] De-couple state in order to achieve micro-server architecture
+* [ ] Use Redis as a memory store, and have a task to periodically update the DB
 * [ ] Design worker_threads system to delegate compute-heavy tasks
 * [ ] Docker support
-* [ ] Performance benchmarking

@@ -3,13 +3,13 @@ import * as winston from 'winston';
 import { ServerType, WINSTON_FORMAT } from "../baseServer";
 import { BaseServer } from "../baseServer";
 import { PacketDelegator } from "../baseDelegator";
-import { PacketReader } from "../../protocol/packet/packetReader";
+import { PacketReader } from "../../protocol/packets/packetReader";
 import { LoginServerPacketDelegator } from "./loginServerDelegator";
 import { Session } from "../session";
 import { Crypto } from '../../protocol/crypto/crypto';
 import { AES } from '../../protocol/crypto/aes';
 import { EncryptedSession } from '../../protocol/crypto/encryptedSession';
-import { PreLoginClient } from './type/preLoginClient';
+import { PreLoginClient } from './types/preLoginClient';
 import { LoginPackets } from './loginPackets';
 import { Shanda } from '../../protocol/crypto/shanda';
 
@@ -62,7 +62,7 @@ export class LoginServer extends BaseServer {
             let ivSend = Crypto.generateIv();
             const sendCypher = new AES(ivSend, 83);
             const recvCypher = new AES(ivRecv, 83);
-            const encSession = new EncryptedSession(session.id, sendCypher, recvCypher);
+            const encSession = new EncryptedSession(session, sendCypher, recvCypher);
             this.sessionStore.set(session.id, encSession);
             session.write(LoginPackets.getLoginHandshake(83, ivRecv, ivSend));
         }
@@ -96,9 +96,12 @@ export class LoginServer extends BaseServer {
         } else {
 
             if (!this.sessionStore.has(session.id)) {
+                // Never reached
                 LoginServer.logger.warn(`LoginServer received a packet from ${session.remoteAddress} before session could be registered`);
                 return;
             }
+
+            // Validate header
 
             const encryptedSession = this.sessionStore.get(session.id);
             let dataNoHeader = data.slice(4); // Remove packet header

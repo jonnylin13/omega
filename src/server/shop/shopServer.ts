@@ -3,7 +3,7 @@ import * as winston from 'winston';
 import { ServerType, WINSTON_FORMAT } from "../baseServer";
 import { BaseServer } from "../baseServer";
 import { PacketDelegator } from "../baseDelegator";
-import { PacketReader } from "../../protocol/packet/packetReader";
+import { PacketReader } from "../../protocol/packets/packetReader";
 import { ShopServerPacketDelegator } from "./shopServerDelegator";
 import { Session } from "../session";
 

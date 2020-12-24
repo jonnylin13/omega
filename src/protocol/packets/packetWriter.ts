@@ -1,4 +1,4 @@
-import { Point } from "../../util/structs/point";
+import { Point } from "../../util/types/point";
 import { AES } from "../crypto/aes";
 
 

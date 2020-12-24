@@ -1,8 +1,9 @@
-import { PacketWriter } from '../../protocol/packet/packetWriter';
-import { CommonSendOpcode } from '../../protocol/opcode/common/send';
+import { PacketWriter } from '../../protocol/packets/packetWriter';
+import { CommonSendOpcode } from '../../protocol/opcodes/common/send';
 import { ServerType } from '../baseServer';
-import { LoginSendOpcode } from '../../protocol/opcode/login/send';
-import { PreLoginClient } from './type/preLoginClient';
+import { LoginSendOpcode } from '../../protocol/opcodes/login/send';
+import { PreLoginClient } from './types/preLoginClient';
+import { MapleSendOpcode } from '../../protocol/opcodes/maple/send';
 
 
 export class LoginPackets {
@@ -29,8 +30,15 @@ export class LoginPackets {
         const packet = new PacketWriter(2 + preLoginClient.password.length + preLoginClient.username.length + preLoginClient.hwidNibbles.length);
         packet.writeShort(LoginSendOpcode.PRE_LOGIN_REQUEST.getValue());
         packet.writeMapleAsciiString(preLoginClient.username);
-        packet.writeMapleAsciiString(preLoginClient.password);
-        packet.writeMapleAsciiString(preLoginClient.hwidNibbles);
+        return packet.getPacket();
+    }
+
+    static getLoginFailed(reason: number): Buffer {
+        const packet = new PacketWriter(8);
+        packet.writeShort(MapleSendOpcode.LOGIN_STATUS.getValue());
+        packet.writeByte(reason);
+        packet.writeByte(0);
+        packet.writeInt(0);
         return packet.getPacket();
     }
 

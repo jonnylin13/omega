@@ -1,4 +1,4 @@
-import { PacketReader } from "../../../protocol/packet/packetReader";
+import { PacketReader } from "../../../protocol/packets/packetReader";
 import { PacketHandler } from "../../baseHandler";
 import { Convert } from "../../../util/convert";
 import { LoginServer } from "../loginServer";
@@ -7,7 +7,7 @@ import { LoginPackets } from "../loginPackets";
 
 
 export class PreLoginPasswordHandler implements PacketHandler {
-    handlePacket(packet: PacketReader, session: Session): void {
+    async handlePacket(packet: PacketReader, session: Session): Promise<void> {
 
         const username = packet.readMapleAsciiString();
         const password = packet.readMapleAsciiString();
@@ -26,7 +26,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
                 return;
             }
         } else {
-            preLoginClient = {username: username, password: password, hwidNibbles: hwidNibbles, attempts: 1};
+            preLoginClient = {username: username, password: password, hwidNibbles: hwidNibbles, attempts: 1, sessionId: session.id};
             LoginServer.instance.preLoginStore.set(session.id, preLoginClient);
         }
 
@@ -35,8 +35,32 @@ export class PreLoginPasswordHandler implements PacketHandler {
     }
 }
 
-export class PostLoginPasswordHandler implements PacketHandler {
-    handlePacket(packet: PacketReader, session: Session): void {
-
+export class PreLoginPasswordAckHandler implements PacketHandler {
+    async handlePacket(packet: PacketReader, session: Session): Promise<void> {
+        const found = packet.readBoolean();
+        const username = packet.readMapleAsciiString();
+        if (!found) {
+            // Account not found
+            // Get the session from preLoginStore - this could be reworked, kind of clunky but works for now
+            for (let preLoginClient of LoginServer.instance.preLoginStore.values()) {
+                if (preLoginClient.username === username) {
+                    const encSession = LoginServer.instance.sessionStore.get(preLoginClient.sessionId);
+                    encSession.write(LoginPackets.getLoginFailed(5));
+                }
+            }
+            // Could not find encrypted session from username, so do nothing :/
+            return;
+        }
+        // Parse the information
+        // TODO: Check if all these fields are necessary
+        const id = packet.readInt();
+        const hashedPassword = packet.readMapleAsciiString();
+        const gender = packet.readByte();
+        const banned = packet.readBoolean();
+        const pin = packet.readMapleAsciiString();
+        const pic = packet.readMapleAsciiString();
+        const character_slots = packet.readByte();
+        const tos = packet.readBoolean();
+        const language = packet.readByte();
     }
 }

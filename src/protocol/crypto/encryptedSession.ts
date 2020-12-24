@@ -1,16 +1,24 @@
 import { AES } from "./aes";
 import { Session } from "../../server/session";
+import { Shanda } from "./shanda";
 
 
 export class EncryptedSession {
 
-    sessionId: number;
+    session: Session;
     sendCrypto: AES;
     recvCrypto: AES;
 
-    constructor(sessionId: number, sendCrypto: AES, recvCrypto: AES) {
+    constructor(session: Session, sendCrypto: AES, recvCrypto: AES) {
         this.sendCrypto = sendCrypto;
         this.recvCrypto = recvCrypto;
-        this.sessionId = sessionId;
+        this.session = session;
+    }
+
+    async write(data: Buffer): Promise<boolean> {
+        const header = this.sendCrypto.generatePacketHeader(data.length);
+        this.sendCrypto.transform(data);
+        Shanda.encrypt(data);
+        return await this.session.write(Buffer.from([...header, ...data]));
     }
 }

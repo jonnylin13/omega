@@ -1,5 +1,5 @@
 import { Convert } from "../../util/convert";
-import { Point } from "../../util/structs/point";
+import { Point } from "../../util/types/point";
 
 
 export class PacketReader {
@@ -15,6 +15,11 @@ export class PacketReader {
         const byte = this.data.readIntLE(this.offset, 1);
         this.offset += 1;
         return byte;
+    }
+
+    readBoolean(): boolean {
+        const bool = this.readByte();
+        return bool === 1 ? true : false;
     }
 
     readUByte(): number {

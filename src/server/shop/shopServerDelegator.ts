@@ -1,4 +1,4 @@
-import { CenterSendOpcode } from "../../protocol/opcode/center/send";
+import { CenterSendOpcode } from "../../protocol/opcodes/center/send";
 import { PacketDelegator } from "../baseDelegator";
 import { CenterHandshakeHandler } from './handlers/centerHandshakeHandler';
 

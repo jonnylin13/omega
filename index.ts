@@ -5,6 +5,13 @@ import { WINSTON_FORMAT } from "./src/server/baseServer";
 import * as cluster from 'cluster';
 import { ShopServer } from "./src/server/shop/shopServer";
 
+// Prometheus metrics
+import * as express from 'express';
+const metricsServer = express();
+import { AggregatorRegistry } from 'prom-client';
+
+const aggregatorRegistry = new AggregatorRegistry();
+
 const logger = winston.createLogger({
     format: WINSTON_FORMAT,
     transports: [
@@ -34,7 +41,7 @@ if (cluster.isMaster) {
 
     const channelServerProcessIds = [];
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < 0; i++) {
         const channelServerProcess = cluster.fork();
         channelServerProcessIds.push(channelServerProcess.id);
         channelServerProcess.send({serverType: 2});
@@ -43,6 +50,23 @@ if (cluster.isMaster) {
     cluster.on('exit', (worker, code, signal) => {
         logger.warn(`Worker process with id ${worker.process.pid} has exited with code ${code} and signal ${signal}`);
     });
+
+    // TODO: Secure metrics endpoint
+    metricsServer.get('/metrics', async (req: any, res: any) => {
+		try {
+            const metrics = await aggregatorRegistry.clusterMetrics();
+            res.set('Content-Type', aggregatorRegistry.contentType);
+			res.send(metrics);
+		} catch (ex) {
+			res.statusCode = 500;
+			res.send(ex.message);
+		}
+	});
+
+	metricsServer.listen(3001);
+	logger.info(
+		'Cluster metrics server listening to port 3001, metrics exposed on /metrics',
+	);
 
 } else {
 

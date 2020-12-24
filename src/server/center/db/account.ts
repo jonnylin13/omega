@@ -8,6 +8,6 @@ export class AccountDB {
             .where({name: username})
             .select('id', 'password', 'gender', 'banned', 'pic', 'pin', 'character_slots', 'tos', 'language');
         if (records.length > 0) return records[0];
-        else return records;
+        else return undefined;
     }
 }

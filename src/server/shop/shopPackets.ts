@@ -1,5 +1,5 @@
-import { PacketWriter } from '../../protocol/packet/packetWriter';
-import { CommonSendOpcode } from '../../protocol/opcode/common/send';
+import { PacketWriter } from '../../protocol/packets/packetWriter';
+import { CommonSendOpcode } from '../../protocol/opcodes/common/send';
 import { ServerType } from '../baseServer';
 
 

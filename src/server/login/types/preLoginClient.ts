@@ -3,4 +3,5 @@ export interface PreLoginClient {
     password: string;
     hwidNibbles: string;
     attempts: number;
+    sessionId: number;
 }
