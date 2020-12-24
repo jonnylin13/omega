@@ -1,6 +1,5 @@
 import * as net from 'net';
-import * as winston from 'winston';
-import { ServerType, WINSTON_FORMAT } from "../baseServer";
+import { ServerType } from "../baseServer";
 import { BaseServer } from "../baseServer";
 import { PacketDelegator } from "../baseDelegator";
 import { PacketReader } from "../../protocol/packets/packetReader";
@@ -16,14 +15,6 @@ import { Shanda } from '../../protocol/crypto/shanda';
 
 export class LoginServer extends BaseServer {
 
-    static logger: winston.Logger = winston.createLogger({
-        format: WINSTON_FORMAT,
-        transports: [
-            new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-            new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }),
-            new winston.transports.Console({ level: 'debug' })
-        ]
-    });
 
     centerServerSession: Session;
     connected: boolean = false;
@@ -59,10 +50,10 @@ export class LoginServer extends BaseServer {
     onConnection(session: Session): void {
         if (this.isCenterServer(session)) {
             this.connected = true;
-            LoginServer.logger.info(`LoginServer has established CenterServer connection`);
+            this.logger.info(`LoginServer has established CenterServer connection`);
         } else {
             // MapleStory client connection
-            LoginServer.logger.info(`LoginServer received a client connection from ${session.remoteAddress}`);
+            this.logger.info(`LoginServer received a client connection from ${session.remoteAddress}`);
             let ivRecv = Crypto.generateIv();
             let ivSend = Crypto.generateIv();
             const sendCypher = new AES(ivSend, 83);
@@ -77,13 +68,13 @@ export class LoginServer extends BaseServer {
         if (this.isCenterServer(session)) {
             this.connected = false;
             delete this.centerServerSession;
-            LoginServer.logger.error(`LoginServer disconnected from CenterServer`);
+            this.logger.error(`LoginServer disconnected from CenterServer`);
             // TODO: Retry connection ???
         } else {
             // Clear local stores
             if (this.preLoginStore.has(session.id)) this.preLoginStore.delete(session.id);
             if (this.sessionStore.has(session.id)) this.sessionStore.delete(session.id);
-            LoginServer.logger.info(`Session ${session.id} disconnected from LoginServer`);
+            this.logger.info(`Session ${session.id} disconnected from LoginServer`);
         }
     }
 
@@ -95,15 +86,15 @@ export class LoginServer extends BaseServer {
             const packetHandler = this.packetDelegator.getHandler(opcode);
 
             if (packetHandler === undefined) {
-                LoginServer.logger.warn(`LoginServer unhandled packet 0x${opcode.toString(16)} from CenterServer`);
+                this.logger.warn(`LoginServer unhandled packet 0x${opcode.toString(16)} from CenterServer`);
                 return;
             }
-            LoginServer.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from CenterServer`);
+            this.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from CenterServer`);
             packetHandler.handlePacket(packet, session);
         } else {
             if (!this.sessionStore.has(session.id)) {
                 // Never reached
-                LoginServer.logger.warn(`LoginServer received a packet from ${session.remoteAddress} before session could be registered`);
+                this.logger.warn(`LoginServer received a packet from ${session.remoteAddress} before session could be registered`);
                 return;
             }
 
@@ -117,27 +108,27 @@ export class LoginServer extends BaseServer {
             const opcode = packet.readShort();
 
             if (opcode >= 0x200) {
-                LoginServer.logger.warn(`Potential malicious attack to LoginServer from ${session.remoteAddress} packet id 0x${opcode.toString(16)}`);
+                this.logger.warn(`Potential malicious attack to LoginServer from ${session.remoteAddress} packet id 0x${opcode.toString(16)}`);
                 session.destroy();
                 return;
             }
             
             const packetHandler = this.packetDelegator.getHandler(opcode);
             if (packetHandler === undefined) {
-                LoginServer.logger.warn(`LoginServer unhandled packet 0x${opcode.toString(16)} from client`);
+                this.logger.warn(`LoginServer unhandled packet 0x${opcode.toString(16)} from client`);
                 return;
             }
-            LoginServer.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+            this.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
             packetHandler.handlePacket(packet, session);
         }
     }
 
     onError(error: any): void {
-        LoginServer.logger.error(error.message);
+        this.logger.error(error.message);
     }
 
     onStart(): void {
-        LoginServer.logger.info(`LoginServer has started listening on port ${this.port}`);
+        this.logger.info(`LoginServer has started listening on port ${this.port}`);
     }
 
     onShutdown(): void {

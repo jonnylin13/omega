@@ -2,11 +2,7 @@ import * as net from 'net';
 import { Session } from './session';
 import * as winston from 'winston';
 import { PacketDelegator } from './baseDelegator';
-
-export const WINSTON_FORMAT = winston.format.combine(
-    winston.format.colorize(),
-    winston.format.simple()
-);
+import { customFormat } from '../..';
 
 export enum ServerType {
     CENTER, LOGIN, CHANNEL, SHOP
@@ -15,6 +11,8 @@ export enum ServerType {
 
 export abstract class BaseServer {
 
+    loggerFormat: winston.Logform.Format;
+    logger: winston.Logger;
     protected port: number;
     private online: boolean = false;
     protected type: ServerType;
@@ -25,6 +23,19 @@ export abstract class BaseServer {
     constructor(type: ServerType, port: number) {
         this.port = port;
         this.type = type;
+        this.loggerFormat = winston.format.combine(
+            winston.format.label({ label: ServerType[this.type] }),
+            winston.format.colorize(),
+            customFormat
+        );
+        this.logger = winston.createLogger({
+            format: this.loggerFormat,
+            transports: [
+                new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
+                new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }),
+                new winston.transports.Console({ level: 'debug' })
+            ]
+        });
         this.start();
     }
 

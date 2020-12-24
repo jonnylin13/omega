@@ -1,7 +1,6 @@
 import { Session } from "../session";
-import * as winston from 'winston';
 import { PacketDelegator } from "../baseDelegator";
-import { BaseServer, ServerType, WINSTON_FORMAT } from "../baseServer";
+import { BaseServer, ServerType } from "../baseServer";
 import { CenterPackets } from "./centerPackets";
 import { PacketReader } from "../../protocol/packets/packetReader";
 import { CenterServerDelegator } from "./centerServerDelegator";
@@ -26,14 +25,6 @@ setInterval(() => {
 
 export class CenterServer extends BaseServer {
 
-    static logger: winston.Logger = winston.createLogger({
-        format: WINSTON_FORMAT,
-        transports: [
-            new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-            new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }),
-            new winston.transports.Console({ level: 'debug' })
-        ]
-    });
 
     loginServerSessionId: number;
     shopServerSessionId: number;
@@ -56,7 +47,7 @@ export class CenterServer extends BaseServer {
     onConnection(session: Session): void {
         // WorkerServer connection
         // Send handshake to establish ServerType
-        CenterServer.logger.info(`CenterServer received a worker connection from ${session.remoteAddress}`);
+        this.logger.info(`CenterServer received a worker connection from ${session.remoteAddress}`);
         this.workerSessionStore.add(session.id);
         session.write(CenterPackets.getWorkerHandshake());
     }
@@ -76,16 +67,16 @@ export class CenterServer extends BaseServer {
             // WorkerServer packet
 
             if (!this.isWorker(session)) {
-                CenterServer.logger.warn(`Potential malicious attack to CenterServer from ${session.remoteAddress}`);
+                this.logger.warn(`Potential malicious attack to CenterServer from ${session.remoteAddress}`);
                 session.destroy();
                 return;
             }
             const packetHandler = this.packetDelegator.getHandler(opcode);
             if (packetHandler === undefined) {
-                CenterServer.logger.warn(`CenterServer unhandled packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+                this.logger.warn(`CenterServer unhandled packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
                 return;
             }
-            CenterServer.logger.debug(`CenterServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+            this.logger.debug(`CenterServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
             packetHandler.handlePacket(packet, session);
 
         }
@@ -96,7 +87,7 @@ export class CenterServer extends BaseServer {
     }
 
     onStart(): void {
-        CenterServer.logger.info(`CenterServer is listening on port ${this.port}`);
+        this.logger.info(`CenterServer is listening on port ${this.port}`);
     }
 
     onShutdown(): void {

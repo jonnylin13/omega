@@ -10,13 +10,13 @@ export class CenterHandshakeAckHandler implements PacketHandler {
         const serverType = packet.readByte();
         if (ServerType[serverType] === 'LOGIN') {
             CenterServer.instance.loginServerSessionId = session.id;
-            CenterServer.logger.info(`CenterServer registered a LoginServer with session id ${session.id}`);
+            CenterServer.instance.logger.info(`CenterServer registered a LoginServer with session id ${session.id}`);
         } else if (ServerType[serverType] === 'SHOP') {
             CenterServer.instance.shopServerSessionId = session.id;
-            CenterServer.logger.info(`CenterServer registered a ShopServer with session id ${session.id}`);
+            CenterServer.instance.logger.info(`CenterServer registered a ShopServer with session id ${session.id}`);
         } else if (ServerType[serverType] === 'CHANNEL') return;
         else {
-            CenterServer.logger.warn(`CenterServer tried to register a server of type ${serverType}`);
+            CenterServer.instance.logger.warn(`CenterServer tried to register a server of type ${serverType}`);
             return;
         }
     }

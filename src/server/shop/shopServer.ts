@@ -1,6 +1,5 @@
 import * as net from 'net';
-import * as winston from 'winston';
-import { ServerType, WINSTON_FORMAT } from "../baseServer";
+import { ServerType } from "../baseServer";
 import { BaseServer } from "../baseServer";
 import { PacketDelegator } from "../baseDelegator";
 import { PacketReader } from "../../protocol/packets/packetReader";
@@ -9,15 +8,6 @@ import { Session } from "../session";
 
 
 export class ShopServer extends BaseServer{
-
-    static logger: winston.Logger = winston.createLogger({
-        format: WINSTON_FORMAT,
-        transports: [
-            new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
-            new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }),
-            new winston.transports.Console({ level: 'debug' })
-        ]
-    });
 
     centerServerSession: Session;
     connected: boolean = false;
@@ -48,7 +38,7 @@ export class ShopServer extends BaseServer{
     onConnection(session: Session): void {
         // TODO: Authenticate with one-time generated key
         this.connected = true;
-        ShopServer.logger.info(`ShopServer has established CenterServer connection`);
+        this.logger.info(`ShopServer has established CenterServer connection`);
     }
 
     onClose(session: Session, hadError: any): void {
@@ -69,11 +59,11 @@ export class ShopServer extends BaseServer{
             const packetHandler = this.packetDelegator.getHandler(opcode);
             if (packetHandler === undefined) {
 
-                ShopServer.logger.debug(`ShopServer unhandled packet 0x${opcode.toString(16)} from CenterServer`);
+                this.logger.debug(`ShopServer unhandled packet 0x${opcode.toString(16)} from CenterServer`);
                 return;
             }
 
-            ShopServer.logger.debug(`ShopServer handling packet 0x${opcode.toString(16)} from CenterServer`);
+            this.logger.debug(`ShopServer handling packet 0x${opcode.toString(16)} from CenterServer`);
             packetHandler.handlePacket(packet, this.centerServerSession);
         } else {
             // Potential malicious attack?
@@ -85,7 +75,7 @@ export class ShopServer extends BaseServer{
     }
 
     onStart(): void {
-        ShopServer.logger.info(`ShopServer has started listening on port ${this.port}`);
+        this.logger.info(`ShopServer has started listening on port ${this.port}`);
     }
 
     onShutdown(): void {

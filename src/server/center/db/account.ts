@@ -1,4 +1,4 @@
-import { LoginServer } from "../../login/loginServer";
+import { CenterServer } from "../centerServer";
 import { Database } from "./database";
 
 
@@ -13,7 +13,7 @@ export class AccountDB {
             if (records.length > 0) return records[0];
             else return undefined;
         } catch (err) {
-            LoginServer.logger.error(err);
+            CenterServer.instance.logger.error(err);
         }
     }
 }

@@ -1,7 +1,6 @@
 import { CenterServer } from "./src/server/center/centerServer";
 import { LoginServer } from "./src/server/login/loginServer";
 import * as winston from 'winston';
-import { WINSTON_FORMAT } from "./src/server/baseServer";
 import * as cluster from 'cluster';
 import { ShopServer } from "./src/server/shop/shopServer";
 
@@ -12,8 +11,16 @@ import { AggregatorRegistry } from 'prom-client';
 
 const aggregatorRegistry = new AggregatorRegistry();
 
+export const customFormat = winston.format.printf(({level, message, label}) => {
+    return `[${label}] ${level}: ${message}`;
+})
+
 const logger = winston.createLogger({
-    format: WINSTON_FORMAT,
+    format: winston.format.combine(
+        winston.format.label({ label: 'BOOT' }),
+        winston.format.colorize(),
+        customFormat
+    ),
     transports: [
         new winston.transports.File({ filename: 'logs/error.log', level: 'error' }),
         new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }),
@@ -65,7 +72,7 @@ if (cluster.isMaster) {
 
 	metricsServer.listen(3001);
 	logger.info(
-		'Cluster metrics server listening to port 3001, metrics exposed on /metrics',
+		'Cluster metrics server listening on port 3001, metrics exposed on /metrics',
 	);
 
 } else {
