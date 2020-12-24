@@ -47,11 +47,13 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
         const encSession = LoginServer.instance.sessionStore.get(sessionId);
 
         if (!preLoginClient || !encSession) {
+            LoginServer.logger.warn(`Could not fetch preLoginClient or encryptedSession from LoginServer stores`);
             return; // Something went wrong
         }
 
         if (!found) {
             // Account not found
+            LoginServer.logger.debug(`Username ${username} not found when attempting login`);
             encSession.write(LoginPackets.getLoginFailed(5));
             return;
         }

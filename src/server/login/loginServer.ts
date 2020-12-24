@@ -83,6 +83,7 @@ export class LoginServer extends BaseServer {
             // Clear local stores
             if (this.preLoginStore.has(session.id)) this.preLoginStore.delete(session.id);
             if (this.sessionStore.has(session.id)) this.sessionStore.delete(session.id);
+            LoginServer.logger.info(`Session ${session.id} disconnected from LoginServer`);
         }
     }
 
@@ -132,7 +133,7 @@ export class LoginServer extends BaseServer {
     }
 
     onError(error: any): void {
-        throw new Error("Method not implemented.");
+        LoginServer.logger.error(error.message);
     }
 
     onStart(): void {

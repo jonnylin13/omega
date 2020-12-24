@@ -37,14 +37,14 @@ export class AES {
         this.cipher = crypto.createCipheriv('aes-256-ecb', key, null);
     }
 
-    static multiplyIV(iv: Buffer, count: number = 4, multiply: number = 4): Buffer {
+    private multiplyIV(iv: Buffer, count: number = 4, multiply: number = 4): Buffer {
         let ret = Buffer.alloc(count * multiply);
         for (let i = 0; i < count * multiply; i++)
             ret[i] = iv[i % count];
         return ret;
     }
 
-    static morphIV(iv: Buffer): Buffer {
+    private morphIV(iv: Buffer): Buffer {
         const newSequence = Buffer.from([0xf2, 0x53, 0x50, 0xc6]);
         for (let i = 0; i < 4; i++) {
             const input = iv[i];
@@ -89,7 +89,7 @@ export class AES {
         let chunk_length = 0x5B0;
         let start = 0;
         while (remaining > 0) {
-            let my_iv = AES.multiplyIV(this.iv, 4, 4);
+            let my_iv = this.multiplyIV(this.iv, 4, 4);
             if (remaining < chunk_length) {
                 chunk_length = remaining;
             }
@@ -103,7 +103,7 @@ export class AES {
             remaining -= chunk_length;
             chunk_length = 0x5B4;
         }
-        this.iv = AES.morphIV(this.iv);
+        this.iv = this.morphIV(this.iv);
         return data;
     }
 
