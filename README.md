@@ -5,8 +5,8 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 * Familiar development environment
 * Uses a microservice architecture where state is decoupled into center, login, shop, and channel servers
 * Can be run in a cluster of processes, or each service can be run independently on a different machine
-* Uses token-based authentication for intra-server communication
-* Uses multi-threading to delegate compute-heavy tasks
+* Uses token-based authentication for intraserver communication
+* Uses multithreading to delegate compute-heavy tasks
 * Advanced metrics with Prometheus
 
 ## Setup and contribution
@@ -64,10 +64,12 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 * [ ] Implement WZ loading
     * [ ] Parse a single WZ XML file
     * [ ] Parse a WZ directory
+* [ ] Scripting engine
+* [ ] Anti-cheat measures
 * [x] Implement database layer
 * [x] Implement logging
 * [ ] Implement configuration
-* [x] Implement prometheus (performance benchmarking/metrics)
+* [x] Implement Prometheus (performance benchmarking/metrics)
 
 ### Long goals
 * [x] Design cluster system to fork worker processes
