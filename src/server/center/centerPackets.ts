@@ -12,11 +12,11 @@ export class CenterPackets {
     }
 
     static getPreLoginPasswordAck(found: boolean, obj: any) {
-        const packetLength = (found ? obj.password.length + obj.pin.length + obj.pic.length + 14 : 0) + 9 + obj.username.length;
+        const packetLength = (found ? obj.password.length + obj.pin.length + obj.pic.length + 15 : 0) + 7;
         const packet = new PacketWriter(packetLength);
-        packet.writeShort(CenterSendOpcode.PRE_LOGIN_PASSWORD_ACK.getValue());
-        packet.writeBoolean(found);
+        packet.writeShort(CenterSendOpcode.PRE_LOGIN_ACK.getValue());
         packet.writeInt(obj.sessionId);
+        packet.writeBoolean(found);
         if (found) {
             packet.writeInt(obj.id);
             packet.writeMapleAsciiString(obj.password);
@@ -29,8 +29,25 @@ export class CenterPackets {
             packet.writeByte(obj.language);
             return packet.getPacket();
         }
+        return packet.getPacket();
+    }
 
-        packet.writeMapleAsciiString(obj.username);
+    static getAutoRegisterAck(sessionId: number, result: any): Buffer {
+        const packet = new PacketWriter((result !== undefined ? result.password.length + result.pin.length + result.pic.length + 15 : 0) + 7);
+        packet.writeShort(CenterSendOpcode.AUTO_REGISTER_ACK.getValue());
+        packet.writeInt(sessionId);
+        packet.writeBoolean(result !== undefined); // Success
+        if (result !== undefined) {
+            packet.writeInt(result.id);
+            packet.writeMapleAsciiString(result.password);
+            packet.writeByte(result.gender);
+            packet.writeBoolean(result.banned);
+            packet.writeMapleAsciiString(result.pin);
+            packet.writeMapleAsciiString(result.pic);
+            packet.writeByte(result.character_slots);
+            packet.writeBoolean(result.tos);
+            packet.writeByte(result.language);
+        }
         return packet.getPacket();
     }
 }

@@ -16,7 +16,7 @@ export class LoginPackets {
     }
 
     static getLoginHandshake(mapleVersion: number, ivRecv: Buffer, ivSend: Buffer): Buffer {
-        const packet = new PacketWriter(16);
+        const packet = new PacketWriter(18);
         packet.writeShort(14); // Packet length
         packet.writeShort(mapleVersion); // Major version
         packet.writeMapleAsciiString('1'); // Patch string (minor version)
@@ -27,8 +27,8 @@ export class LoginPackets {
     }
 
     static getPreLoginRequest(preLoginClient: PreLoginClient): Buffer {
-        const packet = new PacketWriter(6 + preLoginClient.username.length);
-        packet.writeShort(LoginSendOpcode.PRE_LOGIN_REQUEST.getValue());
+        const packet = new PacketWriter(8 + preLoginClient.username.length);
+        packet.writeShort(LoginSendOpcode.PRE_LOGIN.getValue());
         packet.writeInt(preLoginClient.sessionId);
         packet.writeMapleAsciiString(preLoginClient.username);
         return packet.getPacket();
@@ -40,6 +40,15 @@ export class LoginPackets {
         packet.writeByte(reason);
         packet.writeByte(0);
         packet.writeInt(0);
+        return packet.getPacket();
+    }
+
+    static getAutoRegister(sessionId: number, username: string, hashedPassword: string): Buffer {
+        const packet = new PacketWriter(10 + username.length + hashedPassword.length);
+        packet.writeShort(LoginSendOpcode.AUTO_REGISTER.getValue());
+        packet.writeInt(sessionId);
+        packet.writeMapleAsciiString(username);
+        packet.writeMapleAsciiString(hashedPassword);
         return packet.getPacket();
     }
 

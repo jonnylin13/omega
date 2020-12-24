@@ -5,6 +5,7 @@ import { Session } from "../../session";
 import { LoginPackets } from "../loginPackets";
 import * as bcrypt from 'bcrypt';
 import { Config } from "../../../util/config";
+import { LoginService } from "../loginService";
 
 
 export class PreLoginPasswordHandler implements PacketHandler {
@@ -40,9 +41,8 @@ export class PreLoginPasswordHandler implements PacketHandler {
 export class PreLoginPasswordAckHandler implements PacketHandler {
     async handlePacket(packet: PacketReader, session: Session): Promise<void> {
 
-        const found = packet.readBoolean();
         const sessionId = packet.readInt();
-        const username = packet.readMapleAsciiString();
+        const found = packet.readBoolean();
         const preLoginClient = LoginServer.instance.preLoginStore.get(sessionId);
         const encSession = LoginServer.instance.sessionStore.get(sessionId);
 
@@ -55,25 +55,19 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
             // Account not found
             if (Config.instance.login.useAutoRegister) {
                 // Write AutoRegister packet to CenterServer using username and password
-                LoginServer.instance.logger.info(`Auto register`);
+                LoginServer.instance.logger.info(`Auto registering ${preLoginClient.username}`);
+                const hashedPassword = bcrypt.hashSync(preLoginClient.password, 12);
+                session.write(LoginPackets.getAutoRegister(sessionId, preLoginClient.username, hashedPassword));
                 return;
             }
-            LoginServer.instance.logger.debug(`Username ${username} not found when attempting login`);
+            LoginServer.instance.logger.debug(`Username ${preLoginClient.username} not found when attempting login`);
             encSession.write(LoginPackets.getLoginFailed(5));
             return;
         }
 
         // Parse the information
         // TODO: Check if all these fields are necessary
-        const id = packet.readInt();
-        const hashedPassword = packet.readMapleAsciiString();
-        const gender = packet.readByte();
-        const banned = packet.readBoolean();
-        const pin = packet.readMapleAsciiString();
-        const pic = packet.readMapleAsciiString();
-        const character_slots = packet.readByte();
-        const tos = packet.readBoolean();
-        const language = packet.readByte();
+        const {id, hashedPassword, gender, banned, pin, pic, character_slots, tos, language} = LoginService.readPreLoginInfo(packet);
 
         // TODO: Check if ip banned or mac banned or temp banned
         if (banned) return; // TODO: Return correct ban message
@@ -94,4 +88,18 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
         // Success
         // TODO: Return authentication success packet
     }
+}
+
+export class AutoRegisterAckHandler implements PacketHandler {
+    handlePacket(packet: PacketReader, session: Session): void {
+        const sessionId = packet.readInt();
+        const success = packet.readBoolean();
+        if (!success) {
+            // Something went wrong
+            return;
+        }
+        const {id, hashedPassword, gender, banned, pin, pic, character_slots, tos, language} = LoginService.readPreLoginInfo(packet);
+        // Continue login here
+    }
+    
 }

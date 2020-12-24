@@ -3,7 +3,8 @@
 export class CenterSendOpcode {
 
     static WORKER_HANDSHAKE = new CenterSendOpcode(0x200);
-    static PRE_LOGIN_PASSWORD_ACK = new CenterSendOpcode(0x201);
+    static PRE_LOGIN_ACK = new CenterSendOpcode(0x201);
+    static AUTO_REGISTER_ACK = new CenterSendOpcode(0x202);
 
     private code: number;
 
