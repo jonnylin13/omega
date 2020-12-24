@@ -15,6 +15,7 @@ export class CenterPackets {
         const packet = new PacketWriter(found ? 1 : 0);
         packet.writeShort(CenterSendOpcode.PRE_LOGIN_PASSWORD_ACK.getValue());
         packet.writeBoolean(found);
+        packet.writeInt(obj.sessionId);
         if (found) {
             packet.writeMapleAsciiString(obj.username);
             packet.writeInt(obj.id);
@@ -28,7 +29,7 @@ export class CenterPackets {
             packet.writeByte(obj.language);
             return packet.getPacket();
         }
-        packet.writeBoolean(found);
+
         packet.writeMapleAsciiString(obj.username);
         return packet.getPacket();
     }

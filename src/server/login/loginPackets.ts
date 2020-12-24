@@ -27,8 +27,9 @@ export class LoginPackets {
     }
 
     static getPreLoginRequest(preLoginClient: PreLoginClient): Buffer {
-        const packet = new PacketWriter(2 + preLoginClient.password.length + preLoginClient.username.length + preLoginClient.hwidNibbles.length);
+        const packet = new PacketWriter(6 + preLoginClient.username.length);
         packet.writeShort(LoginSendOpcode.PRE_LOGIN_REQUEST.getValue());
+        packet.writeInt(preLoginClient.sessionId);
         packet.writeMapleAsciiString(preLoginClient.username);
         return packet.getPacket();
     }
