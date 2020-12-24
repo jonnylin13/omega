@@ -2,12 +2,12 @@
 v83 MapleStory Server emulator written in TypeScript. Inspired by projects like [HeavenMS](https://github.com/ronancpl/HeavenMS).
 
 ## Features
-* Familiar development environment
+* Easy development environment
 * Uses a microservice architecture where state is decoupled into center, login, shop, and channel servers
 * Can be run in a cluster of processes, or each service can be run independently on a different machine
 * Uses token-based authentication for intraserver communication
 * Uses multithreading to delegate compute-heavy tasks
-* Advanced metrics with Prometheus
+* Advanced metrics using Prometheus
 
 ## Setup and contribution
 * Fork the repository
@@ -15,7 +15,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 
 ## Convention
 * Class names will use PascalCase
-* Filenames, function, and variable names will use camelCase
+* Filenames, functions, and variable names will use camelCase
 * SQL tables and columns will use snake_case
 * Tests will be written as `*.test.ts` and placed in the `test/` directory
 
@@ -69,7 +69,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 * [x] Implement database layer
 * [x] Implement logging
 * [ ] Implement configuration
-* [x] Implement Prometheus (performance benchmarking/metrics)
+* [x] Integrate Prometheus (performance benchmarking/metrics)
 
 ### Long goals
 * [x] Design cluster system to fork worker processes
