@@ -33,6 +33,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 ### Milestones
 * [ ] Login
     * [x] Get to login screen (handshake)
+    * [x] Auto register
     * [ ] Password verification
     * [ ] Accept TOS
     * [ ] Register gender
