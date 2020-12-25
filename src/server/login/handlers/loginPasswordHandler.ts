@@ -47,7 +47,7 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
         const encSession = LoginServer.instance.sessionStore.get(sessionId);
 
         if (!preLoginClient || !encSession) {
-            LoginServer.instance.logger.warn(`Could not fetch preLoginClient or encryptedSession from LoginServer stores`);
+            LoginServer.instance.logger.warn(`Could not fetch PreLoginClient or EncryptedSession for session ${sessionId}`);
             return; // Something went wrong
         }
 
@@ -67,26 +67,9 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
 
         // Parse the information
         // TODO: Check if all these fields are necessary
-        const {id, hashedPassword, gender, banned, pin, pic, character_slots, tos, language} = LoginService.readPreLoginInfo(packet);
-
-        // TODO: Check if ip banned or mac banned or temp banned
-        if (banned) return; // TODO: Return correct ban message
-
-        // TODO: Check if multiclient
+        const loginInfo = LoginService.readLoginInfo(packet);
+        LoginService.login(preLoginClient, encSession, loginInfo);
         
-        if (!tos) encSession.write(LoginPackets.getLoginFailed(23));
-
-        // Compare password
-        const success = await bcrypt.compare(preLoginClient.password, hashedPassword);
-        if (!success) {
-            // Wrong password
-            encSession.write(LoginPackets.getLoginFailed(4));
-            return;
-        }
-        // TODO: Check if already logged in
-
-        // Success
-        // TODO: Return authentication success packet
     }
 }
 
@@ -94,12 +77,24 @@ export class AutoRegisterAckHandler implements PacketHandler {
     handlePacket(packet: PacketReader, session: Session): void {
         const sessionId = packet.readInt();
         const success = packet.readBoolean();
+
         if (!success) {
             // Something went wrong
             return;
         }
-        const {id, hashedPassword, gender, banned, pin, pic, character_slots, tos, language} = LoginService.readPreLoginInfo(packet);
+
+        const preLoginClient = LoginServer.instance.preLoginStore.get(sessionId);
+        const encSession = LoginServer.instance.sessionStore.get(sessionId);
+
+        if (!preLoginClient || !encSession) {
+            LoginServer.instance.logger.warn(`Could not fetch PreLoginClient or EncryptedSession for session ${sessionId}`);
+            return;
+        }
+
+        const loginInfo = LoginService.readLoginInfo(packet);
         // Continue login here
+
+        LoginService.login(preLoginClient, encSession, loginInfo);
     }
     
 }
