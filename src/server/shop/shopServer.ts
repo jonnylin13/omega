@@ -1,39 +1,20 @@
-import * as net from 'net';
 import { ServerType } from "../baseServer";
-import { BaseServer } from "../baseServer";
-import { PacketDelegator } from "../baseDelegator";
 import { PacketReader } from "../../protocol/packets/packetReader";
 import { ShopServerPacketDelegator } from "./shopServerDelegator";
 import { Session } from "../session";
 import { Config } from '../../util/config';
+import { WorkerServer } from '../workerServer';
 
 
-export class ShopServer extends BaseServer{
+export class ShopServer extends WorkerServer {
 
-    centerServerSession: Session;
-    connected: boolean = false;
-    packetDelegator: PacketDelegator;
     static instance: ShopServer;
 
     constructor() {
         super(ServerType.SHOP, Config.instance.shop.host, Config.instance.shop.port);
         // Establish connection with CenterServer
         this.packetDelegator = new ShopServerPacketDelegator();
-        this.centerServerSession = (net.connect({ port: 8483 }) as Session);
-        this.centerServerSession.id = -1;
-        this.centerServerSession.on('connect', () => this.onConnection(this.centerServerSession));
-        this.centerServerSession.on('data', (data: Buffer) => this.onData(this.centerServerSession, data));
-        this.centerServerSession.on('close', (hadError: boolean) => this.onClose(this.centerServerSession, hadError));
-        this.centerServerSession.on('error', (error: any) => this.onError(error));
         ShopServer.instance = this;
-    }
-
-    isCenterServer(session: Session) {
-        return this.centerServerSession.id === session.id;
-    }
-
-    isConnected(): boolean {
-        return this.connected && (this.centerServerSession !== undefined);
     }
 
     onConnection(session: Session): void {

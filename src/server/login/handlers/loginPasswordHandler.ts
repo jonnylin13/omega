@@ -94,7 +94,7 @@ export class AutoRegisterAckHandler implements PacketHandler {
         const loginInfo = LoginService.readLoginInfo(packet);
         // Continue login here
 
-        LoginService.login(preLoginClient, encSession, loginInfo);
+        LoginService.login(preLoginClient, encSession, loginInfo, true);
     }
     
 }

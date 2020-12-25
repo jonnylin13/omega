@@ -23,25 +23,28 @@ export class LoginService {
 
     }
 
-    static async login(preLoginClient: PreLoginClient, encSession: EncryptedSession, loginInfo: any) {
+    static async login(preLoginClient: PreLoginClient, encSession: EncryptedSession, loginInfo: any, autoRegister: boolean = false) {
 
         const {id, hashedPassword, gender, banned, pin, pic, character_slots, tos, language} = loginInfo;
 
-        // TODO: Check if ip banned or mac banned or temp banned
-        if (banned) return; // TODO: Return correct ban message
+        if (!autoRegister) {
+            // TODO: Check if ip banned or mac banned or temp banned
+            if (banned) return; // TODO: Return correct ban message
 
-        // TODO: Check if multiclient
-        
-        if (!tos) encSession.write(LoginPackets.getLoginFailed(23));
+            // TODO: Check if multiclient
+            
+            if (!tos) encSession.write(LoginPackets.getLoginFailed(23));
 
-        // Compare password
-        const success = await bcrypt.compare(preLoginClient.password, hashedPassword);
-        if (!success) {
-            // Wrong password
-            encSession.write(LoginPackets.getLoginFailed(4));
-            return;
+            // Compare password
+            const success = await bcrypt.compare(preLoginClient.password, hashedPassword);
+            if (!success) {
+                // Wrong password
+                encSession.write(LoginPackets.getLoginFailed(4));
+                return;
+            }
+            // TODO: Check if already logged in
+            
         }
-        // TODO: Check if already logged in
 
         // Success
         // TODO: Return authentication success packet

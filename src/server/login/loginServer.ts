@@ -12,40 +12,22 @@ import { PreLoginClient } from './types/preLoginClient';
 import { LoginPackets } from './loginPackets';
 import { Shanda } from '../../protocol/crypto/shanda';
 import { Config } from '../../util/config';
+import { WorkerServer } from '../workerServer';
 
 
-export class LoginServer extends BaseServer {
+export class LoginServer extends WorkerServer {
 
 
-    centerServerSession: Session;
-    connected: boolean = false;
-    packetDelegator: PacketDelegator;
+    static instance: LoginServer;
 
     preLoginStore: Map<number, PreLoginClient> = new Map();
     sessionStore: Map<number, EncryptedSession> = new Map();
-
-    static instance: LoginServer;
 
     constructor() {
         super(ServerType.LOGIN, Config.instance.login.host, Config.instance.login.port);
         // Establish connection with CenterServer
         this.packetDelegator = new LoginServerPacketDelegator();
-        this.centerServerSession = (net.connect({ port: 8483 }) as Session);
-        this.centerServerSession.id = -1;
-        this.centerServerSession.setKeepAlive(true);
-        this.centerServerSession.on('connect', () => this.onConnection(this.centerServerSession));
-        this.centerServerSession.on('data', (data: Buffer) => this.onData(this.centerServerSession, data));
-        this.centerServerSession.on('close', (hadError: boolean) => this.onClose(this.centerServerSession, hadError));
-        this.centerServerSession.on('error', (err: any) => this.onError(err));
         LoginServer.instance = this;
-    }
-
-    isCenterServer(session: Session) {
-        return this.centerServerSession.id === session.id;
-    }
-
-    isConnected(): boolean {
-        return this.connected && (this.centerServerSession !== undefined);
     }
 
     onConnection(session: Session): void {
