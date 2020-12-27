@@ -6,6 +6,7 @@ import { LoginPackets } from "../loginPackets";
 import * as bcrypt from 'bcrypt';
 import { Config } from "../../../util/config";
 import { LoginService } from "../loginService";
+import { PreLoginClient } from "../types/preLoginClient";
 
 
 export class PreLoginPasswordHandler implements PacketHandler {
@@ -29,7 +30,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
                 return;
             }
         } else {
-            preLoginClient = {username: username, password: password, hwidNibbles: hwidNibbles, attempts: 1, sessionId: session.id};
+            preLoginClient = {username: username, password: password, hwidNibbles: hwidNibbles, attempts: 1, sessionId: session.id} as PreLoginClient;
             LoginServer.instance.preLoginStore.set(session.id, preLoginClient);
         }
 
@@ -92,8 +93,6 @@ export class AutoRegisterAckHandler implements PacketHandler {
         }
 
         const loginInfo = LoginService.readLoginInfo(packet);
-        // Continue login here
-
         LoginService.login(preLoginClient, encSession, loginInfo, true);
     }
     

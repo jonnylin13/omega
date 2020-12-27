@@ -4,6 +4,8 @@ import { ServerType } from '../baseServer';
 import { LoginSendOpcode } from '../../protocol/opcodes/login/send';
 import { PreLoginClient } from './types/preLoginClient';
 import { MapleSendOpcode } from '../../protocol/opcodes/maple/send';
+import { LoginClient } from './types/loginClient';
+import { Config } from '../../util/config';
 
 
 export class LoginPackets {
@@ -52,8 +54,33 @@ export class LoginPackets {
         return packet.getPacket();
     }
 
-    static getAuthSuccess(): Buffer {
-        return null; // TODO
+    static getAuthSuccess(loginClient: LoginClient): Buffer {
+        const packet = new PacketWriter();
+        packet.writeShort(MapleSendOpcode.LOGIN_STATUS.getValue());
+        packet.writeInt(0);
+        packet.writeShort(0);
+        packet.writeInt(loginClient.id);
+        packet.writeByte(loginClient.gender);
+        
+        const canFly = true; // TODO
+
+        packet.writeBoolean((Config.instance['game']['enforce_admin_account'] || canFly) ? loginClient.gm > 1 : false);
+        packet.writeByte(((Config.instance['game']['enforce_admin_account'] || canFly) && loginClient.gm > 1) ? 0x80 : 0);
+        packet.writeByte(0); // Country Code.
+        
+        packet.writeMapleAsciiString(loginClient.name);
+        packet.writeByte(0);
+        
+        packet.writeByte(0); // IsQuietBan
+        packet.writeLong(BigInt(0));//IsQuietBanTimeStamp
+        packet.writeLong(BigInt(0)); //CreationTimeStamp
+
+        packet.writeInt(1); // 1: Remove the "Select the world you want to play in"
+        
+        packet.writeByte(Config.instance.game.enable_pin ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+        packet.writeByte(Config.instance.game.enable_pic ? ((loginClient.pic === null || loginClient.pic === undefined || loginClient.pic === '') ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
+        
+        return packet.getPacket();
     }
 
 }

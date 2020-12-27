@@ -1,7 +1,4 @@
-import * as net from 'net';
 import { ServerType } from "../baseServer";
-import { BaseServer } from "../baseServer";
-import { PacketDelegator } from "../baseDelegator";
 import { PacketReader } from "../../protocol/packets/packetReader";
 import { LoginServerPacketDelegator } from "./loginServerDelegator";
 import { Session } from "../session";
@@ -13,6 +10,8 @@ import { LoginPackets } from './loginPackets';
 import { Shanda } from '../../protocol/crypto/shanda';
 import { Config } from '../../util/config';
 import { WorkerServer } from '../workerServer';
+import { LoginClient } from "./types/loginClient";
+import { isThisTypeNode, textChangeRangeIsUnchanged } from "typescript";
 
 
 export class LoginServer extends WorkerServer {
@@ -21,6 +20,7 @@ export class LoginServer extends WorkerServer {
     static instance: LoginServer;
 
     preLoginStore: Map<number, PreLoginClient> = new Map();
+    loginStore: Map<number, LoginClient> = new Map();
     sessionStore: Map<number, EncryptedSession> = new Map();
 
     constructor() {
@@ -56,6 +56,7 @@ export class LoginServer extends WorkerServer {
         } else {
             // Clear local stores
             if (this.preLoginStore.has(session.id)) this.preLoginStore.delete(session.id);
+            if (this.loginStore.has(session.id)) this.loginStore.delete(session.id);
             if (this.sessionStore.has(session.id)) this.sessionStore.delete(session.id);
             this.logger.info(`Session ${session.id} disconnected from LoginServer`);
         }

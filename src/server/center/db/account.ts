@@ -4,11 +4,10 @@ import { Database } from "./database";
 
 export class AccountDB {
     static async getPreLoginInfo(username: string) {
-        // SELECT id, password, gender, banned, pic, pin, character_slots, tos, language FROM accounts WHERE name = username;
         try {
             let records = await Database.knex('accounts')
                 .where({name: username})
-                .select('id', 'password', 'gender', 'banned', 'pic', 'pin', 'character_slots', 'tos', 'language');
+                .select('id', 'password', 'gender', 'banned', 'pic', 'pin', 'character_slots', 'tos', 'language', 'gm');
             if (records.length > 0) return records[0];
         } catch (err) {
             CenterServer.instance.logger.error(err.message);
