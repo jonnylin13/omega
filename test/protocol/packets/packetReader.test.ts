@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { it, describe } from 'mocha';
-import { PacketReader } from '../../src/protocol/packets/packetReader';
+import { PacketReader } from '../../../src/protocol/packets/packetReader';
 
 
 describe('protocol/packets/packetReader.ts', () => {
