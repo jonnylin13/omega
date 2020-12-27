@@ -1,4 +1,3 @@
-import { Convert } from "../../util/convert";
 import { Point } from "../../util/types/point";
 
 

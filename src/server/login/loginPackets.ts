@@ -64,8 +64,8 @@ export class LoginPackets {
         
         const canFly = true; // TODO
 
-        packet.writeBoolean((Config.instance['game']['enforce_admin_account'] || canFly) ? loginClient.gm > 1 : false);
-        packet.writeByte(((Config.instance['game']['enforce_admin_account'] || canFly) && loginClient.gm > 1) ? 0x80 : 0);
+        packet.writeBoolean((Config.instance.game.enforceAdminAccount || canFly) ? loginClient.gm > 1 : false);
+        packet.writeByte(((Config.instance.game.enforceAdminAccount || canFly) && loginClient.gm > 1) ? 0x80 : 0);
         packet.writeByte(0); // Country Code.
         
         packet.writeMapleAsciiString(loginClient.name);
@@ -77,8 +77,8 @@ export class LoginPackets {
 
         packet.writeInt(1); // 1: Remove the "Select the world you want to play in"
         
-        packet.writeByte(Config.instance.game.enable_pin ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
-        packet.writeByte(Config.instance.game.enable_pic ? ((loginClient.pic === null || loginClient.pic === undefined || loginClient.pic === '') ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
+        packet.writeByte(Config.instance.game.enablePin ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+        packet.writeByte(Config.instance.game.enablePic ? ((loginClient.pic === null || loginClient.pic === undefined || loginClient.pic === '') ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
         
         return packet.getPacket();
     }

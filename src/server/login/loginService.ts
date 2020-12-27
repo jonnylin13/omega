@@ -47,7 +47,10 @@ export class LoginService {
                 return;
             }
 
-            // TODO: Check if already logged in
+            if (LoginServer.instance.loginStore.has(preLoginClient.sessionId)) {
+                encSession.write(LoginPackets.getLoginFailed(7)); // TODO: Verify this is the right login failed message
+                return;
+            }
         }
 
         const loginClient = {
@@ -59,7 +62,7 @@ export class LoginService {
             name: preLoginClient.username,
             sessionId: preLoginClient.sessionId
         } as LoginClient;
-        
+
         LoginServer.instance.preLoginStore.delete(preLoginClient.sessionId);
         LoginServer.instance.loginStore.set(loginClient.sessionId, loginClient);
         encSession.write(LoginPackets.getAuthSuccess(loginClient));

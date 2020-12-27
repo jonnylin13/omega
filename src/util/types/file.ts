@@ -17,7 +17,11 @@ export class File {
 
     list(): Array<File> {
         let files = fs.readdirSync(this.path);
-        return files.map(file_name => new File(this.path + '/' + file_name));
+        return files.map(fileName => {
+            if (this.path.charAt(this.path.length - 1) === '/') {
+                return new File(this.path + fileName);
+            } else return new File(this.path + '/' + fileName);
+        });
     }
 
     isDirectory(): boolean {
