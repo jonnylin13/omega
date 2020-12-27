@@ -31,6 +31,10 @@ export class AES {
     iv: Buffer;
     cipher: crypto.Cipher;
 
+    static generateIv(): Buffer {
+        return crypto.randomBytes(4);
+    }
+
     constructor(iv: Buffer, mapleVersion: number) {
         this.iv = iv;
         this.mapleVersion = mapleVersion;

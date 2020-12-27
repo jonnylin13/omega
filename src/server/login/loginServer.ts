@@ -2,7 +2,6 @@ import { ServerType } from "../baseServer";
 import { PacketReader } from "../../protocol/packets/packetReader";
 import { LoginServerPacketDelegator } from "./loginServerDelegator";
 import { Session } from "../session";
-import { Crypto } from '../../protocol/crypto/crypto';
 import { AES } from '../../protocol/crypto/aes';
 import { EncryptedSession } from '../../protocol/crypto/encryptedSession';
 import { PreLoginClient } from './types/preLoginClient';
@@ -37,8 +36,8 @@ export class LoginServer extends WorkerServer {
         } else {
             // MapleStory client connection
             this.logger.info(`LoginServer received a client connection: session ${session.id} @ ${session.remoteAddress}`);
-            let ivRecv = Crypto.generateIv();
-            let ivSend = Crypto.generateIv();
+            let ivRecv = AES.generateIv();
+            let ivSend = AES.generateIv();
             const sendCypher = new AES(ivSend, 83);
             const recvCypher = new AES(ivRecv, 83);
             const encSession = new EncryptedSession(session, sendCypher, recvCypher);

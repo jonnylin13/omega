@@ -14,4 +14,6 @@ describe('protocol/crypto/shanda.ts', () => {
         expect(aes.transform(data)).to.deep.equal(result);
     });
 
+    // test generatePacketHeader()
+
 });
