@@ -17,7 +17,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
         }
         session.write(CenterPackets.getPreLoginPasswordAck(true, {sessionId: sessionId, username: username, id: preLoginInfo.id, password: preLoginInfo.password, 
             gender: preLoginInfo.gender, banned: preLoginInfo.banned, pin: preLoginInfo.pin, pic: preLoginInfo.pic, 
-            character_slots: preLoginInfo.character_slots, tos: preLoginInfo.tos, language: preLoginInfo.language, gm: preLoginInfo.gm}));
+            character_slots: preLoginInfo.character_slots, tos: preLoginInfo.tos, language: preLoginInfo.language}));
     }
     
 }

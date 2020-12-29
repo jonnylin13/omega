@@ -55,7 +55,7 @@ export class LoginPackets {
     }
 
     static getAuthSuccess(loginClient: LoginClient): Buffer {
-        const packet = new PacketWriter();
+        const packet = new PacketWriter(42 + loginClient.name.length);
         packet.writeShort(MapleSendOpcode.LOGIN_STATUS.getValue());
         packet.writeInt(0);
         packet.writeShort(0);
@@ -64,8 +64,10 @@ export class LoginPackets {
         
         const canFly = true; // TODO
 
-        packet.writeBoolean((Config.instance.game.enforceAdminAccount || canFly) ? loginClient.gm > 1 : false);
-        packet.writeByte(((Config.instance.game.enforceAdminAccount || canFly) && loginClient.gm > 1) ? 0x80 : 0);
+        // (Config.instance.game.enforceAdminAccount || canFly) ? loginClient.gm > 1 : 
+        packet.writeBoolean(false);
+        // ((Config.instance.game.enforceAdminAccount || canFly) && loginClient.gm > 1) ? 0x80 : 
+        packet.writeByte(0);
         packet.writeByte(0); // Country Code.
         
         packet.writeMapleAsciiString(loginClient.name);
@@ -80,6 +82,13 @@ export class LoginPackets {
         packet.writeByte(Config.instance.game.enablePin ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
         packet.writeByte(Config.instance.game.enablePic ? ((loginClient.pic === null || loginClient.pic === undefined || loginClient.pic === '') ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
         
+        return packet.getPacket();
+    }
+
+    static addLogin(accountId: number): Buffer {
+        const packet = new PacketWriter(6);
+        packet.writeShort(LoginSendOpcode.ADD_LOGIN.getValue());
+        packet.writeInt(accountId);
         return packet.getPacket();
     }
 

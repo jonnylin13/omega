@@ -30,6 +30,7 @@ export class CenterServer extends BaseServer {
     loginServerSessionId: number;
     shopServerSessionId: number;
     workerSessionStore: Set<number> = new Set();
+    loginStore: Set<number> = new Set();
 
     packetDelegator: PacketDelegator;
     static instance: CenterServer;

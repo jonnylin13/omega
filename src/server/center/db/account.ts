@@ -7,7 +7,7 @@ export class AccountDB {
         try {
             let records = await Database.knex('accounts')
                 .where({name: username})
-                .select('id', 'password', 'gender', 'banned', 'pic', 'pin', 'character_slots', 'tos', 'language', 'gm');
+                .select('id', 'password', 'gender', 'banned', 'pic', 'pin', 'character_slots', 'tos', 'language');
             if (records.length > 0) return records[0];
         } catch (err) {
             CenterServer.instance.logger.error(err.message);

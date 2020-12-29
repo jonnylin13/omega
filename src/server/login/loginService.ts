@@ -20,15 +20,14 @@ export class LoginService {
         const characterSlots = packet.readByte();
         const tos = packet.readBoolean();
         const language = packet.readByte();
-        const gm = packet.readByte();
 
-        return {id, hashedPassword, gender, banned, pin, pic, characterSlots, tos, language, gm};
+        return {id, hashedPassword, gender, banned, pin, pic, characterSlots, tos, language};
 
     }
 
     static async login(preLoginClient: PreLoginClient, encSession: EncryptedSession, loginInfo: any, autoRegister: boolean = false) {
 
-        const {id, hashedPassword, gender, banned, pin, pic, characterSlots, tos, language, gm} = loginInfo;
+        const {id, hashedPassword, gender, banned, pin, pic, characterSlots, tos, language} = loginInfo;
 
         if (!autoRegister) {
 
@@ -36,6 +35,8 @@ export class LoginService {
             if (banned) return; // TODO: Return correct ban message
 
             // TODO: Check if multiclient
+
+            // TODO: Check if already logged in
             
             if (!tos) encSession.write(LoginPackets.getLoginFailed(23));
 
@@ -58,13 +59,13 @@ export class LoginService {
             gender: gender,
             pin: pin,
             pic: pic,
-            gm: gm,
             name: preLoginClient.username,
             sessionId: preLoginClient.sessionId
         } as LoginClient;
 
         LoginServer.instance.preLoginStore.delete(preLoginClient.sessionId);
         LoginServer.instance.loginStore.set(loginClient.sessionId, loginClient);
+
         encSession.write(LoginPackets.getAuthSuccess(loginClient));
     }
 
