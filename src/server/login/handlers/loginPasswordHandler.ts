@@ -26,7 +26,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
             if (preLoginClient.attempts > 3) {
                 // TODO: Do something else here lol
                 LoginServer.instance.preLoginStore.delete(session.id);
-                session.destroy();
+                session.socket.destroy();
                 return;
             }
         } else {
@@ -35,7 +35,7 @@ export class PreLoginPasswordHandler implements PacketHandler {
         }
 
         // Send request to CenterServer to get account information
-        LoginServer.instance.centerServerSession.write(LoginPackets.getPreLoginRequest(preLoginClient));
+        LoginServer.instance.centerServerSession.socket.write(LoginPackets.getPreLoginRequest(preLoginClient));
     }
 }
 
@@ -58,7 +58,7 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
                 // Write AutoRegister packet to CenterServer using username and password
                 LoginServer.instance.logger.info(`Auto registering ${preLoginClient.username}`);
                 const hashedPassword = bcrypt.hashSync(preLoginClient.password, 12);
-                session.write(LoginPackets.getAutoRegister(sessionId, preLoginClient.username, hashedPassword));
+                session.socket.write(LoginPackets.getAutoRegister(sessionId, preLoginClient.username, hashedPassword));
                 return;
             }
             LoginServer.instance.logger.debug(`Username ${preLoginClient.username} not found when attempting login`);

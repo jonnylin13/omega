@@ -11,13 +11,13 @@ export abstract class WorkerServer extends BaseServer {
 
     constructor(type: ServerType, host: string, port: number) {
         super(type, host, port)
-        this.centerServerSession = (net.connect({ port: Config.instance.center.port }) as Session);
+        this.centerServerSession = new Session(net.connect({ port: Config.instance.center.port }));
         this.centerServerSession.id = -1;
-        this.centerServerSession.setKeepAlive(true);
-        this.centerServerSession.on('connect', () => this.onConnection(this.centerServerSession));
-        this.centerServerSession.on('data', (data: Buffer) => this.onData(this.centerServerSession, data));
-        this.centerServerSession.on('close', (hadError: boolean) => this.onClose(this.centerServerSession, hadError));
-        this.centerServerSession.on('error', (err: any) => this.onError(err));
+        this.centerServerSession.socket.setKeepAlive(true);
+        this.centerServerSession.socket.on('connect', () => this.onConnection(this.centerServerSession));
+        this.centerServerSession.socket.on('data', (data: Buffer) => this.onData(this.centerServerSession, data));
+        this.centerServerSession.socket.on('close', (hadError: boolean) => this.onClose(this.centerServerSession, hadError));
+        this.centerServerSession.socket.on('error', (err: any) => this.onError(err));
     }
 
     isCenterServer(session: Session) {

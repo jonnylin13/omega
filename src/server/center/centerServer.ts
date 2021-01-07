@@ -7,6 +7,8 @@ import { CenterServerDelegator } from "./centerServerDelegator";
 import * as prometheus from 'prom-client';
 import * as process from 'process';
 import { Config } from "../../util/config";
+import { CenterSendOpcode } from "../../protocol/opcodes/center/send";
+import { CommonSendOpcode } from "../../protocol/opcodes/common/send";
 
 const requestCounter = new prometheus.Counter({
     name: 'center_request_counter',
@@ -49,9 +51,9 @@ export class CenterServer extends BaseServer {
     onConnection(session: Session): void {
         // WorkerServer connection
         // Send handshake to establish ServerType
-        this.logger.info(`CenterServer received a worker connection from ${session.remoteAddress}`);
+        this.logger.info(`CenterServer received a worker connection from ${session.socket.remoteAddress}`);
         this.workerSessionStore.add(session.id);
-        session.write(CenterPackets.getWorkerHandshake());
+        session.socket.write(CenterPackets.getWorkerHandshake());
     }
 
     onClose(session: Session, hadError: any): void {
@@ -69,17 +71,20 @@ export class CenterServer extends BaseServer {
             // WorkerServer packet
 
             if (!this.isWorker(session)) {
-                this.logger.warn(`Potential malicious attack to CenterServer from ${session.remoteAddress}`);
-                session.destroy();
+                this.logger.warn(`Potential malicious attack to CenterServer from ${session.socket.remoteAddress}`);
+                session.socket.destroy();
                 return;
             }
             const packetHandler = this.packetDelegator.getHandler(opcode);
-            if (packetHandler === undefined) {
-                this.logger.warn(`CenterServer unhandled packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
+            if (packetHandler === undefined && !session.isHandling(opcode)) {
+                this.logger.warn(`CenterServer unhandled packet 0x${opcode.toString(16)} from ${session.socket.remoteAddress}`);
                 return;
             }
-            this.logger.debug(`CenterServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
-            packetHandler.handlePacket(packet, session);
+
+            if (packetHandler !== undefined) {
+                this.logger.debug(`CenterServer handling packet 0x${opcode.toString(16)} from ${session.socket.remoteAddress}`);
+                packetHandler.handlePacket(packet, session);
+            }
 
         }
     }

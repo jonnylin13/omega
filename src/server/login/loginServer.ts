@@ -34,14 +34,14 @@ export class LoginServer extends WorkerServer {
             this.logger.info(`LoginServer has established CenterServer connection`);
         } else {
             // MapleStory client connection
-            this.logger.info(`LoginServer received a client connection: session ${session.id} @ ${session.remoteAddress}`);
+            this.logger.info(`LoginServer received a client connection: session ${session.id} @ ${session.socket.remoteAddress}`);
             let ivRecv = AES.generateIv();
             let ivSend = AES.generateIv();
             const sendCypher = new AES(ivSend, 83);
             const recvCypher = new AES(ivRecv, 83);
             const encSession = new EncryptedSession(session, sendCypher, recvCypher);
             this.sessionStore.set(session.id, encSession);
-            session.write(LoginPackets.getLoginHandshake(83, ivRecv, ivSend));
+            session.socket.write(LoginPackets.getLoginHandshake(83, ivRecv, ivSend));
         }
     }
 
@@ -76,7 +76,7 @@ export class LoginServer extends WorkerServer {
         } else {
             if (!this.sessionStore.has(session.id)) {
                 // Never reached
-                this.logger.warn(`LoginServer received a packet from ${session.remoteAddress} before session could be registered`);
+                this.logger.warn(`LoginServer received a packet from ${session.socket.remoteAddress} before session could be registered`);
                 return;
             }
 
@@ -90,18 +90,21 @@ export class LoginServer extends WorkerServer {
             const opcode = packet.readShort();
 
             if (opcode >= 0x200) {
-                this.logger.warn(`Potential malicious attack to LoginServer from ${session.remoteAddress} packet id 0x${opcode.toString(16)}`);
-                session.destroy();
+                this.logger.warn(`Potential malicious attack to LoginServer from ${session.socket.remoteAddress} packet id 0x${opcode.toString(16)}`);
+                session.socket.destroy();
                 return;
             }
             
             const packetHandler = this.packetDelegator.getHandler(opcode);
-            if (packetHandler === undefined) {
+            if (packetHandler === undefined && !session.isHandling(opcode)) {
                 this.logger.warn(`LoginServer unhandled packet 0x${opcode.toString(16)} from client`);
                 return;
             }
-            this.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from ${session.remoteAddress}`);
-            packetHandler.handlePacket(packet, session);
+
+            if (packetHandler !== undefined) {
+                this.logger.debug(`LoginServer handling packet 0x${opcode.toString(16)} from ${session.socket.remoteAddress}`);
+                packetHandler.handlePacket(packet, session);
+            }
         }
     }
 

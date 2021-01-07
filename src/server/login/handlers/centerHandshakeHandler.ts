@@ -1,16 +1,16 @@
 import { PacketReader } from "../../../protocol/packets/packetReader";
 import { PacketHandler } from "../../baseHandler";
 import { ServerType } from "../../baseServer";
-import * as net from 'net';
 import { LoginPackets } from '../loginPackets';
+import { Session } from "../../session";
 
 
 export class CenterHandshakeHandler implements PacketHandler {
-    async handlePacket(packet: PacketReader, socket: net.Socket): Promise<void> {
+    async handlePacket(packet: PacketReader, session: Session): Promise<void> {
         const serverType = packet.readByte();
         if (ServerType[serverType] === 'CENTER') {
             // Send handshake ack
-            socket.write(LoginPackets.getCenterHandshakeAck());
+            session.socket.write(LoginPackets.getCenterHandshakeAck());
         }
     }
 }

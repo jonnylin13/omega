@@ -20,6 +20,6 @@ export class EncryptedSession {
         const header = this.sendCrypto.generatePacketHeader(data.length);
         Shanda.encrypt(data);
         this.sendCrypto.transform(data);
-        return this.session.write(Buffer.concat([header, data]));
+        return this.session.socket.write(Buffer.concat([header, data]));
     }
 }

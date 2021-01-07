@@ -12,7 +12,7 @@ export class AutoRegisterHandler implements PacketHandler {
         const username = packet.readMapleAsciiString();
         const hashedPassword = packet.readMapleAsciiString();
         const result = await AccountDB.insertAutoRegisterAccount(username, hashedPassword);
-        session.write(CenterPackets.getAutoRegisterAck(sessionId, result));
+        session.socket.write(CenterPackets.getAutoRegisterAck(sessionId, result));
     }
     
 }

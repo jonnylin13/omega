@@ -80,7 +80,7 @@ export abstract class BaseServer {
     }
 
     setupConnection(socket: net.Socket): Session {
-        const session = (socket as Session);
+        const session = new Session(socket);
         session.id = this.getNextSessionId();
         socket.on('close', (hadError) => this.onClose(session, hadError));
         socket.on('data', (data) => this.onData(session, data));
