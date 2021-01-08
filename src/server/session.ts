@@ -23,10 +23,19 @@ export class Session {
         return this.handling.has(opcode);
     }
 
-    writePromise(data: Buffer, ackOpcode: number, recvCrypto?: AES): Promise<PacketReader> {
+    writePromise(data: Buffer, ackOpcode: number, recvCrypto?: AES, timeout: number = 10000): Promise<PacketReader> {
         this.socket.write(data);
         this.handling.set(ackOpcode, this.handling.has(ackOpcode) ? this.handling.get(ackOpcode) + 1 : 1);
+
         return new Promise((resolve, reject) => {
+
+            setTimeout(() => {
+                if (this.handling.has(ackOpcode)) {
+                    this.handling.delete(ackOpcode);
+                    reject(`Never recieved an ack packet with opcode 0x${ackOpcode.toString(16)}`);
+                }
+            }, timeout);
+
             const listener = (returnData: Buffer) => {
                 const packet = new PacketReader(returnData);
                 const opcode = packet.readShort();
@@ -53,7 +62,6 @@ export class Session {
             } else {
                 this.socket.on('data', encListener);
             }
-            // TODO: Where should we reject?
         });
         
     }
