@@ -29,7 +29,7 @@ export class Session {
 
         return new Promise((resolve, reject) => {
 
-            setTimeout(() => {
+            const timeoutTask = setTimeout(() => {
                 if (this.handling.has(ackOpcode)) {
                     this.handling.delete(ackOpcode);
                     reject(`Never recieved an ack packet with opcode 0x${ackOpcode.toString(16)}`);
@@ -42,6 +42,7 @@ export class Session {
                 if (opcode == ackOpcode) {
                     this.socket.removeListener('data', listener);
                     this.updateHandling(ackOpcode);
+                    clearInterval(timeoutTask);
                     resolve(packet);
                 }
             };
@@ -54,6 +55,7 @@ export class Session {
                 if (opcode == ackOpcode) {
                     this.socket.removeListener('data', encListener);
                     this.updateHandling(ackOpcode);
+                    clearInterval(timeoutTask);
                     resolve(packet);
                 }
             };
