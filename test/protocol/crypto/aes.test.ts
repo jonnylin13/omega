@@ -14,6 +14,12 @@ describe('protocol/crypto/aes.ts', () => {
         expect(aes.transform(data)).to.deep.equal(result);
     });
 
-    // test generatePacketHeader()
+    it('should generate packet header', () => {
+        expect(aes.generatePacketHeader(8)).to.deep.equal(Buffer.from([0x37, 0xc7, 0x3f, 0xc7]));
+    });
+
+    it('should morph the iv', () => {
+        expect((aes as any).morphIV(Buffer.from([0x1, 0x2, 0x3, 0x4]))).to.deep.equal(Buffer.from([0x7b, 0xbf, 0xa4, 0x56]));
+    });
 
 });

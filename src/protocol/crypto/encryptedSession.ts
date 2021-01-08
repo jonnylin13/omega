@@ -18,8 +18,8 @@ export class EncryptedSession {
 
     async write(data: Buffer): Promise<boolean> {
         const header = this.sendCrypto.generatePacketHeader(data.length);
-        Shanda.encrypt(data);
-        this.sendCrypto.transform(data);
-        return this.session.socket.write(Buffer.concat([header, data]));
+        let encryptedData = Shanda.encrypt(data);
+        encryptedData = this.sendCrypto.transform(encryptedData);
+        return this.session.socket.write(Buffer.concat([header, encryptedData]));
     }
 }

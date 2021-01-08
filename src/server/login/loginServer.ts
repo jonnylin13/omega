@@ -80,12 +80,12 @@ export class LoginServer extends WorkerServer {
                 return;
             }
 
-            // Validate header
-
             const encryptedSession = this.sessionStore.get(session.id);
             let dataNoHeader = data.slice(4); // Remove packet header
+            // TODO: Validate header
             encryptedSession.recvCrypto.transform(dataNoHeader);
             const decryptedData = Shanda.decrypt(dataNoHeader);
+            this.logger.debug(`Received from session ${session.id}: ${decryptedData.toString('hex').match(/../g).join(' ')}`);
             const packet = new PacketReader(decryptedData);
             const opcode = packet.readShort();
 

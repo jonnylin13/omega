@@ -23,6 +23,7 @@ export class Session {
         return this.handling.has(opcode);
     }
 
+    // TODO: Needs packet id (race condition) -- I.e. two clients logging in at the same time
     writePromise(data: Buffer, ackOpcode: number, recvCrypto?: AES, timeout: number = 10000): Promise<PacketReader> {
         this.socket.write(data);
         this.handling.set(ackOpcode, this.handling.has(ackOpcode) ? this.handling.get(ackOpcode) + 1 : 1);

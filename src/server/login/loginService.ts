@@ -38,18 +38,24 @@ export class LoginService {
 
             // TODO: Check if already logged in
             
-            if (!tos) encSession.write(LoginPackets.getLoginFailed(23));
+            if (!tos) {
+                encSession.write(LoginPackets.getLoginFailed(23));
+                LoginServer.instance.logger.debug(`User ${preLoginClient.username} failed TOS check`);
+                return;
+            }
 
             // Compare password
-            const success = await bcrypt.compare(preLoginClient.password, hashedPassword);
-            if (!success) {
+            const passwordCorrect = await bcrypt.compare(preLoginClient.password, hashedPassword);
+            if (!passwordCorrect) {
                 // Wrong password
                 encSession.write(LoginPackets.getLoginFailed(4));
+                LoginServer.instance.logger.debug(`User ${preLoginClient.username} failed password check`);
                 return;
             }
 
             if (LoginServer.instance.loginStore.has(preLoginClient.sessionId)) {
                 encSession.write(LoginPackets.getLoginFailed(7)); // TODO: Verify this is the right login failed message
+                LoginServer.instance.logger.warn(`User ${preLoginClient.username} tried to login when already in pre-login status`);
                 return;
             }
         }
@@ -65,6 +71,8 @@ export class LoginService {
 
         LoginServer.instance.preLoginStore.delete(preLoginClient.sessionId);
         LoginServer.instance.loginStore.set(loginClient.sessionId, loginClient);
+        
+        LoginServer.instance.logger.debug(`Logging in username ${preLoginClient.username}`);
 
         encSession.write(LoginPackets.getAuthSuccess(loginClient));
     }

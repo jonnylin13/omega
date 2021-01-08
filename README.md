@@ -79,7 +79,7 @@ v83 MapleStory Server emulator written in TypeScript. Inspired by projects like 
 
 ### Long goals
 * [x] Design cluster system to fork worker processes
-* [x] De-couple state in order to achieve micro-server architecture
+* [x] De-couple state in order to achieve micro-service architecture
 * [ ] Use Redis as a memory store, and have a task to periodically update the DB
 * [ ] Design worker_threads system to delegate compute-heavy tasks
 * [ ] Docker support

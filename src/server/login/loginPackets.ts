@@ -78,10 +78,10 @@ export class LoginPackets {
         packet.writeLong(BigInt(0)); //CreationTimeStamp
 
         packet.writeInt(1); // 1: Remove the "Select the world you want to play in"
-        
-        packet.writeByte(Config.instance.game.enablePin ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
-        packet.writeByte(Config.instance.game.enablePic ? ((loginClient.pic === null || loginClient.pic === undefined || loginClient.pic === '') ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
-        
+        packet.writeByte(0);
+        packet.writeByte(2);
+        // packet.writeByte(Config.instance.game.enablePin ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+        // packet.writeByte(Config.instance.game.enablePic ? ((loginClient.pic === null || loginClient.pic === undefined || loginClient.pic === '') ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
         return packet.getPacket();
     }
 

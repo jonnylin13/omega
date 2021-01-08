@@ -23,10 +23,11 @@ export class PreLoginPasswordHandler implements PacketHandler {
             preLoginClient = LoginServer.instance.preLoginStore.get(session.id);
             preLoginClient.attempts++;
 
-            if (preLoginClient.attempts > 3) {
+            if (preLoginClient.attempts > 4) {
                 // TODO: Do something else here lol
-                LoginServer.instance.preLoginStore.delete(session.id);
-                session.socket.destroy();
+                const encSession = LoginServer.instance.sessionStore.get(session.id);
+                encSession.write(LoginPackets.getLoginFailed(6));
+                LoginServer.instance.logger.warn(`Remote address ${session.socket.remoteAddress} maxed out on login attempts`);
                 return;
             }
         } else {
@@ -70,12 +71,12 @@ export class PreLoginPasswordAckHandler implements PacketHandler {
         // TODO: Check if all these fields are necessary
         const loginInfo = LoginService.readLoginInfo(packet);
         LoginService.login(preLoginClient, encSession, loginInfo);
-        
     }
 }
 
 export class AutoRegisterAckHandler implements PacketHandler {
     handlePacket(packet: PacketReader, session: Session): void {
+
         const sessionId = packet.readInt();
         const success = packet.readBoolean();
 

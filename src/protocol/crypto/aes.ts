@@ -57,7 +57,6 @@ export class AES {
             newSequence[1] -= newSequence[2] ^ tableInput;
             newSequence[2] ^= shiftKey[newSequence[3]] + input;
             newSequence[3] -= newSequence[0] - tableInput;
-
             let val = 
                 (newSequence[0] |
                 ((newSequence[1] & 0xff) << 8) |
@@ -76,14 +75,14 @@ export class AES {
     }
 
     generatePacketHeader(length: number): Buffer {
-        let a = this.iv[2] | (this.iv[3] << 8);
-        a ^= -(this.mapleVersion + 1);
-        const b = a ^ length;
+        let a = (this.iv[3] & 0xff) | ((this.iv[2] << 8) & 0xff00);
+        a ^= ((this.mapleVersion >> 8) & 0xff) | ((this.mapleVersion << 8) & 0xff00);
+        const b = a ^ (((length << 8) & 0xff00) | length >>> 8);
         const header = Buffer.from([
-            a & 0xff,
             (a >>> 8) & 0xff,
-            b & 0xff,
+            a & 0xff,
             (b >>> 8) & 0xff,
+            b & 0xff
         ]);
         return header;
     }

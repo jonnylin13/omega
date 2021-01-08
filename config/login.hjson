@@ -1,5 +1,5 @@
 {
-    useAutoRegister: true
+    useAutoRegister: false
     port: 8484 # Don't change this
     host: '0.0.0.0'
 }
