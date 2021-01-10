@@ -5,7 +5,6 @@ import { LoginSendOpcode } from '../../protocol/opcodes/login/send';
 import { PreLoginClient } from './types/preLoginClient';
 import { MapleSendOpcode } from '../../protocol/opcodes/maple/send';
 import { LoginClient } from './types/loginClient';
-import { Config } from '../../util/config';
 
 
 export class LoginPackets {
@@ -25,6 +24,7 @@ export class LoginPackets {
         packet.write(ivRecv);
         packet.write(ivSend);
         packet.writeByte(8); // Locale
+        console.log(packet.getPacket().toString('hex').match(/../g).join(' '));
         return packet.getPacket();
     }
 
@@ -39,9 +39,8 @@ export class LoginPackets {
     static getLoginFailed(reason: number): Buffer {
         const packet = new PacketWriter(8);
         packet.writeShort(MapleSendOpcode.LOGIN_STATUS.getValue());
-        packet.writeByte(reason);
-        packet.writeByte(0);
-        packet.writeInt(0);
+        packet.writeInt(reason);
+        packet.writeShort(0);
         return packet.getPacket();
     }
 
@@ -60,25 +59,17 @@ export class LoginPackets {
         packet.writeInt(0);
         packet.writeShort(0);
         packet.writeInt(loginClient.id);
-        packet.writeByte(loginClient.gender);
-        
-        const canFly = true; // TODO
-
-        // (Config.instance.game.enforceAdminAccount || canFly) ? loginClient.gm > 1 : 
         packet.writeBoolean(false);
-        // ((Config.instance.game.enforceAdminAccount || canFly) && loginClient.gm > 1) ? 0x80 : 
         packet.writeByte(0);
-        packet.writeByte(0); // Country Code.
-        
+        packet.writeByte(0);
+        packet.writeByte(0); // CountryCode
         packet.writeMapleAsciiString(loginClient.name);
         packet.writeByte(0);
-        
         packet.writeByte(0); // IsQuietBan
-        packet.writeLong(BigInt(0));//IsQuietBanTimeStamp
-        packet.writeLong(BigInt(0)); //CreationTimeStamp
-
-        packet.writeInt(1); // 1: Remove the "Select the world you want to play in"
-        packet.writeByte(0);
+        packet.writeLong(BigInt(0));// IsQuietBanTimeStamp
+        packet.writeLong(BigInt(0)); // CreationTimeStamp
+        packet.writeInt(0); // 1: Remove the "Select the world you want to play in"
+        packet.writeByte(1);
         packet.writeByte(2);
         // packet.writeByte(Config.instance.game.enablePin ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
         // packet.writeByte(Config.instance.game.enablePic ? ((loginClient.pic === null || loginClient.pic === undefined || loginClient.pic === '') ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled

@@ -5,6 +5,7 @@ import { PreLoginClient } from "./types/preLoginClient";
 import * as bcrypt from 'bcrypt';
 import { LoginServer } from "./loginServer";
 import { LoginClient } from "./types/loginClient";
+import { CommonPackets } from "../commonPackets";
 
 
 export class LoginService {
@@ -22,7 +23,35 @@ export class LoginService {
         const language = packet.readByte();
 
         return {id, hashedPassword, gender, banned, pin, pic, characterSlots, tos, language};
+    }
 
+    private static async loginOk(preLoginClient: PreLoginClient, loginInfo: any): Promise<number> {
+
+        // TODO: Check if ip banned, mac banned, or temp banned
+        if (loginInfo.banned) return 3;
+
+        // TODO: Check multiclient
+
+        // Compare password
+        const passwordCorrect = await bcrypt.compare(preLoginClient.password, loginInfo.hashedPassword);
+        if (!passwordCorrect) {
+            // Wrong password
+            LoginServer.instance.logger.debug(`User ${preLoginClient.username} failed password check`);
+            return 4;
+        }
+
+
+        if (!loginInfo.tos) {
+            LoginServer.instance.logger.debug(`Sending EULA to user ${preLoginClient.username}`);
+            return 23;
+        }
+
+        if (LoginServer.instance.loginStore.has(preLoginClient.sessionId)) {
+            LoginServer.instance.logger.warn(`User ${preLoginClient.username} tried to login when already in login store`);
+            return 7; // TODO: Make sure this is correct reason code
+        }
+
+        return 0;
     }
 
     static async login(preLoginClient: PreLoginClient, encSession: EncryptedSession, loginInfo: any, autoRegister: boolean = false) {
@@ -31,31 +60,13 @@ export class LoginService {
 
         if (!autoRegister) {
 
-            // TODO: Check if ip banned or mac banned or temp banned
-            if (banned) return; // TODO: Return correct ban message
+            const loginOk = await LoginService.loginOk(preLoginClient, loginInfo);
 
-            // TODO: Check if multiclient
+            // TODO: Move logic to loginOk
 
-            // TODO: Check if already logged in
-            
-            if (!tos) {
-                encSession.write(LoginPackets.getLoginFailed(23));
-                LoginServer.instance.logger.debug(`User ${preLoginClient.username} failed TOS check`);
-                return;
-            }
-
-            // Compare password
-            const passwordCorrect = await bcrypt.compare(preLoginClient.password, hashedPassword);
-            if (!passwordCorrect) {
-                // Wrong password
-                encSession.write(LoginPackets.getLoginFailed(4));
-                LoginServer.instance.logger.debug(`User ${preLoginClient.username} failed password check`);
-                return;
-            }
-
-            if (LoginServer.instance.loginStore.has(preLoginClient.sessionId)) {
-                encSession.write(LoginPackets.getLoginFailed(7)); // TODO: Verify this is the right login failed message
-                LoginServer.instance.logger.warn(`User ${preLoginClient.username} tried to login when already in pre-login status`);
+            if (loginOk !== 0) {
+                // await LoginServer.instance.queueMessage(encSession.session, await encSession.encryptPacket(LoginPackets.getLoginFailed(loginOk)));
+                await encSession.write(LoginPackets.getLoginFailed(loginOk));
                 return;
             }
         }
@@ -74,7 +85,7 @@ export class LoginService {
         
         LoginServer.instance.logger.debug(`Logging in username ${preLoginClient.username}`);
 
-        encSession.write(LoginPackets.getAuthSuccess(loginClient));
+        await encSession.write(LoginPackets.getAuthSuccess(loginClient));
     }
 
 }

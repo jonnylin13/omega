@@ -85,6 +85,7 @@ export abstract class BaseServer {
         socket.on('close', (hadError) => this.onClose(session, hadError));
         socket.on('data', (data) => this.onData(session, data));
         socket.on('error', (error) => this.onError(error));
+        socket.setNoDelay(true); // Disable Nagle's algorithm
         return session;
     }
 

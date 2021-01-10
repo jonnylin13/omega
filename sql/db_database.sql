@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `accounts` (
   `maple_points` int(11) DEFAULT NULL,
   `nx_prepaid` int(11) DEFAULT NULL,
   `character_slots` tinyint(2) NOT NULL DEFAULT '3',
-  `gender` tinyint(2) NOT NULL DEFAULT '10',
+  `gender` tinyint(2) NOT NULL DEFAULT '0',
   `temp_ban` timestamp NOT NULL DEFAULT '2015-01-01 05:00:00',
   `greason` tinyint(4) NOT NULL DEFAULT '0',
   `tos` tinyint(1) NOT NULL DEFAULT '0',

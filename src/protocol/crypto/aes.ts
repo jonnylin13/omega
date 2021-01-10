@@ -31,13 +31,9 @@ export class AES {
     iv: Buffer;
     cipher: crypto.Cipher;
 
-    static generateIv(): Buffer {
-        return crypto.randomBytes(4);
-    }
-
     constructor(iv: Buffer, mapleVersion: number) {
         this.iv = iv;
-        this.mapleVersion = mapleVersion;
+        this.mapleVersion = (((mapleVersion >> 8) & 0xff) | ((mapleVersion << 8) & 0xff00));
         this.cipher = crypto.createCipheriv('aes-256-ecb', key, null);
     }
 
@@ -54,7 +50,7 @@ export class AES {
             const input = iv[i];
             const tableInput = shiftKey[input];
             newSequence[0] += shiftKey[newSequence[1]] - input;
-            newSequence[1] -= newSequence[2] ^ tableInput;
+            newSequence[1] -= newSequence[2] ^ tableInput; 
             newSequence[2] ^= shiftKey[newSequence[3]] + input;
             newSequence[3] -= newSequence[0] - tableInput;
             let val = 
@@ -74,9 +70,10 @@ export class AES {
         return newSequence;
     }
 
-    generatePacketHeader(length: number): Buffer {
-        let a = (this.iv[3] & 0xff) | ((this.iv[2] << 8) & 0xff00);
-        a ^= ((this.mapleVersion >> 8) & 0xff) | ((this.mapleVersion << 8) & 0xff00);
+    createPacketHeader(length: number): Buffer {
+        let a = (this.iv[3] & 0xff);
+        a |= (this.iv[2] << 8) & 0xff00;
+        a ^= this.mapleVersion;
         const b = a ^ (((length << 8) & 0xff00) | length >>> 8);
         const header = Buffer.from([
             (a >>> 8) & 0xff,

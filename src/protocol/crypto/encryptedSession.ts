@@ -1,8 +1,6 @@
 import { AES } from "./aes";
 import { Session } from "../../server/session";
 import { Shanda } from "./shanda";
-import { LoginServer } from "../../server/login/loginServer";
-
 
 export class EncryptedSession {
 
@@ -17,9 +15,16 @@ export class EncryptedSession {
     }
 
     async write(data: Buffer): Promise<boolean> {
-        const header = this.sendCrypto.generatePacketHeader(data.length);
-        let encryptedData = Shanda.encrypt(data);
-        encryptedData = this.sendCrypto.transform(encryptedData);
-        return this.session.socket.write(Buffer.concat([header, encryptedData]));
+        const encPacket = await this.encryptPacket(data);
+        console.log(encPacket.toString('hex').match(/../g).join(' '));
+        return this.session.socket.write(encPacket);
+    }
+
+    async encryptPacket(data: Buffer): Promise<Buffer> {
+        const header = this.sendCrypto.createPacketHeader(data.length);
+        Shanda.encrypt(data);
+        this.sendCrypto.transform(data);
+        const encPacket = Buffer.concat([header, data]);
+        return encPacket;
     }
 }

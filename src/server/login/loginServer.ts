@@ -10,6 +10,7 @@ import { Shanda } from '../../protocol/crypto/shanda';
 import { Config } from '../../util/config';
 import { WorkerServer } from '../workerServer';
 import { LoginClient } from "./types/loginClient";
+import { CommonPackets } from "../commonPackets";
 
 
 export class LoginServer extends WorkerServer {
@@ -35,12 +36,15 @@ export class LoginServer extends WorkerServer {
         } else {
             // MapleStory client connection
             this.logger.info(`LoginServer received a client connection: session ${session.id} @ ${session.socket.remoteAddress}`);
-            let ivRecv = AES.generateIv();
-            let ivSend = AES.generateIv();
-            const sendCypher = new AES(ivSend, 83);
+
+            let ivRecv = Buffer.from([70, 114, Math.round(Math.random() * 127), 82]);
+            // let ivSend = Buffer.from([82, 48, Math.round(Math.random() * 127), 115]);
+            let ivSend = Buffer.from([0x52, 0x30, 0x78, 0x61]);
+            const sendCypher = new AES(ivSend, 0xffff - 83);
             const recvCypher = new AES(ivRecv, 83);
             const encSession = new EncryptedSession(session, sendCypher, recvCypher);
             this.sessionStore.set(session.id, encSession);
+            console.log(ivSend.toString('hex').match(/../g).join(' '));
             session.socket.write(LoginPackets.getLoginHandshake(83, ivRecv, ivSend));
         }
     }
