@@ -1,6 +1,8 @@
 # omega
 v83 MapleStory Server emulator written in TypeScript. Inspired by projects like [HeavenMS](https://github.com/ronancpl/HeavenMS).
 
+This project has been sidetracked for [@perion/perion](https://github.com/jonnylin13/perion).
+
 ## Features
 * Easy development environment
 * Uses a microservice architecture where state is decoupled into center, login, shop, and channel servers

@@ -1,6 +1,5 @@
 import { PacketHandler } from "./baseHandler";
 
-
 export abstract class PacketDelegator {
 
     protected handlers: Map<number, PacketHandler> = new Map();

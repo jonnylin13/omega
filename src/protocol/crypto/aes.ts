@@ -1,5 +1,6 @@
 import * as crypto from 'crypto';
 
+
 const key: Buffer = Buffer.from([0x13, 0x00, 0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 
     0x06, 0x00, 0x00, 0x00, 0xB4, 0x00, 0x00, 0x00, 
     0x1B, 0x00, 0x00, 0x00, 0x0F, 0x00, 0x00, 0x00, 
@@ -33,7 +34,7 @@ export class AES {
 
     constructor(iv: Buffer, mapleVersion: number) {
         this.iv = iv;
-        this.mapleVersion = (((mapleVersion >> 8) & 0xff) | ((mapleVersion << 8) & 0xff00));
+        this.mapleVersion = ((mapleVersion >> 8) & 0xff) | ((mapleVersion << 8) & 0xff00);
         this.cipher = crypto.createCipheriv('aes-256-ecb', key, null);
     }
 
@@ -85,6 +86,53 @@ export class AES {
     }
 
     transform(data: Buffer) {
+    const { length } = data;
+    // MapleStory's 1460 byte block
+    const blockLength = 1460;
+    let currentBlockLength = 1456;
+
+    const ivCopy = Buffer.from([
+      this.iv[0],
+      this.iv[1],
+      this.iv[2],
+      this.iv[3],
+      this.iv[0],
+      this.iv[1],
+      this.iv[2],
+      this.iv[3],
+      this.iv[0],
+      this.iv[1],
+      this.iv[2],
+      this.iv[3],
+      this.iv[0],
+      this.iv[1],
+      this.iv[2],
+      this.iv[3],
+    ]);
+
+    for (let i = 0; i < length; ) {
+      const block = Math.min(length - i, currentBlockLength);
+
+      // Get a new copy of the key
+      let xorKey = ivCopy.slice();
+
+      for (let j = 0; j < block; j++) {
+        if (j % 16 === 0) {
+          xorKey = this.cipher.update(xorKey);
+        }
+
+        data[i + j] ^= xorKey[j % 16];
+      }
+
+      i += block;
+      currentBlockLength = blockLength;
+    }
+    this.iv = this.morphIV(this.iv);
+
+    return data;
+    }
+
+    oldTransform(data: Buffer) {
         let remaining = data.length;
         let chunk_length = 0x5B0;
         let start = 0;

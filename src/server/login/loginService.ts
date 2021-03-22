@@ -65,7 +65,6 @@ export class LoginService {
             // TODO: Move logic to loginOk
 
             if (loginOk !== 0) {
-                // await LoginServer.instance.queueMessage(encSession.session, await encSession.encryptPacket(LoginPackets.getLoginFailed(loginOk)));
                 await encSession.write(LoginPackets.getLoginFailed(loginOk));
                 return;
             }

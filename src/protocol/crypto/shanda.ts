@@ -1,6 +1,5 @@
 
 
-
 export class Shanda {
 
     private static rollLeft(value: number, shift: number): number {

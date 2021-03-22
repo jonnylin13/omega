@@ -20,6 +20,7 @@ export abstract class BaseServer {
     protected server: net.Server;
     private _nextSessionId: number = 0;
     protected packetDelegator: PacketDelegator;
+    protected availableSessionIds: Array<number> = [];
 
     constructor(type: ServerType, host: string, port: number) {
         this.port = port;
@@ -54,6 +55,7 @@ export abstract class BaseServer {
     }
 
     private getNextSessionId() {
+        if (this.availableSessionIds.length > 0) return this.availableSessionIds.shift();
         return this._nextSessionId++;
     }
 
@@ -82,7 +84,10 @@ export abstract class BaseServer {
     setupConnection(socket: net.Socket): Session {
         const session = new Session(socket);
         session.id = this.getNextSessionId();
-        socket.on('close', (hadError) => this.onClose(session, hadError));
+        socket.on('close', (hadError) => {
+            this.onClose(session, hadError);
+            this.availableSessionIds.push(session.id);
+        });
         socket.on('data', (data) => this.onData(session, data));
         socket.on('error', (error) => this.onError(error));
         socket.setNoDelay(true); // Disable Nagle's algorithm

@@ -15,12 +15,12 @@ export class EncryptedSession {
     }
 
     async write(data: Buffer): Promise<boolean> {
-        const encPacket = await this.encryptPacket(data);
+        const encPacket = await this.createMaplePacket(data);
         console.log(encPacket.toString('hex').match(/../g).join(' '));
         return this.session.socket.write(encPacket);
     }
 
-    async encryptPacket(data: Buffer): Promise<Buffer> {
+    private async createMaplePacket(data: Buffer): Promise<Buffer> {
         const header = this.sendCrypto.createPacketHeader(data.length);
         Shanda.encrypt(data);
         this.sendCrypto.transform(data);
